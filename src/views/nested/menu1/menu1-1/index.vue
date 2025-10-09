@@ -18,7 +18,6 @@
       <blockquote class="my-blockquote">更多帮助</blockquote>
       <pre class="my-code">QQ交流群：一群：891137268、二群：947578238、三群：659622532</pre>
     </div> -->
-    <div>666666</div>
   </div>
 </template>
 <script>
