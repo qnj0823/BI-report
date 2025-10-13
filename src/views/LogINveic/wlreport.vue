@@ -64,6 +64,8 @@ import {
 
 import * as api from '@/api/frame/customer.js'
 
+import axios from 'axios';
+
 export default {
     name: 'wlreport-page',
     data() {

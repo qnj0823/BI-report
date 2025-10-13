@@ -65,6 +65,14 @@
                 label="300常温(宴席版）" />
             <el-table-column :show-overflow-tooltip="true" align="center" width="120" prop="box1520100028"
                 label="300常温(经典版）" />
+                <el-table-column :show-overflow-tooltip="true" align="center" prop="box1520100051" width="120"
+                    label="180活力健爽" />
+                <el-table-column :show-overflow-tooltip="true" align="center" prop="box1520100054" width="120"
+                    label="455活力健爽" />
+                <el-table-column :show-overflow-tooltip="true" align="center" prop="box1520100052" width="120"
+                    label="200鲜酪乳" />
+                <el-table-column :show-overflow-tooltip="true" align="center" prop="box1520100053" width="120"
+                    label="450鲜酪乳" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="box1520100030" label="380橙汁" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="box1520100029" label="1.35橙汁" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="box1520100032" label="380双柚汁" />

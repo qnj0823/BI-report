@@ -197,9 +197,9 @@ export default {
                 console.log(this.dataList, 'his.dataList')
                 this.dataList = this.dataList.map(item => {
                     // 1. 计算今日完成
-                    const todayend = (Number(item.today180box) || 0) + (Number(item.today330box) || 0) + (Number(item.looktodaybox) || 0)+ (Number(item.todayjianshuangbox) || 0)+ (Number(item.todaylaorubox) || 0);
+                    const todayend = (Number(item.today180box) || 0) + (Number(item.today330box) || 0) + (Number(item.looktodaybox) || 0) + (Number(item.todayjianshuangbox) || 0) + (Number(item.todaylaorubox) || 0);
 
-                    const leijiend = (Number(item.leiji180box) || 0) + (Number(item.leiji330box) || 0) + (Number(item.lookleijibox) || 0)+ (Number(item.leijilaorubox) || 0) +(Number(item.leijijianshuangbox) || 0);//累计完成
+                    const leijiend = (Number(item.leiji180box) || 0) + (Number(item.leiji330box) || 0) + (Number(item.lookleijibox) || 0) + (Number(item.leijilaorubox) || 0) + (Number(item.leijijianshuangbox) || 0);//累计完成
 
                     const leijidiff = (Number(item.lejibox) || 0) - (Number(leijiend) || 0)//累计差额
 
@@ -264,7 +264,13 @@ export default {
                 this.dataList = this.dataList.filter(obj => {
                     return obj.leijiend; //会过滤掉所有假值
                 });
-
+                console.log(this.dataList,'this.dataList112255')
+                this.dataList = this.dataList.map(item => ({
+                    ...item,           // 保留其他属性
+                    goalnumtotal: '',  // 覆盖这两个字段
+                    lejibox: '',
+                    leijidiff:''
+                }));
                 this.currentData = {
                     ...this.dataList
                 };
@@ -311,7 +317,7 @@ export default {
             const sumFields = [
                 'goalnumtotal', 'goalnum', 'looktodaybox', 'today330box', 'today180box',
                 'todayend', 'todaydiff', 'ordersnumStage', 'lookleijibox', 'leiji330box',
-                'leiji180box', 'leijiend', 'leijidiff','lejibox','todayjianshuangbox','todaylaorubox','leijijianshuangbox','leijilaorubox'
+                'leiji180box', 'leijiend', 'leijidiff', 'lejibox', 'todayjianshuangbox', 'todaylaorubox', 'leijijianshuangbox', 'leijilaorubox'
             ];
 
             // 创建合计对象，初始化字段为0
@@ -351,7 +357,7 @@ export default {
             const sumFields = [
                 'goalnumtotal', 'goalnum', 'looktodaybox', 'today330box', 'today180box',
                 'todayend', 'todaydiff', 'ordersnumStage', 'lookleijibox', 'leiji330box',
-                'leiji180box', 'leijiend', 'leijidiff','lejibox','todayjianshuangbox','todaylaorubox','leijijianshuangbox','leijilaorubox'
+                'leiji180box', 'leijiend', 'leijidiff', 'lejibox', 'todayjianshuangbox', 'todaylaorubox', 'leijijianshuangbox', 'leijilaorubox'
             ];
 
             // 按 iParentName 分组（忽略空值）
@@ -402,7 +408,7 @@ export default {
             const sumFields = [
                 'goalnumtotal', 'goalnum', 'looktodaybox', 'today330box', 'today180box',
                 'todayend', 'todaydiff', 'ordersnumStage', 'lookleijibox', 'leiji330box',
-                'leiji180box', 'leijiend', 'leijidiff','lejibox','todayjianshuangbox','todaylaorubox','leijijianshuangbox','leijilaorubox'
+                'leiji180box', 'leijiend', 'leijidiff', 'lejibox', 'todayjianshuangbox', 'todaylaorubox', 'leijijianshuangbox', 'leijilaorubox'
             ];
 
             // 按 ocustomerClass_name 分组（忽略已合计项）

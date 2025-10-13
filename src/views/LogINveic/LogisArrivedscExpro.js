@@ -18,7 +18,7 @@ export function exportscExcel(tableList, date, fileName, area) {
 
   let tableData = [
     [`${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`,
-    `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`
+    `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`
     ]
   ]
   const tableTitle = ['区域', '大LOOK', '小LOOK', '健能', 'LOOK优选', '大白桃', '小白桃', '大清新', '小清新',
@@ -53,11 +53,12 @@ export function exportscExcel(tableList, date, fileName, area) {
   mergeSecondAndThirdRows(ws); // 合并
   // mergeDuplicateInFirstTwoRows(ws)
   mergeDuplicateInFirstTwoRows1(ws)
+  styleRowsWithSubtotal1(ws)
   setExcelStyle(ws) // 设置样式
   styleFirstTwoRows(ws)
   styleLastRow(ws)
   styleRowsWithSubtotal(ws)//小计
-  // styleRowsWithSubtotal1(ws)
+ 
   // styleFirstTwoRows1(ws2)
 
   let wb = XLSX.utils.book_new()
@@ -392,109 +393,36 @@ function styleFirstRows(ws) {
 }
 function styleRowsWithSubtotal1(ws) {
   // 样式定义
-  const styles = {
-    // 小计行样式 - 浅绿色背景
-    subtotal: {
-      fill: {
-        fgColor: {
-          rgb: "FFFF00"  // 浅绿色
-        }
-      },
-      font: {
-        color: {
-          rgb: "000000"  // 黑色字体
-        },
-        name: 'Microsoft YaHei',
-        sz: 11
-      }
+  const subtotalStyle = {
+    fill: {
+      type: "pattern",
+      patternType: "solid",
+      fgColor: { rgb: "00FF00" }  // 绿色背景
     },
-    // 合计行样式 - 深绿色背景
-    total: {
-      fill: {
-        fgColor: {
-          rgb: "9aba58"  // 深绿色
-        }
-      },
-      font: {
-        color: {
-          rgb: "000000"  // 黑色字体
-        },
-        name: 'Microsoft YaHei',
-        sz: 11
-      }
-    },
-    // 小于50的值 - 黄色背景
-    lessThan50: {
-      fill: {
-        fgColor: {
-          rgb: "FFFF00"  // 黄色
-        }
-      },
-      font: {
-        color: {
-          rgb: "000000"  // 黑色字体
-        },
-        name: 'Microsoft YaHei',
-        sz: 11
-      }
+    font: {
+      color: { rgb: "000000" },   // 黑色字体
+      name: 'Microsoft YaHei',
+      sz: 11,
+      bold: true
     }
   };
 
   // 获取工作表范围
   const range = XLSX.utils.decode_range(ws['!ref']);
-  const rowCount = range.e.r + 1; // 总行数
-  const colCount = range.e.c + 1; // 总列数
-
-  for (let row = 0; row < rowCount; row++) {
-    // 1. 检查第二列（索引1）是否为小计/合计行
-    const secondColCell = ws[XLSX.utils.encode_cell({ c: 1, r: row })];
-    let rowStyle = null;
-
-    if (secondColCell && secondColCell.v && typeof secondColCell.v === 'string') {
-      if (secondColCell.v.includes("小计")) {
-        rowStyle = styles.subtotal;
-      } else if (secondColCell.v.includes("合计")) {
-        rowStyle = styles.total;
-      }
-    }
-
-    // 2. 从第三行开始检查P列（索引15）的值
-    if (row >= 2) {  // 从第三行开始（索引2）
-      const pColCell = ws[XLSX.utils.encode_cell({ c: 16, r: row })];  // P列是第16列，索引15
-
-      if (pColCell) {
-        // 尝试获取数值
-        let value = pColCell.v;
-        if (typeof value === 'string') {
-          value = parseFloat(value.replace(/[^\d.-]/g, ''));
+  
+  // 遍历所有行
+  for (let row = range.s.r; row <= range.e.r; row++) {
+    const cellA = ws[XLSX.utils.encode_cell({ c: 0, r: row })];
+    
+    // 检查A列是否包含"汇总"
+    if (cellA && cellA.v && typeof cellA.v === 'string' && cellA.v.includes("汇总")) {
+      // 应用整行样式
+      for (let col = range.s.c; col <= range.e.c; col++) {
+        const cellAddress = XLSX.utils.encode_cell({ c: col, r: row });
+        if (!ws[cellAddress]) {
+          ws[cellAddress] = { t: 's', v: '' };
         }
-
-        // 如果值小于50，应用黄色样式
-        if (!isNaN(value) && value < 50) {
-          pColCell.s = {
-            ...(pColCell.s || {}),  // 保留现有样式
-            ...styles.lessThan50
-          };
-        }
-      }
-    }
-
-    // 3. 应用小计/合计行的整行样式
-    if (rowStyle) {
-      for (let col = 0; col < colCount; col++) {
-        const targetCell = ws[XLSX.utils.encode_cell({ c: col, r: row })];
-        if (targetCell) {
-          targetCell.s = {
-            ...(targetCell.s || {}),
-            ...rowStyle
-          };
-        } else {
-          ws[XLSX.utils.encode_cell({ c: col, r: row })] = {
-            t: 's',
-            v: '',
-            s: rowStyle
-          };
-        }
+        ws[cellAddress].s = subtotalStyle;
       }
     }
   }
@@ -557,7 +485,7 @@ function styleRowsWithSubtotal(ws) {
     if (cell && cell.v && typeof cell.v === 'string') {
       if (cell.v.includes("小计")) {
         rowStyle = styles.subtotal;
-      } else if (cell.v.includes("合计")) {
+      } else if (cell.v.includes("汇总")) {
         rowStyle = styles.total;
       }
     }

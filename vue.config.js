@@ -35,6 +35,21 @@ module.exports = {
           '^/api': 'api'
         }
       },
+      // '/uapws': {
+      //   target: 'http://172.16.100.166:9090',
+      //   changeOrigin: true,
+      //   secure: false,
+      //   logLevel: 'debug',
+      //   onProxyReq: (proxyReq, req, res) => {
+      //     console.log('原始请求路径:', req.url)
+      //     console.log('代理后路径:', proxyReq.path)
+      //     console.log('完整目标URL:', `http://172.16.100.166:9090${proxyReq.path}`)
+      //   },
+      //   // 确保包含端口
+      //   headers: {
+      //     Host: '172.16.100.166:9090'
+      //   }
+      // },
       // '/api': {
       //   target: 'http://172.16.100.239:9000',
       //   changeOrigin: true,

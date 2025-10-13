@@ -143,6 +143,10 @@ export default {
                 size: 200,
                 sort: '',
             },
+            switchForm: {
+                file_path: '',
+                file_name: ''
+            },
             butnshow: false,
             butnshow1: false,
             butnshow2: false,
@@ -543,9 +547,34 @@ export default {
             this.dataListLoading = true
             console.log(this.dictForm, 'this.dictForm')
             if (this.dictForm.p_areaname == '湖北') {
+                const isDev = process.env.NODE_ENV === 'development';
+                console.log(isDev,666666)
+                const baseURL = isDev ? 'http://172.16.100.199:9000' : '';
                 //湖北
                 api.wlProductexcelnewhbApi(this.dictForm).then(res => {
-                    window.open('http://bi.yufanjtbip.com:8069/file/%E6%96%87%E6%A1%A3/newfilehubeiout.xlsx')
+                    this.switchForm.file_name = 'newfilehubeiout.xlsx'
+                    try {
+                        const response = axios.post(
+                            `${baseURL}/convertexcel `,
+                            {
+                                data: this.switchForm,
+                            }, // 请求体（POST data），这里可以留空或传其他数据
+                            {
+                                
+                                headers: {
+                                    'Accept': 'application/json, text/plain, */*',
+                                    'Content-Type': 'application/json',
+                                    // 'Host': '172.16.100.239:9000', // 明确指定Host
+                                    // 'Origin': 'http://bi.yufanjtbip.com:8059'
+                                }
+                            }
+                        );
+                        window.open('http://bi.yufanjtbip.com:8069/file/%E6%96%87%E6%A1%A3/newfilehubeiout.xlsx')
+
+                    } catch (err) {
+                        window.open('http://bi.yufanjtbip.com:8069/file/%E6%96%87%E6%A1%A3/newfilehubeiout.xlsx')
+                    }
+
                     this.dataListLoading = false
                 })
             } else if (this.dictForm.p_areaname == '湖南') {
@@ -608,7 +637,7 @@ export default {
                 this.dataListLoading = false
             })
         },
-        exportSDnO(){
+        exportSDnO() {
             console.log(66666)
             this.dataListLoading = true
             api.wlSDOpenthenotherNoApi(this.dictForm).then(res => {

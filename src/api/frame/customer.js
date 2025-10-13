@@ -1300,6 +1300,14 @@ export function wlarrivedApi(params) {
     method: 'get'
   })
 }
+//返回全部(物流表(四川单独到货明细--到货日期))
+export function wlarrivedsichuanApi(params) {
+  return request({
+    url: 'api/wlWlsiteOrFactoryproductOrderDeliveryCycle/get_pro_wl_product_or_factory_excel_new_hunan_arrived_goods_sichuan',
+    params,
+    method: 'get'
+  })
+}
 
 //查询物流报表管理(到货)-二次物流生成并查询
 export function wlarrivedbuildApi(params) {

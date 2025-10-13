@@ -36,6 +36,8 @@
         </el-form>
         <div class="test">{{ this.labelText }}</div>
         <el-table border ref="table" v-loading="dataListLoading" :data="dataList" style="width: 100%;">
+            <!-- <el-table-column v-if="['四川'].includes(areas)" :show-overflow-tooltip="true" align="center" prop="linename"
+                label="客户分类" /> -->
             <el-table-column :show-overflow-tooltip="true" align="center" width="150" prop="wlSiteName" label="区域" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="box1520100001" label="大LOOK" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="box1520100002" label="小LOOK" />
@@ -327,8 +329,9 @@ export default {
             this.sichuanTwoForm.p_vouchdatecur = this.dataForm.p_vouchdateend
             const [year, month, day] = this.dataForm.p_vouchdateend.split('-').map(Number);
             this.labelText = `${this.areas}区域到货明细表--截止${year}年${month}月${day}日`; // 如果没有选择日期，显示默认文本
-            api.wlarrivedApi(this.sichuanForm).then(res => {
+            api.wlarrivedsichuanApi(this.sichuanForm).then(res => {
                 this.dataList = res
+                console.log(this.dataList, '四川')
                 this.dataList = this.mergeBoxFields(this.dataList)
                 this.dataList = this.dataList.map(item => ({
                     ...item, // 展开原对象的所有属性
@@ -349,6 +352,21 @@ export default {
                     // 返回新对象（保留原字段 + 新增 sum）
                     return { ...item, sum };
                 });
+
+                // 去除开头的数字
+                this.dataList = this.dataList.map(item => ({
+                    ...item,
+                    linename: item.linename.replace(/^\d+/, '') // 替换开头的数字
+                }));
+                //相同排序在一起
+                this.dataList.sort((a, b) => {
+                    if (a.linename < b.linename) return -1;
+                    if (a.linename > b.linename) return 1;
+                    return 0;
+                });
+
+
+                console.log(this.dataList, 'this.dataList四川')
                 //计算总计
                 this.calculateTotals(this.dataList, {
                     excludeFields: ['vcol6_name', 'vcol6_code', 'vcol2_name', 'vcol2', 'vnote'],
@@ -361,8 +379,7 @@ export default {
                     addToOriginal: true
                 })
                 // this.calculateTotals(this.dataList);
-
-                console.log(this.dataList, 'this.dataList')
+                this.dataList = this.groupAndSumWithTotal(this.dataList);
                 api.wlarrivedbuildApi(this.sichuanTwoForm).then(res => {
                     console.log(res, '二次物流')
                     this.sichuanList = res
@@ -402,6 +419,66 @@ export default {
                 })
 
             })
+        },
+        groupAndSumWithTotal(arr) {
+            const result = [];
+            const groups = {};
+            const totalItems = [];
+
+            // 首先分离出总计对象和普通对象
+            arr.forEach(item => {
+                if (item.wlSiteName === '总计') {
+                    totalItems.push(item);
+                } else {
+                    const linename = item.linename;
+                    if (!groups[linename]) {
+                        groups[linename] = [];
+                    }
+                    groups[linename].push(item);
+                }
+            });
+
+            // 对每个分组进行处理
+            Object.keys(groups).forEach(linename => {
+                const groupItems = groups[linename];
+
+                // 添加原始对象
+                result.push(...groupItems);
+
+                // 创建汇总对象
+                const summary = {
+                    linename: `${linename}汇总`,
+                    wlSiteName: `${linename}汇总`  // wlSiteName 取 linename 的值
+                };
+
+                // 收集所有可能的数字字段（遍历所有对象）
+                const allNumberFields = new Set();
+
+                // 首先收集所有可能的数字字段
+                groupItems.forEach(item => {
+                    Object.keys(item).forEach(key => {
+                        if (key !== 'linename' && key !== 'wlSiteName' && typeof item[key] === 'number') {
+                            allNumberFields.add(key);
+                        }
+                    });
+                });
+
+                // 计算所有数值字段的总和
+                allNumberFields.forEach(key => {
+                    summary[key] = groupItems.reduce((sum, item) => {
+                        // 安全地获取值，如果字段不存在或不是数字，则视为0
+                        const value = item[key];
+                        return sum + (typeof value === 'number' ? value : 0);
+                    }, 0);
+                });
+
+                result.push(summary);
+            });
+
+            // 最后添加总计对象
+            result.push(...totalItems);
+
+            return result;
         },
         mergeBoxFields(data) {
             const result = [];
@@ -2041,7 +2118,7 @@ export default {
                     // 将 matresult 数组元素添加到 zjfinalResult
                     this.GXfinalResult.push(...matresult);
                     this.GXfinalResult.push(...treematresult);
-                    
+
 
 
 

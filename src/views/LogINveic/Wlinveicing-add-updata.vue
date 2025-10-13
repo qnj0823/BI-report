@@ -206,7 +206,6 @@ export default {
                 }
                 // 判断环境并设置基础URL
                 const isDev = process.env.NODE_ENV === 'development';
-                console.log(isDev)
                 const baseURL = isDev ? 'http://172.16.100.239:9000' : '';
 
                 const response = await axios.post(

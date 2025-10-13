@@ -97,7 +97,7 @@ export function exportscTwoExcel(tableList, tableList1, date, fileName, area) {
   styleFirstTwoRows(ws)
   styleLastRow(ws)
   styleRowsWithSubtotal(ws)//小计
-  // styleRowsWithSubtotal1(ws)
+  styleRowsWithSubtotal1(ws)
   // styleFirstTwoRows1(ws2)
 
   let wb = XLSX.utils.book_new()
@@ -146,6 +146,43 @@ function mergeColumnCells(ws, colIndex = 0) {
     }
   }
 }
+
+// function styleRowsWithSubtotal1(ws) {
+//   // 样式定义
+//   const subtotalStyle = {
+//     fill: {
+//       type: "pattern",
+//       patternType: "solid",
+//       fgColor: { rgb: "00FF00" }  // 绿色背景
+//     },
+//     font: {
+//       color: { rgb: "000000" },   // 黑色字体
+//       name: 'Microsoft YaHei',
+//       sz: 11,
+//       bold: true
+//     }
+//   };
+
+//   // 获取工作表范围
+//   const range = XLSX.utils.decode_range(ws['!ref']);
+  
+//   // 遍历所有行
+//   for (let row = range.s.r; row <= range.e.r; row++) {
+//     const cellA = ws[XLSX.utils.encode_cell({ c: 0, r: row })];
+    
+//     // 检查A列是否包含"汇总"
+//     if (cellA && cellA.v && typeof cellA.v === 'string' && cellA.v.includes("汇总")) {
+//       // 应用整行样式
+//       for (let col = range.s.c; col <= range.e.c; col++) {
+//         const cellAddress = XLSX.utils.encode_cell({ c: col, r: row });
+//         if (!ws[cellAddress]) {
+//           ws[cellAddress] = { t: 's', v: '' };
+//         }
+//         ws[cellAddress].s = subtotalStyle;
+//       }
+//     }
+//   }
+// }
 
 //合并第几列单元格
 function mergeSecondAndThirdRows(ws) {
@@ -488,37 +525,17 @@ function styleRowsWithSubtotal1(ws) {
 
   for (let row = 0; row < rowCount; row++) {
     // 1. 检查第二列（索引1）是否为小计/合计行
-    const secondColCell = ws[XLSX.utils.encode_cell({ c: 1, r: row })];
+    const secondColCell = ws[XLSX.utils.encode_cell({ c: 0, r: row })];
     let rowStyle = null;
 
     if (secondColCell && secondColCell.v && typeof secondColCell.v === 'string') {
       if (secondColCell.v.includes("小计")) {
         rowStyle = styles.subtotal;
-      } else if (secondColCell.v.includes("合计")) {
+      } else if (secondColCell.v.includes("汇总")) {
         rowStyle = styles.total;
       }
     }
 
-    // 2. 从第三行开始检查P列（索引15）的值
-    if (row >= 2) {  // 从第三行开始（索引2）
-      const pColCell = ws[XLSX.utils.encode_cell({ c: 16, r: row })];  // P列是第16列，索引15
-
-      if (pColCell) {
-        // 尝试获取数值
-        let value = pColCell.v;
-        if (typeof value === 'string') {
-          value = parseFloat(value.replace(/[^\d.-]/g, ''));
-        }
-
-        // 如果值小于50，应用黄色样式
-        if (!isNaN(value) && value < 50) {
-          pColCell.s = {
-            ...(pColCell.s || {}),  // 保留现有样式
-            ...styles.lessThan50
-          };
-        }
-      }
-    }
 
     // 3. 应用小计/合计行的整行样式
     if (rowStyle) {

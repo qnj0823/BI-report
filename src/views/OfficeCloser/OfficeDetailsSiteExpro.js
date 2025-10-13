@@ -34,7 +34,7 @@ export async function exportExcel(tableList, startDate, endDate, areas, fileName
     { header: '省区', key: 'iParentName', width: 13, hidden: false },
     { header: '单位体', key: 'ocustomerClass_name', width: 19, hidden: false },
     { header: '客户/站点', key: 'cSiteName', width: 22, hidden: false },
-    { header: '本月累计基数', key: 'goalnumtotal', width: 12, hidden: false },
+    { header: '本月累计基数', key: 'goalnumtotal', width: 12, hidden: true },
     { header: 'look系列', key: 'looktodaybox', width: 12, hidden: false },
     { header: '330/310', key: 'today330box', width: 12, hidden: false },
     // { header: '180宴席', key: 'today180box', width: 12, hidden: false },
@@ -128,7 +128,9 @@ worksheet.eachRow((row, rowNum) => {
 
 
   // 隐藏指定列（例如隐藏第4列）
-  // worksheet.getColumn(4).hidden = true;
+  worksheet.getColumn(4).hidden = true;
+  worksheet.getColumn(10).hidden = true;
+  worksheet.getColumn(16).hidden = true; 
 
   // 导出文件
   const buffer = await workbook.xlsx.writeBuffer();
