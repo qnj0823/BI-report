@@ -8,7 +8,7 @@ import { saveAs } from 'file-saver';
  * @param {String} endDate - 结束日期
  * @param {String} fileName - 文件名
  */
-export async function exportExcel(tableList, startDate, endDate, fileName) {
+export async function exportExcel(tableList, startDate, endDate,month1,day1,monthend1,dayend1, fileName) {
   // 初始化工作簿
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Sheet1');
@@ -58,7 +58,7 @@ export async function exportExcel(tableList, startDate, endDate, fileName) {
   const headers = ['增幅排名', '省区','单位体', '负责人', `${LableTitle}`,`${LableTitle}`,
      `${LableTitle}`,`${LableTitle}`,`${LableTitle}`,
     `${LableTitle}`];
-    const subHeaders = ['增幅排名', '省区','单位体', '负责人', `本月累计\n基数`,'今日\n报单','累计\n报单','截止今日\n累计基数', `累计缺口\n(正为缺口)`,'累计\n同比'];
+    const subHeaders = ['增幅排名', '省区','单位体', '负责人',`${month1}.1-${month1}.${dayend1}\n报单基数`,'今日\n报单',`${month1}.${day1}-今日\n累计报单`,`${month1}.${day1}-今日\n报单基数`,`${month1}.${day1}-今日\n累计缺口`,`${month1}.${day1}-今日\n累计同比`];
 
   worksheet.addRow(headers);
   worksheet.addRow(subHeaders);
@@ -108,7 +108,7 @@ worksheet.eachRow((row, rowNum) => {
   styleDatabscRows(worksheet)
   styleColumnsJandP(worksheet)
   // 隐藏指定列（例如隐藏第4列）
-  // worksheet.getColumn(4).hidden = true;
+  worksheet.getColumn(4).hidden = true;
 
   // 导出文件
   const buffer = await workbook.xlsx.writeBuffer();

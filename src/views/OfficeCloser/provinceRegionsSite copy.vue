@@ -1,5 +1,5 @@
 <template>
-    <div class='SalesProgressSite'>
+    <div class='provinceRegionsSite'>
         <el-form :inline="true" style="width: 100%; margin: 0 auto;">
             <el-form-item>
                 <el-date-picker v-model="dataForm.p_vouchdatestart" value-format="yyyy-MM-dd" type="date"
@@ -9,6 +9,10 @@
                 <el-date-picker v-model="dataForm.p_vouchdateend" value-format="yyyy-MM-dd" type="date" placeholder="日期"
                     clearable style="width: 100%"></el-date-picker>
             </el-form-item>
+            <!-- <el-form-item>
+                <el-input v-model="bullay" placeholder="模糊查询" clearable @keyup.enter.native="searchEnterFun()"
+                    ref="searchInput"></el-input>
+            </el-form-item> -->
             <el-form-item>
                 <el-button class="filter-item" size="mini" type="success" icon="el-icon-search"
                     @click="getdataList">查询</el-button>
@@ -20,25 +24,20 @@
         <el-table border ref="table" v-loading="dataListLoading" height="680" :data="dataList" style="width: 100%;">
             <el-table-column :show-overflow-tooltip="true" align="center" prop="sort" label="增幅排名" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="sqname" label="省区" />
-            <el-table-column :show-overflow-tooltip="true" align="center" prop="companyname" label="单位体" />
+            <!-- <el-table-column :show-overflow-tooltip="true" align="center" prop="companyname" label="单位体" /> -->
             <el-table-column prop="companyman" width="110" align="center" label="负责人" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="converBigPiece" :label="`低温系列`">
-                <el-table-column :show-overflow-tooltip="true" align="center" prop="fixedbox"
-                    :label="`${month1}.1-${month1}.${dayend1}报单基数`">
+                <el-table-column :show-overflow-tooltip="true" align="center" prop="fixedbox" label="本月累计基数">
                 </el-table-column>
                 <el-table-column :show-overflow-tooltip="true" align="center" prop="todaybox" label="今日报单">
                 </el-table-column>
-                <el-table-column :show-overflow-tooltip="true" align="center" prop="leijibox"
-                    :label="`${month1}.${day1}-今日累计报单`">
+                <el-table-column :show-overflow-tooltip="true" align="center" prop="leijibox" label="累计报单">
                 </el-table-column>
-                <el-table-column :show-overflow-tooltip="true" align="center" prop="leijiboxhistory"
-                    :label="`${month1}.${day1}-今日报单基数`">
+                <el-table-column :show-overflow-tooltip="true" align="center" prop="leijiboxhistory" label="截止今日累计基数">
                 </el-table-column>
-                <el-table-column :show-overflow-tooltip="true" align="center" prop="cumulativeDiff"
-                    :label="`${month1}.${day1}-今日累计缺口`">
+                <el-table-column :show-overflow-tooltip="true" align="center" prop="cumulativeDiff" label="累计缺口(正为缺口)">
                 </el-table-column>
-                <el-table-column :show-overflow-tooltip="true" align="center" prop="lasteyear"
-                    :label="`${month1}.${day1}-今日累计同比`">
+                <el-table-column :show-overflow-tooltip="true" align="center" prop="lasteyear" label="累计同比">
                 </el-table-column>
             </el-table-column>
         </el-table>
@@ -48,13 +47,13 @@
 <script>
 import {
     exportExcel
-} from './SalesProgressSiteExpro.js'
+} from './provinceRegionsSiteExpro.js'
 import * as api from '@/api/frame/customer.js'
 export default {
-    name: 'SalesProgressSite-page',
+    name: 'provinceRegionsSite-page',
     data() {
         return {
-            msg: 'SalesProgressSite-page',
+            msg: 'provinceRegionsSite-page',
             dataForm: {
                 p_vouchdatestart: '',
                 p_vouchdateend: ''
@@ -82,13 +81,7 @@ export default {
             yearaddSame: [],
             NowSame: [],
             nowaddSame: [],
-            yearDay: [],
-            yearDaysum: [],
-            yearDayallsum: [],
-            month1: '',
-            day1: '',
-            monthend1: '',
-            dayend1: ''
+            yearDaysum: [],//去年本月截止今日数据
         };
     },
     created() {
@@ -113,7 +106,7 @@ export default {
             // 解析日期
             const date = new Date(dateString);
             if (isNaN(date.getTime())) {
-                throw new Error('日期格式无效，请使用YYYY-MM-DD格式');
+                throw new Error('日期格式无效,请使用YYYY-MM-DD格式');
             }
 
             // 获取月份的第一天
@@ -135,31 +128,24 @@ export default {
 
             const [year, month, day] = this.dataForm.p_vouchdatestart.split('-').map(Number);
             const [yearend, monthend, dayend] = this.dataForm.p_vouchdateend.split('-').map(Number);
-            this.month1 = month
-            this.day1 = day
-            this.monthend1 = monthend
 
-            this.labelText = `${this.year}年全国 各分公司 低温销售数据进度表(${month}月${day}日—${monthend}月${dayend}日)`;
+            this.labelText = `${this.year}年全国(各省区)低温销售数据进度表(${month}月${day}日—${monthend}月${dayend}日)`;
             this.yearForm.p_vouchdatestart = this.subtractYear(this.dataForm.p_vouchdatestart);
             this.yearForm.p_vouchdateend = this.subtractYear(this.dataForm.p_vouchdateend);
 
             const result = this.getMonthStartAndEnd(this.dataForm.p_vouchdatestart);
             this.dataFormADD.p_vouchdatestart = result.firstDay
             this.dataFormADD.p_vouchdateend = result.lastDay
-            const [yearend12, monthend12, dayend12] = this.dataFormADD.p_vouchdateend.split('-').map(Number);
-            this.dayend1 = dayend12
-
 
             this.dataFormADD.p_vouchdatestart = this.subtractYear(this.dataFormADD.p_vouchdatestart);
             this.dataFormADD.p_vouchdateend = this.subtractYear(this.dataFormADD.p_vouchdateend);
 
             this.dataFormNow.p_vouchdatestart = this.dataForm.p_vouchdateend
             this.dataFormNow.p_vouchdateend = this.dataForm.p_vouchdateend
-
             try {
                 const [yearCAR, yearADD, nowCAR, nowADD, ljtqjr, goal] = await Promise.all([
-                    api.APILowTempLBaseCHECK(),
                     // api.companypartSite(this.yearForm),
+                    api.APILowTempLBaseCHECK(),
                     api.companypartSite(this.dataFormADD),
                     api.companySite(this.dataForm),
                     api.companySite(this.dataFormNow),
@@ -169,29 +155,67 @@ export default {
                 //第一个接口取出所有导出数据
                 this.yearSame = yearCAR
                 //根据时间段过滤对象
-                this.yearDay = this.yearSame.filter(item => {
+                const yearDay = this.yearSame.filter(item => {
                     const itemDate = new Date(item.yearmonthdate);
                     return itemDate >= new Date(this.yearForm.p_vouchdatestart) &&
                         itemDate <= new Date(this.yearForm.p_vouchdateend);
                 });
-                console.log(this.yearDay, 'this.yearDay')
-                //(1)取出截止今日数据的和
-                this.yearDaysum = this.sumByCompany(this.yearDay)
+                //取出截止今日数据的和
+                this.yearDaysum = this.sumBySqname(yearDay)
+                // this.yearSame = this.yearSame.reduce((acc, curr) => {
+                //     const existingItem = acc.find(item => item.sqid === curr.sqid);
+                //     if (existingItem) {
+                //         existingItem.box = Number(existingItem.box) + Number(curr.box);
+                //     } else {
+                //         acc.push({ ...curr, box: Number(curr.box) });
+                //     }
+                //     return acc;
+                // }, []);
                 console.log(this.yearDaysum, 'this.yearDaysum')
-
-                //(2)取出本月数据之和
-                this.yearDayallsum = this.sumByCompany(this.yearSame)
-                console.log(this.yearDayallsum, 'this.yearDayallsum')
+                console.log(this.yearSame, 'this.yearSame')
 
                 //第二个接口去年6-20到8-20
                 this.yearaddSame = yearADD
+                this.yearaddSame = this.yearaddSame.reduce((acc, curr) => {
+                    const existingItem = acc.find(item => item.sqid === curr.sqid);
+                    if (existingItem) {
+                        existingItem.box = Number(existingItem.box) + Number(curr.box);
+                    } else {
+                        acc.push({ ...curr, box: Number(curr.box) });
+                    }
+                    return acc;
+                }, []);
+                console.log(this.yearaddSame, 'this.yearaddSame')
                 //第三个接口今年6-20到当前日期
                 this.NowSame = nowCAR
-                console.log(this.NowSame)
+                this.NowSame = this.NowSame.reduce((acc, curr) => {
+                    const existingItem = acc.find(item => item.sqid === curr.sqid);
+                    if (existingItem) {
+                        existingItem.box = Number(existingItem.box) + Number(curr.box);
+                    } else {
+                        acc.push({ ...curr, box: Number(curr.box) });
+                    }
+                    return acc;
+                }, []);
                 //第四个接口当年当前日期
                 this.nowaddSame = nowADD
+                this.nowaddSame = this.nowaddSame.reduce((acc, curr) => {
+                    const existingItem = acc.find(item => item.sqid === curr.sqid);
+                    if (existingItem) {
+                        existingItem.box = Number(existingItem.box) + Number(curr.box);
+                    } else {
+                        acc.push({ ...curr, box: Number(curr.box) });
+                    }
+                    return acc;
+                }, []);
+
                 //第五个接口
                 this.dataList = ljtqjr
+                this.dataList = this.dataList.map(item => ({
+                    ...item,
+                    sqname: item.sqname.replace(/^\d+/, '') // 去掉开头的所有数字
+                }));
+
                 this.dataList = this.dataList.filter(item => item.companyname !== "新零售事业部");
                 this.dataList.forEach(item => {
                     if (item.sqname) {
@@ -200,21 +224,20 @@ export default {
                         item.sqname = ""; // 如果 sqname 不存在，设为空字符串
                     }
                 });
-                this.dataList = this.dataList.filter(item =>
-                    item.type == "集团分公司"
-                );
+                this.dataList = this.mergeObjectsBySqid(this.dataList);
+
                 //历史到今天的数据
                 this.dataList.forEach(item => {
-                    const matchedYearSameItem = this.yearDaysum.find(yearItem => yearItem.companyid === item.companyid);
+                    const matchedYearSameItem = this.yearDaysum.find(yearItem => yearItem.sqname === item.sqname);
                     if (matchedYearSameItem) {
                         item.leijiboxhistory = matchedYearSameItem.goalvalue;
                     }
                 });
                 //2024年基数
                 this.dataList.forEach(item => {
-                    const matchedYearSameItemadd = this.yearDayallsum.find(yearItem => yearItem.companyid === item.companyid);
+                    const matchedYearSameItemadd = this.yearaddSame.find(yearItem => yearItem.sqid === item.sqid);
                     if (matchedYearSameItemadd) {
-                        item.fixedbox = matchedYearSameItemadd.goalvalue;
+                        item.fixedbox = matchedYearSameItemadd.box;
                     }
                 });
                 //累计报单
@@ -231,33 +254,38 @@ export default {
                         item.todaybox = matchedYearSameItemadd.box;
                     }
                 });
+
+                console.log(this.dataList, 'this.dataList')
+
                 //处理第六个接口
                 this.goalList = goal
                 console.log(this.goalList, 'this.goalList')
-                //根据单位体id去重
-                const uniqueArray = [...new Map(this.goalList.map(item => [item.companyname, item]))].map(([_, value]) => value);
-                //根据单位体id去重的结果添加负责人
+
+                //根据省区去重
+                const uniqueArray = [...new Map(this.goalList.map(item => [item.sqname, item]))].map(([_, value]) => value);
+                console.log(uniqueArray, '根据省区去重')
+                //根据省区去重的结果添加负责人
                 this.dataList = this.dataList.map(dataItem => {
-                    const matchedUniqueItem = uniqueArray.find(uniqueItem => uniqueItem.companyname === dataItem.companyname);
-                    if (matchedUniqueItem && matchedUniqueItem.companyman !== undefined) {
-                        return { ...dataItem, companyman: matchedUniqueItem.companyman }; // 合并字段（不修改原对象）
+                    const matchedUniqueItem = uniqueArray.find(uniqueItem => uniqueItem.sqname === dataItem.sqname);
+                    if (matchedUniqueItem && matchedUniqueItem.sqman !== undefined) {
+                        return { ...dataItem, sqman: matchedUniqueItem.sqman }; // 合并字段（不修改原对象）
                     }
                     return dataItem; // 无匹配则返回原对象
                 });
-                //根据单位体id和站点去重
+                //根据省区和站点去重
                 const uniquezdArray = [
                     ...new Map(
                         this.goalList.map((item) => [
-                            `${item.companyname}_${item.sitename}`, // 用组合键作为唯一标识
+                            `${item.sqname}_${item.sitename}`, // 用组合键作为唯一标识
                             item,
                         ])
                     ).values(),
                 ];
-                //计算单位体单数总计。报单数总计
+                //计算省区单数总计。报单数总计
                 const mergedArray = this.mergeObjectsBySqname(uniquezdArray);
-                //根据单位体id和站点去重的结果添加总单数，总报单数
+                //根据省区和站点去重的结果添加总单数，总报单数
                 this.dataList = this.dataList.map(dataItem => {
-                    const matchedUniqueItem = mergedArray.find(uniqueItem => uniqueItem.companyname === dataItem.companyname);
+                    const matchedUniqueItem = mergedArray.find(uniqueItem => uniqueItem.sqname === dataItem.sqname);
                     if (matchedUniqueItem && matchedUniqueItem.sqman !== undefined) {
                         return { ...dataItem, goalnumtotal: matchedUniqueItem.goalnumtotal, ordersnumtotal: matchedUniqueItem.ordersnumtotal, goalrate: matchedUniqueItem.goalrate }; // 合并字段（不修改原对象）
                     }
@@ -271,14 +299,17 @@ export default {
                     return itemDate >= new Date('2025-06-20') &&
                         itemDate <= new Date(this.dataForm.p_vouchdateend);
                 });
+
                 //更据站点计算ordersnum 形成ordersnumStage
                 const dataStage = this.mergezdByname(filteredData2);
-                //根据分公司id计算形成ordersnumStage
+
+                //根据省区计算形成ordersnumStage
                 const datesqStage = this.mergesqByname(dataStage)
+
                 this.dataList = this.dataList.map(dataItem => {
-                    const matchedUniqueItem = datesqStage.find(uniqueItem => uniqueItem.companyname === dataItem.companyname);
+                    const matchedUniqueItem = datesqStage.find(uniqueItem => uniqueItem.sqname === dataItem.sqname);
                     if (matchedUniqueItem && matchedUniqueItem.sqman !== undefined) {
-                        return { ...dataItem, ordersnumStage: matchedUniqueItem.ordersnumStage, }; // 合并字段（不修改原对象）
+                        return { ...dataItem, ordersnumStage: matchedUniqueItem.ordersnumStage, goalnumStage: matchedUniqueItem.goalnumStage }; // 合并字段（不修改原对象）
                     }
                     return dataItem; // 无匹配则返回原对象
                 });
@@ -291,14 +322,14 @@ export default {
                 );
 
                 const filtereddateArray = this.mergeObjectsByname(filteredArray);
-
                 this.dataList = this.dataList.map(dataItem => {
-                    const matchedUniqueItem = filtereddateArray.find(uniqueItem => uniqueItem.companyname === dataItem.companyname);
+                    const matchedUniqueItem = filtereddateArray.find(uniqueItem => uniqueItem.sqname === dataItem.sqname);
                     if (matchedUniqueItem && matchedUniqueItem.sqman !== undefined) {
                         return { ...dataItem, goalnum: matchedUniqueItem.goalnum, ordersnum: matchedUniqueItem.ordersnum }; // 合并字段（不修改原对象）
                     }
                     return dataItem; // 无匹配则返回原对象
                 });
+
                 console.log(filtereddateArray)
 
                 this.dataList = this.dataList.map(item => {
@@ -335,6 +366,7 @@ export default {
                         cumulativeDiff: Number(cumulativeDiff.toFixed(0)) // 保留2位小数
                     };
                 });
+
                 // 1. 按 lasteyear 降序排序
                 this.dataList = this.dataList.sort((a, b) => {
                     // 处理 a.lasteyear
@@ -354,8 +386,8 @@ export default {
                     ...item,
                     sort: index + 1, // 从 1 开始编号
                 }));
+
                 this.dataList = this.addNationalTotal(this.dataList);
-                this.dataList = this.addGroupTotals(this.dataList)
 
                 this.dataList = this.dataList.map(item => {
 
@@ -377,19 +409,13 @@ export default {
                         lasteyear,
                     };
                 });
-                this.dataList = this.dataList.filter(item => item.sqname !== "分公司总计合计");
-
-                this.dataList.forEach(item => {
-                    item.fixedbox = parseInt(item.fixedbox) || '';
-                    item.todaybox = parseInt(item.todaybox) || '';
-                    item.leijibox = parseInt(item.leijibox) || '';
-                    item.leijiboxhistory = parseInt(item.leijiboxhistory) || '';
-                });
+                sessionStorage.setItem('dataListSite', JSON.stringify(this.dataList));
                 this.dataList = this.dataList.map(item => ({
                     ...item,
                     cumulativeDiff: item.cumulativeDiff
                 }));
-                console.log('接口:', this.dataList);
+                console.log('累计、同期、今日:', this.dataList);
+
 
             } catch (error) {
                 console.error("获取数据时出错:", error);
@@ -399,7 +425,8 @@ export default {
                 this.dataListLoading = false; // 确保无论成功失败都会重置加载状态
             }
         },
-        sumByCompany(originalArray) {
+        //根据sqname分组计算goalvalue的值
+        sumBySqname(originalArray) {
             // 检查输入是否为有效的数组
             if (!Array.isArray(originalArray)) {
                 throw new Error("输入必须是一个数组");
@@ -409,32 +436,33 @@ export default {
             const grouped = originalArray.reduce((acc, item) => {
                 // 确保item是对象且包含必要的字段
                 if (typeof item !== 'object' || item === null) return acc;
-                if (!('companyid' in item) || !('companyname' in item) || !('goalvalue' in item)) return acc;
+                if (!('sqname' in item) || !('goalvalue' in item)) return acc;
 
-                const companyid = item.companyid;
-                const companyname = item.companyname;
+                const sqname = item.sqname;
                 // 将goalvalue转换为数字，非数字值按0处理
                 const value = Number(item.goalvalue) || 0;
 
-                if (acc[companyid]) {
-                    acc[companyid].goalvalue += value;
+                if (acc[sqname]) {
+                    acc[sqname] += value;
                 } else {
-                    acc[companyid] = {
-                        companyid,
-                        companyname,
-                        goalvalue: value
-                    };
+                    acc[sqname] = value;
                 }
                 return acc;
             }, {});
 
             // 转换为目标格式的数组
-            return Object.values(grouped);
+            return Object.entries(grouped).map(([sqname, goalvalue]) => ({
+                sqname,
+                goalvalue
+            }));
         },
+
+
+
         addNationalTotal(dataArray) {
             // 初始化新对象
             const nationalTotal = {
-                sqname: '分公司总计',
+                sqname: '全国合计',
                 fixedbox: 0,
                 goalnumtotal: 0,
                 goalrate: 0,  // 这里初始化为0，后面会处理百分数
@@ -443,7 +471,8 @@ export default {
                 difference: 0,
                 leijibox: 0,
                 cumulativeDiff: 0,  // 这个会保留两位小数
-                leijiboxhistory: 0
+                leijiboxhistory: 0,
+                goalnumStage: 0
             };
 
             // 遍历数组中的每个对象，累加指定字段
@@ -459,6 +488,7 @@ export default {
                 nationalTotal.todaybox += Number(item.todaybox) || 0;
                 nationalTotal.difference += Number(item.difference) || 0;
                 nationalTotal.leijibox += Number(item.leijibox) || 0;
+                nationalTotal.goalnumStage += Number(item.goalnumStage) || 0;
 
                 // 处理cumulativeDiff，保留两位小数
                 const cumulativeDiffValue = parseFloat(item.cumulativeDiff) || 0;
@@ -475,73 +505,98 @@ export default {
 
             return dataArray;
         },
-        addGroupTotals(dataArray) {
-            // 1. 按sqname分组
-            const groups = {};
-            dataArray.forEach(item => {
-                const key = item.sqname;
-                if (!groups[key]) {
-                    groups[key] = [];
-                }
-                groups[key].push(item);
+        //过滤掉 levelName2 为空的对象
+        filterEmptyLevelName2(array) {
+            return array.filter(item => {
+                const value = item.levelName2;
+                return value != null && value !== "";
             });
-
-            // 2. 为每个分组创建汇总对象
-            const totals = [];
-            Object.keys(groups).forEach(sqname => {
-                const groupItems = groups[sqname];
-                const groupTotal = {
-                    sqname: `${sqname}合计`,
-                    fixedbox: 0,
-                    goalnumtotal: 0,
-                    goalrate: 0,
-                    goalnum: 0,
-                    todaybox: 0,
-                    difference: 0,
-                    leijibox: 0,
-                    cumulativeDiff: 0,
-                    leijiboxhistory: 0
-                };
-
-                // 3. 计算每个字段的总和
-                groupItems.forEach(item => {
-                    groupTotal.fixedbox += Number(item.fixedbox) || 0;
-                    groupTotal.goalnumtotal += Number(item.goalnumtotal) || 0;
-
-                    const goalrateValue = parseFloat(item.goalrate) || 0;
-                    groupTotal.goalrate += goalrateValue;
-
-                    groupTotal.goalnum += Number(item.goalnum) || 0;
-                    groupTotal.todaybox += Number(item.todaybox) || 0;
-                    groupTotal.difference += Number(item.difference) || 0;
-                    groupTotal.leijibox += Number(item.leijibox) || 0;
-
-                    const cumulativeDiffValue = parseFloat(item.cumulativeDiff) || 0;
-                    groupTotal.cumulativeDiff = parseFloat(
-                        (groupTotal.cumulativeDiff + cumulativeDiffValue).toFixed(0)
-                    );
-
-                    groupTotal.leijiboxhistory += Number(item.leijiboxhistory) || 0;
-                });
-
-                // 格式化百分数
-                groupTotal.goalrate = groupTotal.goalrate.toFixed(2) + '%';
-
-                totals.push(groupTotal);
-            });
-
-            // 4. 将汇总对象添加到原数组
-            return dataArray.concat(totals);
         },
-        //按单位体计算goalnumtotal，goalrate，ordersnumtotal---总单数目标，总报单目标，总增长率
+        //按站点时间段计算ordersnumStage截至当日单数
+        mergezdByname(arr) {
+            const result = {};
+
+            arr.forEach(obj => {
+                const key = obj.sitename;
+                const currentValue = parseFloat(obj.ordersnum) || 0; // 安全转换为数字
+                const goalnumValue = parseFloat(obj.goalnum) || 0; // 安全转换为数字
+
+                if (!result[key]) {
+                    // 第一次遇到这个站点，创建新对象
+                    result[key] = {
+                        ...obj, // 保留所有原始字段
+                        ordersnumStage: currentValue, // 初始化累计值
+                        goalnumStage: goalnumValue
+                    };
+                } else {
+                    // 已存在该站点，累加ordersnum值
+                    result[key].ordersnumStage += currentValue;
+                    result[key].goalnumStage += goalnumValue;
+
+                    // 可选：保留其他需要的信息，如最新日期的数据
+                    // if (new Date(obj.date) > new Date(result[key].date)) {
+                    //     result[key].date = obj.date;
+                    // }
+                }
+            });
+
+            return Object.values(result); // 转换为数组
+        },
+        //按省区时间段计算ordersnumStage截至当日单数
+        mergesqByname(arr) {
+            const result = {};
+
+            arr.forEach(obj => {
+                const key = obj.sqname;
+
+                if (!result[key]) {
+                    // 如果是第一次遇到这个sqname，创建一个新对象（保留所有原始字段）
+                    result[key] = { ...obj };
+                    // 只转换我们需要计算的字段
+                    result[key].ordersnumStage = parseFloat(obj.ordersnumStage) || 0;
+                    result[key].goalnumStage = parseFloat(obj.goalnumStage) || 0;
+                } else {
+                    // 如果已经存在，只累加指定的两个字段
+                    result[key].ordersnumStage += parseFloat(obj.ordersnumStage) || 0;
+                    result[key].goalnumStage += parseFloat(obj.goalnumStage) || 0;
+                }
+            });
+
+            // 转换回数组
+            return Object.values(result);
+        },
+        //按省区当前时间计算goalnum今日目标
+        mergeObjectsByname(arr) {
+            const result = {};
+
+            arr.forEach(obj => {
+                const key = obj.sqname;
+
+                if (!result[key]) {
+                    // 如果是第一次遇到这个sqname，创建一个新对象（保留所有原始字段）
+                    result[key] = { ...obj };
+                    // 只转换我们需要计算的字段
+                    result[key].goalnum = parseFloat(obj.goalnum) || 0;
+                    result[key].ordersnum = parseFloat(obj.ordersnum) || 0;
+                } else {
+                    // 如果已经存在，只累加指定的两个字段
+                    result[key].goalnum += parseFloat(obj.goalnum) || 0;
+                    result[key].ordersnum += parseFloat(obj.ordersnum) || 0;
+                }
+            });
+
+            // 转换回数组
+            return Object.values(result);
+        },
+        //按省区计算goalnumtotal，goalrate，ordersnumtotal---总单数目标，总报单目标，总增长率
         mergeObjectsBySqname(arr) {
             const result = {};
 
             arr.forEach(obj => {
-                const key = obj.companyname;
+                const key = obj.sqname;
 
                 if (!result[key]) {
-                    // 如果是第一次遇到这个companyname，创建一个新对象
+                    // 如果是第一次遇到这个sqname，创建一个新对象
                     result[key] = {
                         ...obj,
                         goalnumtotal: parseFloat(obj.goalnumtotal) || 0,
@@ -564,75 +619,38 @@ export default {
                 goalrate: item.goalrate.toFixed(2) + '%'
             }));
         },
-        //按站点时间段计算ordersnumStage截至当日单数
-        mergezdByname(arr) {
+        mergeObjectsBySqid(arr) {
             const result = {};
-
             arr.forEach(obj => {
-                const key = obj.sitename;
-                const currentValue = parseFloat(obj.ordersnum) || 0; // 安全转换为数字
-
-                if (!result[key]) {
-                    // 第一次遇到这个站点，创建新对象
-                    result[key] = {
-                        ...obj, // 保留所有原始字段
-                        ordersnumStage: currentValue // 初始化累计值
+                const sqid = obj.sqid;
+                if (!result[sqid]) {
+                    // 初始化新对象，保留 sqname 和 zqname
+                    result[sqid] = {
+                        sqid: sqid,
+                        sqname: obj.sqname,
+                        type: obj.type,
+                        companyname: obj.companyname,
+                        companyid: obj.companyid,
+                        zhanquame: obj.zhanquame,
+                        zhanquid: obj.zhanquid,
                     };
-                } else {
-                    // 已存在该站点，累加ordersnum值
-                    result[key].ordersnumStage += currentValue;
 
-                    // 可选：保留其他需要的信息，如最新日期的数据
-                    // if (new Date(obj.date) > new Date(result[key].date)) {
-                    //     result[key].date = obj.date;
-                    // }
+                    // 其他字段初始化为 0
+                    for (const key in obj) {
+                        if (key !== 'sqid' && key !== 'sqname' && key !== 'type' && key !== 'companyname' && key !== 'companyid' && key !== 'zhanquame' && key !== 'zhanquid') {
+                            result[sqid][key] = parseFloat(obj[key]) || 0;
+                        }
+                    }
+                } else {
+                    // 累加其他字段
+                    for (const key in obj) {
+                        if (key !== 'sqid' && key !== 'sqname' && key !== 'type' && key !== 'companyname' && key !== 'companyid' && key !== 'zhanquame' && key !== 'zhanquid') {
+                            result[sqid][key] = (parseFloat(result[sqid][key]) || 0) + (parseFloat(obj[key]) || 0);
+                        }
+                    }
                 }
             });
 
-            return Object.values(result); // 转换为数组
-        },
-        //按分公司id时间段计算ordersnumStage截至当日单数
-        mergesqByname(arr) {
-            const result = {};
-
-            arr.forEach(obj => {
-                const key = obj.companyname;
-
-                if (!result[key]) {
-                    // 如果是第一次遇到这个companyname，创建一个新对象（保留所有原始字段）
-                    result[key] = { ...obj };
-                    // 只转换我们需要计算的字段
-                    result[key].ordersnumStage = parseFloat(obj.ordersnumStage) || 0;
-                } else {
-                    // 如果已经存在，只累加指定的两个字段
-                    result[key].ordersnumStage += parseFloat(obj.ordersnumStage) || 0;
-                }
-            });
-
-            // 转换回数组
-            return Object.values(result);
-        },
-        //按分公司id当前时间计算goalnum今日目标
-        mergeObjectsByname(arr) {
-            const result = {};
-
-            arr.forEach(obj => {
-                const key = obj.companyname;
-
-                if (!result[key]) {
-                    // 如果是第一次遇到这个companyname，创建一个新对象（保留所有原始字段）
-                    result[key] = { ...obj };
-                    // 只转换我们需要计算的字段
-                    result[key].goalnum = parseFloat(obj.goalnum) || 0;
-                    result[key].ordersnum = parseFloat(obj.ordersnum) || 0;
-                } else {
-                    // 如果已经存在，只累加指定的两个字段
-                    result[key].goalnum += parseFloat(obj.goalnum) || 0;
-                    result[key].ordersnum += parseFloat(obj.ordersnum) || 0;
-                }
-            });
-
-            // 转换回数组
             return Object.values(result);
         },
         exportData() {
@@ -641,7 +659,7 @@ export default {
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                exportExcel(this.dataList, this.dataForm.p_vouchdatestart, this.dataForm.p_vouchdateend,this.month1,this.day1,this.monthend1,this.dayend1, '分公司低温销售数据进度表.xlsx')
+                exportExcel(this.dataList, this.dataForm.p_vouchdatestart, this.dataForm.p_vouchdateend, '省区低温销售数据进度表.xlsx')
             })
         },
         // 获取今年的日期数据
@@ -656,6 +674,7 @@ export default {
             const endOfMonthDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
             this.endOfMonth = this.formatDate(endOfMonthDate);
 
+
             // 获取截至今天的时间 
             this.endOfToday = this.formatDate(today);
 
@@ -665,7 +684,7 @@ export default {
 
             this.dataFormADD.p_vouchdatestart = this.startOfMonth;
             this.dataFormADD.p_vouchdateend = this.endOfMonth;
-            this.labelText = `${this.year}年全国 各分公司 低温销售数据进度表(${this.month}月${this.day}日—${this.month}月${this.day}日)`;
+            this.labelText = `${this.year}年全国(各省区)低温销售数据进度表(${this.month}月${this.day}日—${this.month}月${this.day}日)`;
         },
         // 格式化日期
         formatDate(date) {

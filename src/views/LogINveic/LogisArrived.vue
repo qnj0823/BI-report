@@ -1974,6 +1974,7 @@ export default {
                         ...item, // 展开原对象的所有属性
                         ["box" + item.productCode]: item.box // 新增动态属性
                     }));
+
                     this.dataList = Object.values(
                         this.dataList.reduce((acc, item) => {
                             const key = item.wlSiteCode; // 使用 wlSiteCode 作为分组依据
@@ -2016,7 +2017,10 @@ export default {
                             return acc;
                         }, {})
                     );
-                    this.dataList = this.processArray(this.dataList)
+                    console.log(this.dataList, '广西广西')
+                    this.dataList = this.processDataassets(this.dataList)
+                    // this.dataList = this.processArray(this.dataList)
+
                     // console.log(this.dataList, 'this.dataList广西')
                     this.dataList = this.dataList.map(item => {
                         let sum = 0;
@@ -2141,7 +2145,7 @@ export default {
                     // this.dataList = this.processData1_9(this.dataList)
                     // this.dataList = this.processData1_10(this.dataList)
 
-                    console.log(this.dataList, '广西')
+
 
                     this.dataList = this.dataList.filter(item =>
                         item.wlSiteName.includes(this.bullay)
@@ -2278,6 +2282,59 @@ export default {
 
             })
 
+        },
+
+
+        processDataassets(data) {
+            // 定义需要处理的字段列表
+            const targetFields = [
+                'box1520100001', 'box1520100002', 'box1520100010',
+                'box1520100009', 'box1520100052', 'box1520100053',
+                'box1520100051', 'box1520130001'
+            ];
+
+            // 查找两个目标对象
+            const sourceObj = data.find(item => item.wlSiteName === '桂南宁奈思商贸');
+            const targetObj = data.find(item => item.wlSiteName === '桂南宁兴宁圣泽宇');
+
+            // 检查对象是否存在
+            if (!sourceObj) {
+                console.log('未找到 wlSiteName 为 "桂南宁奈思商贸" 的对象');
+                return data;
+            }
+
+            if (!targetObj) {
+                console.log('未找到 wlSiteName 为 "桂南宁兴宁圣泽宇" 的对象');
+                return data;
+            }
+
+            // 计算指定字段的总和
+            let totalSum = 0;
+            targetFields.forEach(field => {
+                const value = parseFloat(sourceObj[field]) || 0;
+                totalSum += value;
+            });
+
+            console.log(`指定字段总和: ${totalSum}`);
+
+            // 如果总和小于50，执行转移操作
+            if (totalSum < 50) {
+                targetFields.forEach(field => {
+                    const value = parseFloat(sourceObj[field]) || 0;
+
+                    // 将值转移到目标对象（累加）
+                    targetObj[field] = (parseFloat(targetObj[field]) || 0) + value;
+
+                    // 将源对象的字段值置空
+                    sourceObj[field] = '';
+                });
+
+                console.log('字段值转移完成');
+            } else {
+                console.log('字段值总和大于等于50，不执行转移操作');
+            }
+
+            return data;
         },
         processArray(arr) {
             // 找到桂南宁奈思商贸对象

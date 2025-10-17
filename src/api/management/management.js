@@ -551,6 +551,22 @@ export function APILowTempLastPORT(data) {
     })
 }
 
+//导入管理部去年低温基数(每天)
+export function APILowTempBasePORT(data) {
+    return request({
+        url: 'api/basicSqAndCompanyLowTempBase/importorderdata',
+        method: 'POST',
+        data,
+    })
+}
+//查询管理部去年低温基数(每天)
+export function APILowTempLBaseCHECK(params) {
+    return request({
+        url: 'api/basicSqAndCompanyLowTempBase/all',
+        params,
+        method: 'get'
+    })
+}
 
 
 //查询返回全部(当天)半小时计算一次

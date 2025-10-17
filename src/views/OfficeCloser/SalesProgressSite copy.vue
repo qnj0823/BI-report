@@ -23,23 +23,38 @@
             <el-table-column :show-overflow-tooltip="true" align="center" prop="companyname" label="单位体" />
             <el-table-column prop="companyman" width="110" align="center" label="负责人" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="converBigPiece" :label="`低温系列`">
-                <el-table-column :show-overflow-tooltip="true" align="center" prop="fixedbox"
-                    :label="`${month1}.1-${month1}.${dayend1}报单基数`">
+                <el-table-column :show-overflow-tooltip="true" align="center" prop="fixedbox" label="本月累计基数">
                 </el-table-column>
                 <el-table-column :show-overflow-tooltip="true" align="center" prop="todaybox" label="今日报单">
                 </el-table-column>
-                <el-table-column :show-overflow-tooltip="true" align="center" prop="leijibox"
-                    :label="`${month1}.${day1}-今日累计报单`">
+                <el-table-column :show-overflow-tooltip="true" align="center" prop="leijibox" label="累计报单">
                 </el-table-column>
-                <el-table-column :show-overflow-tooltip="true" align="center" prop="leijiboxhistory"
-                    :label="`${month1}.${day1}-今日报单基数`">
+                <el-table-column :show-overflow-tooltip="true" align="center" prop="leijiboxhistory" label="截止今日累计基数">
                 </el-table-column>
-                <el-table-column :show-overflow-tooltip="true" align="center" prop="cumulativeDiff"
-                    :label="`${month1}.${day1}-今日累计缺口`">
+                <el-table-column :show-overflow-tooltip="true" align="center" prop="cumulativeDiff" label="累计缺口(正为缺口)">
                 </el-table-column>
-                <el-table-column :show-overflow-tooltip="true" align="center" prop="lasteyear"
-                    :label="`${month1}.${day1}-今日累计同比`">
+                <el-table-column :show-overflow-tooltip="true" align="center" prop="lasteyear" label="累计同比">
                 </el-table-column>
+                <!-- <el-table-column :show-overflow-tooltip="true" align="center" prop="fixedbox" label="2024年基数">
+                </el-table-column>
+                <el-table-column :show-overflow-tooltip="true" align="center" prop="goalnumtotal" label="低温目标">
+                </el-table-column>
+                <el-table-column :show-overflow-tooltip="true" align="center" prop="goalrate" label="目标增幅">
+                </el-table-column>
+                <el-table-column :show-overflow-tooltip="true" align="center" prop="goalnum" label="今日目标">
+                </el-table-column>
+                <el-table-column :show-overflow-tooltip="true" align="center" prop="todaybox" label="今日报单">
+                </el-table-column>
+                <el-table-column :show-overflow-tooltip="true" align="center" prop="difference" label="今日差额">
+                </el-table-column>
+                <el-table-column :show-overflow-tooltip="true" align="center" prop="leijibox" label="累计报单">
+                </el-table-column>
+                <el-table-column :show-overflow-tooltip="true" align="center" prop="cumulativeDiff" label="累计差额">
+                </el-table-column>
+                <el-table-column :show-overflow-tooltip="true" align="center" prop="leijiboxhistory" label="累计基数">
+                </el-table-column>
+                <el-table-column :show-overflow-tooltip="true" align="center" prop="lasteyear" label="累计同比">
+                </el-table-column> -->
             </el-table-column>
         </el-table>
     </div>
@@ -81,14 +96,7 @@ export default {
             yearSame: [],
             yearaddSame: [],
             NowSame: [],
-            nowaddSame: [],
-            yearDay: [],
-            yearDaysum: [],
-            yearDayallsum: [],
-            month1: '',
-            day1: '',
-            monthend1: '',
-            dayend1: ''
+            nowaddSame: []
         };
     },
     created() {
@@ -135,9 +143,6 @@ export default {
 
             const [year, month, day] = this.dataForm.p_vouchdatestart.split('-').map(Number);
             const [yearend, monthend, dayend] = this.dataForm.p_vouchdateend.split('-').map(Number);
-            this.month1 = month
-            this.day1 = day
-            this.monthend1 = monthend
 
             this.labelText = `${this.year}年全国 各分公司 低温销售数据进度表(${month}月${day}日—${monthend}月${dayend}日)`;
             this.yearForm.p_vouchdatestart = this.subtractYear(this.dataForm.p_vouchdatestart);
@@ -146,9 +151,6 @@ export default {
             const result = this.getMonthStartAndEnd(this.dataForm.p_vouchdatestart);
             this.dataFormADD.p_vouchdatestart = result.firstDay
             this.dataFormADD.p_vouchdateend = result.lastDay
-            const [yearend12, monthend12, dayend12] = this.dataFormADD.p_vouchdateend.split('-').map(Number);
-            this.dayend1 = dayend12
-
 
             this.dataFormADD.p_vouchdatestart = this.subtractYear(this.dataFormADD.p_vouchdatestart);
             this.dataFormADD.p_vouchdateend = this.subtractYear(this.dataFormADD.p_vouchdateend);
@@ -158,31 +160,15 @@ export default {
 
             try {
                 const [yearCAR, yearADD, nowCAR, nowADD, ljtqjr, goal] = await Promise.all([
-                    api.APILowTempLBaseCHECK(),
-                    // api.companypartSite(this.yearForm),
+                    api.companypartSite(this.yearForm),
                     api.companypartSite(this.dataFormADD),
                     api.companySite(this.dataForm),
                     api.companySite(this.dataFormNow),
                     api.companyOrderData(this.dataForm),
                     api.MagDepSiteGoal()
                 ]);
-                //第一个接口取出所有导出数据
+                //第一个接口去年6-20到当前日期
                 this.yearSame = yearCAR
-                //根据时间段过滤对象
-                this.yearDay = this.yearSame.filter(item => {
-                    const itemDate = new Date(item.yearmonthdate);
-                    return itemDate >= new Date(this.yearForm.p_vouchdatestart) &&
-                        itemDate <= new Date(this.yearForm.p_vouchdateend);
-                });
-                console.log(this.yearDay, 'this.yearDay')
-                //(1)取出截止今日数据的和
-                this.yearDaysum = this.sumByCompany(this.yearDay)
-                console.log(this.yearDaysum, 'this.yearDaysum')
-
-                //(2)取出本月数据之和
-                this.yearDayallsum = this.sumByCompany(this.yearSame)
-                console.log(this.yearDayallsum, 'this.yearDayallsum')
-
                 //第二个接口去年6-20到8-20
                 this.yearaddSame = yearADD
                 //第三个接口今年6-20到当前日期
@@ -205,16 +191,16 @@ export default {
                 );
                 //历史到今天的数据
                 this.dataList.forEach(item => {
-                    const matchedYearSameItem = this.yearDaysum.find(yearItem => yearItem.companyid === item.companyid);
+                    const matchedYearSameItem = this.yearSame.find(yearItem => yearItem.companyid === item.companyid);
                     if (matchedYearSameItem) {
-                        item.leijiboxhistory = matchedYearSameItem.goalvalue;
+                        item.leijiboxhistory = matchedYearSameItem.box;
                     }
                 });
                 //2024年基数
                 this.dataList.forEach(item => {
-                    const matchedYearSameItemadd = this.yearDayallsum.find(yearItem => yearItem.companyid === item.companyid);
+                    const matchedYearSameItemadd = this.yearaddSame.find(yearItem => yearItem.companyid === item.companyid);
                     if (matchedYearSameItemadd) {
-                        item.fixedbox = matchedYearSameItemadd.goalvalue;
+                        item.fixedbox = matchedYearSameItemadd.box;
                     }
                 });
                 //累计报单
@@ -326,7 +312,7 @@ export default {
                     const leijibox = Number(item.leijibox) || 0;
 
                     // const cumulativeDiff = current - ((goalnumtotal / ordersnumtotal) * ordersnumStage);
-                    const cumulativeDiff = leijiboxhistory - leijibox;
+                    const cumulativeDiff =leijiboxhistory - leijibox;
 
                     return {
                         ...item,
@@ -398,38 +384,6 @@ export default {
             } finally {
                 this.dataListLoading = false; // 确保无论成功失败都会重置加载状态
             }
-        },
-        sumByCompany(originalArray) {
-            // 检查输入是否为有效的数组
-            if (!Array.isArray(originalArray)) {
-                throw new Error("输入必须是一个数组");
-            }
-
-            // 分组并累加goalvalue
-            const grouped = originalArray.reduce((acc, item) => {
-                // 确保item是对象且包含必要的字段
-                if (typeof item !== 'object' || item === null) return acc;
-                if (!('companyid' in item) || !('companyname' in item) || !('goalvalue' in item)) return acc;
-
-                const companyid = item.companyid;
-                const companyname = item.companyname;
-                // 将goalvalue转换为数字，非数字值按0处理
-                const value = Number(item.goalvalue) || 0;
-
-                if (acc[companyid]) {
-                    acc[companyid].goalvalue += value;
-                } else {
-                    acc[companyid] = {
-                        companyid,
-                        companyname,
-                        goalvalue: value
-                    };
-                }
-                return acc;
-            }, {});
-
-            // 转换为目标格式的数组
-            return Object.values(grouped);
         },
         addNationalTotal(dataArray) {
             // 初始化新对象
@@ -641,7 +595,7 @@ export default {
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                exportExcel(this.dataList, this.dataForm.p_vouchdatestart, this.dataForm.p_vouchdateend,this.month1,this.day1,this.monthend1,this.dayend1, '分公司低温销售数据进度表.xlsx')
+                exportExcel(this.dataList, this.dataForm.p_vouchdatestart, this.dataForm.p_vouchdateend, '分公司低温销售数据进度表.xlsx')
             })
         },
         // 获取今年的日期数据

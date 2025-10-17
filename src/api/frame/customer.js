@@ -1317,7 +1317,14 @@ export function wlarrivedbuildApi(params) {
     method: 'get'
   })
 }
-
+//查询管理部去年低温基数(每天)
+export function APILowTempLBaseCHECK(params) {
+  return request({
+      url: 'api/basicSqAndCompanyLowTempBase/all',
+      params,
+      method: 'get'
+  })
+}
 
 
 
@@ -1742,5 +1749,14 @@ export function RPIWechupsimportAPI(params) {
     url: 'api/rpaWechatPrompt/importorderdata',
     params,
     method: 'get'
+  })
+}
+
+//查询(管理部)大区&单位体负责人数据表
+export function APIDqAndCompanyCHECK(params) {
+  return request({
+      url: 'api/basicDqAndCompany',
+      params,
+      method: 'get'
   })
 }

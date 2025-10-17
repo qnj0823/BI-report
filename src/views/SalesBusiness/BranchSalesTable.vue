@@ -28,7 +28,7 @@
             <el-table-column align="center" label="老品增幅">
                 <el-table-column :show-overflow-tooltip="true" align="center" prop="oldproductvalue" label="老品对赌增幅" />
                 <el-table-column :show-overflow-tooltip="true" align="center" prop="oldbox1" label="同期老品" />
-                <el-table-column :show-overflow-tooltip="true" align="center" prop="oldbox" label="累计达成" />
+                <el-table-column :show-overflow-tooltip="true" align="center" prop="oldbox"  label="累计达成" />
                 <el-table-column :show-overflow-tooltip="true" align="center" prop="oldrate" label="老品増幅" />
                 <el-table-column :show-overflow-tooltip="true" align="center" prop="oldtite" label="是否达标" />
             </el-table-column>
@@ -40,10 +40,10 @@
             </el-table-column>
             <el-table-column align="center" label="全品增幅">
                 <el-table-column :show-overflow-tooltip="true" align="center" prop="allproductvalue" label="全品对赌增幅" />
-                <el-table-column :show-overflow-tooltip="true" align="center" prop="Mallsum1" label="同期全品" />
-                <el-table-column :show-overflow-tooltip="true" align="center" prop="Mallsum" label="累计达成" />
+                <el-table-column :show-overflow-tooltip="true" align="center" prop="Mallsum1"  label="同期全品" />
+                <el-table-column :show-overflow-tooltip="true" align="center" prop="Mallsum"   label="累计达成" />
                 <el-table-column :show-overflow-tooltip="true" align="center" prop="totalrate" label="全品增幅" />
-                <el-table-column :show-overflow-tooltip="true" align="center" prop="alltite" label="是否达标" />
+                <el-table-column :show-overflow-tooltip="true" align="center" prop="alltite"   label="是否达标" />
             </el-table-column>
         </el-table>
     </div>

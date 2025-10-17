@@ -213,3 +213,15 @@ export function figCompanyCityAPI(data) {
     method: 'post'
   })
 }
+
+/**
+ * LooK屋顶装每日报单计划(万盒)
+ * @param pram
+ */
+export function GetareaDataAPi(params) {
+  return request({
+    url: 'api/report/get_pro_area_data',
+    method: 'GET',
+    params
+  })
+}

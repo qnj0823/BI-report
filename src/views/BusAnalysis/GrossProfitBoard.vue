@@ -53,14 +53,12 @@ export default {
         this.calculateDates();
     },
     methods: {
-
-
         async getDateList() {
+            this.dataListLoading = true
             const isDev = process.env.NODE_ENV === 'development';
             const baseURL = isDev ? 'http://153.0.158.115:8180' : '';
             const response = await axios.get(
                 `${baseURL}/uapws/rest/wms/getGrossProfitMargin?queryDate=${this.dataForm.queryDate}`,
-
             );
             if (response.data.restCode == 200) {
                 this.dataList = response.data.data[0].currDetailList
@@ -75,7 +73,7 @@ export default {
                     (item.customer_name && item.customer_name.includes(this.bullay))  
                 );
                 console.log(this.dataList)
-
+                this.dataListLoading = false
             } else {
                 // alert(response.data.msg)
                 this.$message.warning(response.data.msg)
@@ -89,7 +87,6 @@ export default {
                 type: 'warning'
             }).then(() => {
                 exportExcel(this.dataList, '毛利率总表.xlsx')
-
             })
         },
         // 获取今年的日期数据
@@ -105,11 +102,10 @@ export default {
             this.dataForm.queryDate = this.endOfToday
             // this.dataForm.queryDate = this.startOfMonth
             console.log(this.dataForm.queryDate, 'this.dataForm.queryDate')
-
         },
         formatDate(date) {
             const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份从0开始，所以加1 
+            const month = String(date.getMonth() + 1).padStart(2, '0'); //月份从0开始，所以加1 
             const day = String(date.getDate()).padStart(2, '0');
             return `${year}-${month}-${day}`;
         },

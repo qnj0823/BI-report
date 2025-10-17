@@ -24,41 +24,25 @@
         <el-table border ref="table" v-loading="dataListLoading" height="680" :data="dataList" style="width: 100%;">
             <el-table-column :show-overflow-tooltip="true" align="center" prop="sort" label="增幅排名" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="sqname" label="省区" />
-            <!-- <el-table-column :show-overflow-tooltip="true" align="center" prop="companyname" label="单位体" /> -->
             <el-table-column prop="companyman" width="110" align="center" label="负责人" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="converBigPiece" :label="`低温系列`">
-                <el-table-column :show-overflow-tooltip="true" align="center" prop="fixedbox" label="本月累计基数">
+                <el-table-column :show-overflow-tooltip="true" align="center" prop="fixedbox"
+                    :label="`${month1}.1-${month1}.${dayend1}报单基数`">
                 </el-table-column>
                 <el-table-column :show-overflow-tooltip="true" align="center" prop="todaybox" label="今日报单">
                 </el-table-column>
-                <el-table-column :show-overflow-tooltip="true" align="center" prop="leijibox" label="累计报单">
+                <el-table-column :show-overflow-tooltip="true" align="center" prop="leijibox"
+                    :label="`${month1}.${day1}-今日累计报单`">
                 </el-table-column>
-                <el-table-column :show-overflow-tooltip="true" align="center" prop="leijiboxhistory" label="截止今日累计基数">
+                <el-table-column :show-overflow-tooltip="true" align="center" prop="leijiboxhistory"
+                    :label="`${month1}.${day1}-今日报单基数`">
                 </el-table-column>
-                <el-table-column :show-overflow-tooltip="true" align="center" prop="cumulativeDiff" label="累计缺口(正为缺口)">
+                <el-table-column :show-overflow-tooltip="true" align="center" prop="cumulativeDiff"
+                    :label="`${month1}.${day1}-今日累计缺口`">
                 </el-table-column>
-                <el-table-column :show-overflow-tooltip="true" align="center" prop="lasteyear" label="累计同比">
+                <el-table-column :show-overflow-tooltip="true" align="center" prop="lasteyear"
+                    :label="`${month1}.${day1}-今日累计同比`">
                 </el-table-column>
-                <!-- <el-table-column :show-overflow-tooltip="true" align="center" prop="fixedbox" label="2024年基数">
-                </el-table-column>
-                <el-table-column :show-overflow-tooltip="true" align="center" prop="goalnumtotal" label="低温目标">
-                </el-table-column>
-                <el-table-column :show-overflow-tooltip="true" align="center" prop="goalrate" label="目标增幅">
-                </el-table-column>
-                <el-table-column :show-overflow-tooltip="true" align="center" prop="goalnum" label="今日目标">
-                </el-table-column>
-                <el-table-column :show-overflow-tooltip="true" align="center" prop="todaybox" label="今日报单">
-                </el-table-column>
-                <el-table-column :show-overflow-tooltip="true" align="center" prop="difference" label="今日差额">
-                </el-table-column>
-                <el-table-column :show-overflow-tooltip="true" align="center" prop="leijibox" label="累计报单">
-                </el-table-column>
-                <el-table-column :show-overflow-tooltip="true" align="center" prop="cumulativeDiff" label="累计差额">
-                </el-table-column>
-                <el-table-column :show-overflow-tooltip="true" align="center" prop="leijiboxhistory" label="累计基数">
-                </el-table-column>
-                <el-table-column :show-overflow-tooltip="true" align="center" prop="lasteyear" label="累计同比">
-                </el-table-column> -->
             </el-table-column>
         </el-table>
     </div>
@@ -90,6 +74,11 @@ export default {
                 p_vouchdatestart: '',
                 p_vouchdateend: ''
             },
+            dataFzrForm: {
+                page: 0,
+                size: 2000,
+                sort: '',
+            },
             dataListLoading: false,
             labelText: '',
             bullay: '',
@@ -98,9 +87,16 @@ export default {
             bscList: [],
             goalList: [],
             yearSame: [],
+            FZRList: [],
             yearaddSame: [],
             NowSame: [],
-            nowaddSame: []
+            nowaddSame: [],
+            yearDaysum: [],//去年本月截止今日数据
+            yearDayallsum: [],//去年本月所有数据
+            month1: '',
+            day1: '',
+            monthend1: '',
+            dayend1: ''
         };
     },
     created() {
@@ -147,6 +143,10 @@ export default {
 
             const [year, month, day] = this.dataForm.p_vouchdatestart.split('-').map(Number);
             const [yearend, monthend, dayend] = this.dataForm.p_vouchdateend.split('-').map(Number);
+            this.month1 = month
+            this.day1 = day
+            this.monthend1 = monthend
+            // this.dayend1 = dayend
 
             this.labelText = `${this.year}年全国(各省区)低温销售数据进度表(${month}月${day}日—${monthend}月${dayend}日)`;
             this.yearForm.p_vouchdatestart = this.subtractYear(this.dataForm.p_vouchdatestart);
@@ -156,44 +156,42 @@ export default {
             this.dataFormADD.p_vouchdatestart = result.firstDay
             this.dataFormADD.p_vouchdateend = result.lastDay
 
+            const [yearend12, monthend12, dayend12] = this.dataFormADD.p_vouchdateend.split('-').map(Number);
+            this.dayend1 = dayend12
+
             this.dataFormADD.p_vouchdatestart = this.subtractYear(this.dataFormADD.p_vouchdatestart);
             this.dataFormADD.p_vouchdateend = this.subtractYear(this.dataFormADD.p_vouchdateend);
 
             this.dataFormNow.p_vouchdatestart = this.dataForm.p_vouchdateend
             this.dataFormNow.p_vouchdateend = this.dataForm.p_vouchdateend
             try {
-                const [yearCAR, yearADD, nowCAR, nowADD, ljtqjr, goal] = await Promise.all([
-                    api.companypartSite(this.yearForm),
+                const [yearCAR, yearADD, nowCAR, nowADD, ljtqjr, goal, fzr] = await Promise.all([
+                    // api.companypartSite(this.yearForm),
+                    api.APILowTempLBaseCHECK(),
                     api.companypartSite(this.dataFormADD),
                     api.companySite(this.dataForm),
                     api.companySite(this.dataFormNow),
                     api.companyOrderData(this.dataForm),
-                    api.MagDepSiteGoal()
+                    api.MagDepSiteGoal(),
+                    api.APIDqAndCompanyCHECK(this.dataFzrForm)
                 ]);
-                //第一个接口去年6-20到当前日期
+                //第一个接口取出所有导出数据
                 this.yearSame = yearCAR
-                this.yearSame = this.yearSame.reduce((acc, curr) => {
-                    const existingItem = acc.find(item => item.sqid === curr.sqid);
-                    if (existingItem) {
-                        existingItem.box = Number(existingItem.box) + Number(curr.box);
-                    } else {
-                        acc.push({ ...curr, box: Number(curr.box) });
-                    }
-                    return acc;
-                }, []);
+                //根据时间段过滤对象
+                const yearDay = this.yearSame.filter(item => {
+                    const itemDate = new Date(item.yearmonthdate);
+                    return itemDate >= new Date(this.yearForm.p_vouchdatestart) &&
+                        itemDate <= new Date(this.yearForm.p_vouchdateend);
+                });
+                //(1)取出截止今日数据的和
+                this.yearDaysum = this.sumBySqname(yearDay)
+                console.log(this.yearDaysum, 'this.yearDaysum')
                 console.log(this.yearSame, 'this.yearSame')
-                //第二个接口去年6-20到8-20
-                this.yearaddSame = yearADD
-                this.yearaddSame = this.yearaddSame.reduce((acc, curr) => {
-                    const existingItem = acc.find(item => item.sqid === curr.sqid);
-                    if (existingItem) {
-                        existingItem.box = Number(existingItem.box) + Number(curr.box);
-                    } else {
-                        acc.push({ ...curr, box: Number(curr.box) });
-                    }
-                    return acc;
-                }, []);
-                console.log(this.yearaddSame, 'this.yearaddSame')
+
+                //(2)取出本月数据之和
+                this.yearDayallsum = this.sumBySqname(this.yearSame)
+                console.log(this.yearDayallsum, 'this.yearDayallsum')
+
                 //第三个接口今年6-20到当前日期
                 this.NowSame = nowCAR
                 this.NowSame = this.NowSame.reduce((acc, curr) => {
@@ -219,6 +217,11 @@ export default {
 
                 //第五个接口
                 this.dataList = ljtqjr
+                this.dataList = this.dataList.map(item => ({
+                    ...item,
+                    sqname: item.sqname.replace(/^\d+/, '') // 去掉开头的所有数字
+                }));
+
                 this.dataList = this.dataList.filter(item => item.companyname !== "新零售事业部");
                 this.dataList.forEach(item => {
                     if (item.sqname) {
@@ -231,16 +234,16 @@ export default {
 
                 //历史到今天的数据
                 this.dataList.forEach(item => {
-                    const matchedYearSameItem = this.yearSame.find(yearItem => yearItem.sqid === item.sqid);
+                    const matchedYearSameItem = this.yearDaysum.find(yearItem => yearItem.sqname === item.sqname);
                     if (matchedYearSameItem) {
-                        item.leijiboxhistory = matchedYearSameItem.box;
+                        item.leijiboxhistory = matchedYearSameItem.goalvalue;
                     }
                 });
                 //2024年基数
                 this.dataList.forEach(item => {
-                    const matchedYearSameItemadd = this.yearaddSame.find(yearItem => yearItem.sqid === item.sqid);
+                    const matchedYearSameItemadd = this.yearDayallsum.find(yearItem => yearItem.sqname === item.sqname);
                     if (matchedYearSameItemadd) {
-                        item.fixedbox = matchedYearSameItemadd.box;
+                        item.fixedbox = matchedYearSameItemadd.goalvalue;
                     }
                 });
                 //累计报单
@@ -261,10 +264,19 @@ export default {
                 console.log(this.dataList, 'this.dataList')
 
                 //处理第六个接口
-                this.goalList = goal
-                console.log(this.goalList, 'this.goalList')
 
-                //根据省区去重
+                this.FZRList = fzr.content
+                this.dataList.forEach(item => {
+                    const matchedYearSameItem = this.FZRList.find(yearItem => yearItem.dqname === item.sqname);
+                    if (matchedYearSameItem) {
+                        item.companyman = matchedYearSameItem.companyperson;
+                    }
+                });
+
+                console.log(this.FZRList, 'this.FZRList')
+
+                this.goalList = goal
+                // //根据省区去重
                 const uniqueArray = [...new Map(this.goalList.map(item => [item.sqname, item]))].map(([_, value]) => value);
                 console.log(uniqueArray, '根据省区去重')
                 //根据省区去重的结果添加负责人
@@ -360,7 +372,7 @@ export default {
                     const leijibox = Number(item.leijibox) || 0;
 
                     // const cumulativeDiff = current - ((goalnumtotal / ordersnumtotal) * ordersnumStage);
-                    const cumulativeDiff =leijiboxhistory - leijibox;
+                    const cumulativeDiff = leijiboxhistory - leijibox;
 
                     return {
                         ...item,
@@ -394,7 +406,6 @@ export default {
 
                 this.dataList = this.dataList.map(item => {
 
-
                     // 2. 计算同比增长率
                     const current = Number(item.leijibox) || 0;
                     const previous = Number(item.leijiboxhistory) || 0;
@@ -418,8 +429,7 @@ export default {
                     cumulativeDiff: item.cumulativeDiff
                 }));
                 console.log('累计、同期、今日:', this.dataList);
-
-
+                
             } catch (error) {
                 console.error("获取数据时出错:", error);
                 // 可以在这里添加错误提示
@@ -428,6 +438,40 @@ export default {
                 this.dataListLoading = false; // 确保无论成功失败都会重置加载状态
             }
         },
+        //根据sqname分组计算goalvalue的值
+        sumBySqname(originalArray) {
+            // 检查输入是否为有效的数组
+            if (!Array.isArray(originalArray)) {
+                throw new Error("输入必须是一个数组");
+            }
+
+            // 分组并累加goalvalue
+            const grouped = originalArray.reduce((acc, item) => {
+                // 确保item是对象且包含必要的字段
+                if (typeof item !== 'object' || item === null) return acc;
+                if (!('sqname' in item) || !('goalvalue' in item)) return acc;
+
+                const sqname = item.sqname;
+                // 将goalvalue转换为数字，非数字值按0处理
+                const value = Number(item.goalvalue) || 0;
+
+                if (acc[sqname]) {
+                    acc[sqname] += value;
+                } else {
+                    acc[sqname] = value;
+                }
+                return acc;
+            }, {});
+
+            // 转换为目标格式的数组
+            return Object.entries(grouped).map(([sqname, goalvalue]) => ({
+                sqname,
+                goalvalue
+            }));
+        },
+
+
+
         addNationalTotal(dataArray) {
             // 初始化新对象
             const nationalTotal = {
@@ -628,7 +672,7 @@ export default {
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                exportExcel(this.dataList, this.dataForm.p_vouchdatestart, this.dataForm.p_vouchdateend, '省区低温销售数据进度表.xlsx')
+                exportExcel(this.dataList, this.dataForm.p_vouchdatestart, this.dataForm.p_vouchdateend, this.month1, this.day1, this.monthend1, this.dayend1, '省区低温销售数据进度表.xlsx')
             })
         },
         // 获取今年的日期数据
@@ -639,8 +683,8 @@ export default {
             const startOfMonthDate = new Date(today.getFullYear(), today.getMonth(), 1);
             this.startOfMonth = this.formatDate(startOfMonthDate);
 
-             // 获取当前月份的月末时间
-             const endOfMonthDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            // 获取当前月份的月末时间
+            const endOfMonthDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
             this.endOfMonth = this.formatDate(endOfMonthDate);
 
 
