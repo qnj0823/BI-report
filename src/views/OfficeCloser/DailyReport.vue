@@ -41,7 +41,7 @@
             <el-table-column :show-overflow-tooltip="true" align="center" prop="yznr" label="今日同期" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="todaybox" label="今日报单" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="yznr" label="今日同期差额" />
-            <el-table-column :show-overflow-tooltip="true" align="center" prop="yznr" label="累积同期差额" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="yznr" label="累积同期差额111" />
         </el-table>
         <el-pagination @size-change="sizeChangeHandle" ref="pagination" @current-change="handleCurrentChange"
             :current-page="currentPage" :page-sizes="[20, 40, 60, 80, 100, 1000]" :page-size="pageSize"
