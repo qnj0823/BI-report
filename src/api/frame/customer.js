@@ -1760,3 +1760,12 @@ export function APIDqAndCompanyCHECK(params) {
       method: 'get'
   })
 }
+
+//查询站点销售任务目标日跟进表
+export function APIdaily_report(params) {
+  return request({
+      url: 'api/report/get_pro_site_daily_report',
+      params,
+      method: 'get'
+  })
+}

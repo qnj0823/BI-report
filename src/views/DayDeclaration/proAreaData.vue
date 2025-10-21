@@ -66,7 +66,7 @@ export default {
                 { province: "湖北省", factory: "武汉工厂" },
                 { province: "江苏省", factory: "" },
                 { province: "河南省", factory: "武汉工厂" },
-                { province: "山东省", factory: "射阳工厂/金华工厂" },
+                { province: "山东省", factory: "射阳工厂" },
                 { province: "贵州省", factory: "成都工厂" },
                 { province: "福建省", factory: "金华工厂" },
                 { province: "山西省", factory: "武汉工厂" },
@@ -178,7 +178,7 @@ export default {
                 "广东省", "广西省", "海南省", "湖南省", "四川省",
                 "重庆市", "浙江省", "江西省", "云南省", "上海市",
                 "湖北省", "江苏省", "河南省", "山东省", "贵州省",
-                "福建省", "山西省", "陕西省", "西藏自治区",
+                "福建省", "山西省", "陕西省", "安徽省",  "广西壮族自治区",  "西藏自治区",
                 "海南look常温", "海南look椰汁", "海南look果汁"
             ];
 
