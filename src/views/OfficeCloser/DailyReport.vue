@@ -31,7 +31,7 @@
         </el-form>
         <el-table class="table" ref="table" :data="currentData" v-loading="dataListLoading"
             style="width: 90%; margin: 0 auto; margin-bottom: 50px;">
-            <el-table-column :show-overflow-tooltip="true" align="center" prop="vouchdate" label="日期" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="vouchdate" label="日期1" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="areaname" label="城市" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="provincename" label="区域" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="cSiteName" label="客户(站点)" />

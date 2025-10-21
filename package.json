@@ -20,10 +20,7 @@
     }
   },
   "lint-staged": {
-    "src/**/*.{js,vue}": [
-      "eslint --fix",
-      "git add"
-    ]
+    "src/**/*.{js,vue}": []
   },
   "repository": {
     "type": "git",
