@@ -33,6 +33,81 @@
                     @click="exportData">导出</el-button>
             </el-form-item>
         </el-form>
+        
+        <!-- 三个小表格 -->
+        <div class="summary-tables-container" style="width: 90%; margin: 20px auto;">
+            <div class="summary-tables-row">
+                <!-- 区间总增幅表格 -->
+                <div class="summary-table">
+                    <div class="summary-table-title">区间总增幅</div>
+                    <table class="summary-table-content">
+                        <tr>
+                            <td class="label-cell">去年同区间累积</td>
+                            <td class="data-cell"></td>
+                        </tr>
+                        <tr>
+                            <td class="label-cell">今年同区间报单</td>
+                            <td class="data-cell"></td>
+                        </tr>
+                        <tr>
+                            <td class="label-cell">区间同比差额</td>
+                            <td class="data-cell"></td>
+                        </tr>
+                        <tr>
+                            <td class="label-cell">区间同比完成率</td>
+                            <td class="data-cell"></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- 截止今日增幅表格 -->
+                <div class="summary-table">
+                    <div class="summary-table-title">截止今日增幅</div>
+                    <table class="summary-table-content">
+                        <tr>
+                            <td class="label-cell">截止去年同期累积</td>
+                            <td class="data-cell"></td>
+                        </tr>
+                        <tr>
+                            <td class="label-cell">截止今日当期累积</td>
+                            <td class="data-cell"></td>
+                        </tr>
+                        <tr>
+                            <td class="label-cell">截止今日同比差额</td>
+                            <td class="data-cell"></td>
+                        </tr>
+                        <tr>
+                            <td class="label-cell">截止今日同比完成率</td>
+                            <td class="data-cell"></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- 今日增幅表格 -->
+                <div class="summary-table">
+                    <div class="summary-table-title">今日增幅</div>
+                    <table class="summary-table-content">
+                        <tr>
+                            <td class="label-cell">去年同期</td>
+                            <td class="data-cell"></td>
+                        </tr>
+                        <tr>
+                            <td class="label-cell">今日报单</td>
+                            <td class="data-cell"></td>
+                        </tr>
+                        <tr>
+                            <td class="label-cell">今日差额</td>
+                            <td class="data-cell"></td>
+                        </tr>
+                        <tr>
+                            <td class="label-cell">日完成率</td>
+                            <td class="data-cell"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <el-table class="table" ref="table" :data="currentData" v-loading="dataListLoading"
             style="width: 90%; margin: 0 auto; margin-bottom: 50px;">
             <el-table-column :show-overflow-tooltip="true" align="center" prop="vouchdate" label="日期" />
@@ -79,7 +154,21 @@ export default {
             currentPage: 1,
             pageSize: 20,
             totalItems: 0,
-            labelText: '销售日订单跟进表'
+            labelText: '销售日订单跟进表',
+            summaryData: {
+                lastYearInterval: 0,
+                thisYearInterval: 0,
+                intervalDifference: 0,
+                intervalCompletionRate: '0%',
+                lastYearToday: 0,
+                thisDayTotal: 0,
+                todayTotalDifference: 0,
+                todayTotalCompletionRate: '0%',
+                lastYearSameDay: 0,
+                todayOrders: 0,
+                todayDifference: 0,
+                dailyCompletionRate: '0%'
+            }
         };
     },
     created() {
@@ -149,6 +238,9 @@ export default {
                 };
                 this.dataListLoading = false
                 this.sizeChangeHandle(this.pageSize);
+                
+                // 计算三个小表的汇总数据
+                this.calculateSummaryData();
             })
         },
         exportData() {
@@ -249,6 +341,56 @@ export default {
             this.day = String(date.getDate()).padStart(2, '0');
             return `${this.year}-${this.month}-${this.day}`;
         },
+        
+        // 计算三个小表的汇总数据
+        calculateSummaryData() {
+            if (!this.dataListTA || this.dataListTA.length === 0) {
+                return;
+            }
+            
+            // 获取数值的工具函数
+            const getNumValue = (value) => {
+                if (value === null || value === undefined || value === '') return 0;
+                return Number(value) || 0;
+            };
+            
+            // 计算汇总数据
+            let totalLastBox = 0;
+            let totalCurrentBox = 0;
+            let totalLastTodayBox = 0;
+            let totalTodayBox = 0;
+            
+            this.dataListTA.forEach(item => {
+                totalLastBox += getNumValue(item.lastbox);
+                totalCurrentBox += getNumValue(item.currentbox);
+                totalLastTodayBox += getNumValue(item.lasttodaybox);
+                totalTodayBox += getNumValue(item.todaybox);
+            });
+            
+            // 区间总增幅数据
+            this.summaryData.lastYearInterval = totalLastBox;
+            this.summaryData.thisYearInterval = totalCurrentBox;
+            this.summaryData.intervalDifference = totalCurrentBox - totalLastBox;
+            this.summaryData.intervalCompletionRate = totalLastBox > 0 
+                ? ((totalCurrentBox / totalLastBox) * 100).toFixed(2) + '%' 
+                : '0%';
+            
+            // 截止今日增幅数据（使用累积数据）
+            this.summaryData.lastYearToday = totalLastBox;
+            this.summaryData.thisDayTotal = totalCurrentBox;
+            this.summaryData.todayTotalDifference = totalCurrentBox - totalLastBox;
+            this.summaryData.todayTotalCompletionRate = totalLastBox > 0 
+                ? ((totalCurrentBox / totalLastBox) * 100).toFixed(2) + '%' 
+                : '0%';
+            
+            // 今日增幅数据
+            this.summaryData.lastYearSameDay = totalLastTodayBox;
+            this.summaryData.todayOrders = totalTodayBox;
+            this.summaryData.todayDifference = totalTodayBox - totalLastTodayBox;
+            this.summaryData.dailyCompletionRate = totalLastTodayBox > 0 
+                ? ((totalTodayBox / totalLastTodayBox) * 100).toFixed(2) + '%' 
+                : '0%';
+        },
     }
 };
 </script>
@@ -259,5 +401,78 @@ export default {
     font-size: 22px;
     text-align: center;
     margin-bottom: 10px;
+}
+
+/* 三个小表格的样式 */
+.summary-tables-container {
+    margin-bottom: 20px;
+}
+
+.summary-tables-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.summary-table {
+    flex: 1;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.summary-table-title {
+    background: #f5f7fa;
+    padding: 8px 12px;
+    font-weight: bold;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+    font-size: 14px;
+}
+
+.summary-table-content {
+    width: 100%;
+    border-collapse: collapse;
+    
+    tr {
+        border-bottom: 1px solid #eee;
+        
+        &:last-child {
+            border-bottom: none;
+        }
+    }
+    
+    td {
+        padding: 6px 8px;
+        font-size: 12px;
+        border-right: 1px solid #eee;
+        
+        &:last-child {
+            border-right: none;
+        }
+    }
+    
+    .label-cell {
+        background: #fafafa;
+        font-weight: 500;
+        width: 60%;
+        text-align: left;
+    }
+    
+    .data-cell {
+        background: #fff;
+        text-align: right;
+        font-weight: normal;
+        width: 40%;
+    }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .summary-tables-row {
+        flex-direction: column;
+        gap: 10px;
+    }
 }
 </style>
