@@ -31,7 +31,7 @@
         </el-form>
         <el-table class="table" ref="table" :data="currentData" v-loading="dataListLoading"
             style="width: 90%; margin: 0 auto; margin-bottom: 50px;">
-            <el-table-column :show-overflow-tooltip="true" align="center" prop="vouchdate" label="日期1" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="vouchdate" label="日期" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="areaname" label="城市" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="provincename" label="区域" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="cSiteName" label="客户(站点)" />
@@ -41,7 +41,7 @@
             <el-table-column :show-overflow-tooltip="true" align="center" prop="yznr" label="今日同期" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="todaybox" label="今日报单" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="yznr" label="今日同期差额" />
-            <el-table-column :show-overflow-tooltip="true" align="center" prop="yznr" label="累积同期差额111" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="yznr" label="累积同期差额" />
         </el-table>
         <el-pagination @size-change="sizeChangeHandle" ref="pagination" @current-change="handleCurrentChange"
             :current-page="currentPage" :page-sizes="[20, 40, 60, 80, 100, 1000]" :page-size="pageSize"
@@ -96,13 +96,138 @@ export default {
             })
         },
         exportData() {
+            console.log(this.dataForm.p_vouchdatecur);
             this.$confirm('是否导出表格数据到Excel?', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                exportExcel(this.dataList, '销售日订单跟进表.xlsx')
+                // 处理数据：按日期汇总并建立层级关系
+                const processedData = this.processDataForExport(this.dataList);
+                console.log(processedData, 'processedData');
+                exportExcel(processedData, this.dataForm.p_vouchdatestart, this.dataForm.p_vouchdateend,this.dataForm.p_vouchdatecur,'销售日订单跟进表.xlsx')
             })
+        },
+        // 处理数据：按日期汇总并建立层级关系
+        processDataForExport(rawData) {
+            // 按日期分组
+            const dateGroups = {};
+            
+            rawData.forEach(item => {
+                const fullDate = item.vouchdate; // 完整日期，如 "2025-10-01"
+                // 将日期格式从 "2025-10-01" 转换为 "10月1日"
+                let formattedDate = '';
+                if (fullDate) {
+                    const dateParts = fullDate.split('-');
+                    if (dateParts.length === 3) {
+                        const month = parseInt(dateParts[1], 10); // 去掉前导零
+                        const day = parseInt(dateParts[2], 10);   // 去掉前导零
+                        formattedDate = `${month}月${day}日`;
+                    }
+                }
+                
+                if (!dateGroups[formattedDate]) {
+                    dateGroups[formattedDate] = {
+                        originalDate: fullDate, // 保存原始日期用于排序
+                        items: []
+                    };
+                }
+                
+                // 创建新的数据项，日期改为中文格式
+                const processedItem = {
+                    ...item,
+                    vouchdate: formattedDate
+                };
+                
+                dateGroups[formattedDate].items.push(processedItem);
+            });
+            
+            // 按层级关系排序：日期 -> 城市 -> 区域 -> 客户站点
+            const sortedData = [];
+            
+            // 按原始日期排序（使用原始的YYYY-MM-DD格式进行正确排序）
+            const sortedDates = Object.keys(dateGroups).sort((a, b) => {
+                const dateA = dateGroups[a].originalDate;
+                const dateB = dateGroups[b].originalDate;
+                return dateA.localeCompare(dateB);
+            });
+            
+            sortedDates.forEach(date => {
+                const dateItems = dateGroups[date].items;
+                
+                // 按城市分组
+                const cityGroups = {};
+                dateItems.forEach(item => {
+                    const city = item.areaname || '';
+                    if (!cityGroups[city]) {
+                        cityGroups[city] = [];
+                    }
+                    cityGroups[city].push(item);
+                });
+                
+                // 按城市排序
+                const sortedCities = Object.keys(cityGroups).sort();
+                
+                sortedCities.forEach(city => {
+                    const cityItems = cityGroups[city];
+                    
+                    // 按区域分组
+                    const regionGroups = {};
+                    cityItems.forEach(item => {
+                        const region = item.provincename || '';
+                        if (!regionGroups[region]) {
+                            regionGroups[region] = [];
+                        }
+                        regionGroups[region].push(item);
+                    });
+                    
+                    // 按区域排序
+                    const sortedRegions = Object.keys(regionGroups).sort();
+                    
+                    sortedRegions.forEach(region => {
+                        const regionItems = regionGroups[region];
+                        
+                        // 按客户站点排序
+                        regionItems.sort((a, b) => {
+                            const siteA = a.cSiteName || '';
+                            const siteB = b.cSiteName || '';
+                            return siteA.localeCompare(siteB);
+                        });
+                        
+                        // 添加到最终结果
+                        sortedData.push(...regionItems);
+                    });
+                });
+                
+                // 为每个日期添加合计行
+                const dailySubtotal = this.calculateDailySubtotal(dateItems, date);
+                sortedData.push(dailySubtotal);
+            });
+            
+            return sortedData;
+        },
+        
+        // 计算每日合计
+        calculateDailySubtotal(dateItems, date) {
+            // 初始化合计数据
+            const subtotal = {
+                vouchdate: date,
+                areaname: '小计',
+                provincename: '',
+                cSiteName: '',
+                js: 0,
+                yznr: 0,
+                todaybox: 0
+            };
+            
+            // 累加各项数值
+            dateItems.forEach(item => {
+                subtotal.js += parseFloat(item.js || 0);
+                subtotal.yznr += parseFloat(item.yznr || 0);
+                subtotal.todaybox += parseFloat(item.todaybox || 0);
+            });
+            
+            return subtotal;
         },
         // 每页数
         sizeChangeHandle(val) {
