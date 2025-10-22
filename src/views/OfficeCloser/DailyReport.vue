@@ -155,20 +155,7 @@ export default {
             pageSize: 20,
             totalItems: 0,
             labelText: '销售日订单跟进表',
-            summaryData: {
-                lastYearInterval: 0,
-                thisYearInterval: 0,
-                intervalDifference: 0,
-                intervalCompletionRate: '0%',
-                lastYearToday: 0,
-                thisDayTotal: 0,
-                todayTotalDifference: 0,
-                todayTotalCompletionRate: '0%',
-                lastYearSameDay: 0,
-                todayOrders: 0,
-                todayDifference: 0,
-                dailyCompletionRate: '0%'
-            }
+
         };
     },
     created() {
@@ -238,9 +225,7 @@ export default {
                 };
                 this.dataListLoading = false
                 this.sizeChangeHandle(this.pageSize);
-                
-                // 计算三个小表的汇总数据
-                this.calculateSummaryData();
+
             })
         },
         exportData() {
@@ -342,55 +327,6 @@ export default {
             return `${this.year}-${this.month}-${this.day}`;
         },
         
-        // 计算三个小表的汇总数据
-        calculateSummaryData() {
-            if (!this.dataListTA || this.dataListTA.length === 0) {
-                return;
-            }
-            
-            // 获取数值的工具函数
-            const getNumValue = (value) => {
-                if (value === null || value === undefined || value === '') return 0;
-                return Number(value) || 0;
-            };
-            
-            // 计算汇总数据
-            let totalLastBox = 0;
-            let totalCurrentBox = 0;
-            let totalLastTodayBox = 0;
-            let totalTodayBox = 0;
-            
-            this.dataListTA.forEach(item => {
-                totalLastBox += getNumValue(item.lastbox);
-                totalCurrentBox += getNumValue(item.currentbox);
-                totalLastTodayBox += getNumValue(item.lasttodaybox);
-                totalTodayBox += getNumValue(item.todaybox);
-            });
-            
-            // 区间总增幅数据
-            this.summaryData.lastYearInterval = totalLastBox;
-            this.summaryData.thisYearInterval = totalCurrentBox;
-            this.summaryData.intervalDifference = totalCurrentBox - totalLastBox;
-            this.summaryData.intervalCompletionRate = totalLastBox > 0 
-                ? ((totalCurrentBox / totalLastBox) * 100).toFixed(2) + '%' 
-                : '0%';
-            
-            // 截止今日增幅数据（使用累积数据）
-            this.summaryData.lastYearToday = totalLastBox;
-            this.summaryData.thisDayTotal = totalCurrentBox;
-            this.summaryData.todayTotalDifference = totalCurrentBox - totalLastBox;
-            this.summaryData.todayTotalCompletionRate = totalLastBox > 0 
-                ? ((totalCurrentBox / totalLastBox) * 100).toFixed(2) + '%' 
-                : '0%';
-            
-            // 今日增幅数据
-            this.summaryData.lastYearSameDay = totalLastTodayBox;
-            this.summaryData.todayOrders = totalTodayBox;
-            this.summaryData.todayDifference = totalTodayBox - totalLastTodayBox;
-            this.summaryData.dailyCompletionRate = totalLastTodayBox > 0 
-                ? ((totalTodayBox / totalLastTodayBox) * 100).toFixed(2) + '%' 
-                : '0%';
-        },
     }
 };
 </script>
