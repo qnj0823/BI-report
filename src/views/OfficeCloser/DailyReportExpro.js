@@ -121,8 +121,10 @@ export async function exportExcel(tableList, startDate, endDate, currentDate,fil
   tableList.forEach((item, index) => {
     const dataRow = worksheet.getRow(currentRow);
     const currentDate = item.vouchdate || '';
-    const currentCity = item.areaname || '';
-    const currentRegion = item.provincename || '';
+    const currentCity = item.cityname || '';
+    const currentRegion = item.areaname || '';
+
+    
     
     // 检查日期组变化
     if (currentDateGroup !== currentDate) {
