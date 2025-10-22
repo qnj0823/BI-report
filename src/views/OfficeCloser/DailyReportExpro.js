@@ -196,13 +196,13 @@ export async function exportExcel(tableList, startDate, endDate, currentDate,fil
     dataRow.getCell(3).value = currentRegion;
     dataRow.getCell(4).value = item.cSiteName || '';
     // 第5列为空（因为客户站点占据D和E两列）
-    dataRow.getCell(6).value = item.fixedbox || '';
-    dataRow.getCell(7).value = item.goalnumtotal || '';
-    dataRow.getCell(8).value = item.goalrate || '';
-    dataRow.getCell(9).value = item.goalnum || '';
+    dataRow.getCell(6).value = item.lastbox || '';
+    dataRow.getCell(7).value = item.currentbox || '';
+    dataRow.getCell(8).value = item.yearcomplet || '';
+    dataRow.getCell(9).value = item.lasttodaybox || '';
     dataRow.getCell(10).value = item.todaybox || '';
-    dataRow.getCell(11).value = item.difference || '';
-    dataRow.getCell(12).value = item.leijibox || '';
+    dataRow.getCell(11).value = item.tadaydifferen || '';
+    dataRow.getCell(12).value = item.yearlate || '';
     
     // 合并每行的客户(站点)列：D到E
     worksheet.mergeCells(`D${currentRow}:E${currentRow}`);
