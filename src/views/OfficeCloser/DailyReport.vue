@@ -35,17 +35,17 @@
         </el-form>
         <el-table class="table" ref="table" :data="currentData" v-loading="dataListLoading"
             style="width: 90%; margin: 0 auto; margin-bottom: 50px;">
-            <el-table-column :show-overflow-tooltip="true" align="center" prop="vouchdate" label="日期" />
-            <el-table-column :show-overflow-tooltip="true" align="center" prop="cityname" label="城市" />
-            <el-table-column :show-overflow-tooltip="true" align="center" prop="areaname" label="区域" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="vouchdate" label="日期1" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="areaname" label="城市" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="provincename" label="区域" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="cSiteName" label="客户(站点)" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="lastbox" label="24年10月累积" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="currentbox" label="10月报单累积" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="yearcomplet" label="同比完成率" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="lasttodaybox" label="今日同期" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="todaybox" label="今日报单" />
-            <el-table-column :show-overflow-tooltip="true" align="center" prop="tadaydifferen" label="今日同期差额" />
-            <el-table-column :show-overflow-tooltip="true" align="center" prop="yearlate" label="累积同期差额" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="yznr" label="今日同期差额" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="yznr" label="累积同期差额111" />
         </el-table>
         <el-pagination @size-change="sizeChangeHandle" ref="pagination" @current-change="handleCurrentChange"
             :current-page="currentPage" :page-sizes="[20, 40, 60, 80, 100, 1000]" :page-size="pageSize"
@@ -151,60 +151,14 @@ export default {
             })
         },
         exportData() {
+            console.log(this.dataForm.p_vouchdatecur);
             this.$confirm('是否导出表格数据到Excel?', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                exportExcel(this.dataListTA, '销售日订单跟进表.xlsx')
+                exportExcel(this.dataList, '销售日订单跟进表.xlsx')
             })
-        },
-        processData(originalArray) {
-            // 工具函数：将空值（null/undefined/''等）转为0，非空值转为数字
-            const getNumberValue = (value) => {
-                // 判定为空值的情况：null、undefined、空字符串、纯空格字符串
-                if (value === null || value === undefined || (typeof value === 'string' && value.trim() === '')) {
-                    return 0;
-                }
-                // 非空值转为数字（兼容数字型、字符串型数字）
-                return Number(value);
-            };
-
-            // 1. 按cSiteName分组（复制原对象，避免修改原始数据）
-            const groups = {};
-            originalArray.forEach(item => {
-                const siteName = item.cSiteName;
-                if (!groups[siteName]) {
-                    groups[siteName] = [];
-                }
-                groups[siteName].push({ ...item });
-            });
-
-            // 2. 处理每组：排序 + 计算yearlate（空字段按0处理）
-            const dataListTA = [];
-            Object.values(groups).forEach(group => {
-                // 按vouchdate升序排序（空日期会排在最前，若需特殊处理可补充逻辑）
-                group.sort((a, b) => {
-                    const dateA = a.vouchdate ? new Date(a.vouchdate) : new Date(0);
-                    const dateB = b.vouchdate ? new Date(b.vouchdate) : new Date(0);
-                    return dateA - dateB;
-                });
-
-                // 计算累加yearlate，空字段通过getNumberValue转为0
-                let accumulated = 0;
-                group.forEach(item => {
-                    const todayboxNum = getNumberValue(item.todaybox);
-                    const lasttodayboxNum = getNumberValue(item.lasttodaybox);
-                    const currentDiff = todayboxNum - lasttodayboxNum;
-
-                    accumulated += currentDiff; // 直接累加（第一项自然是currentDiff，无需判断索引）
-                    item.yearlate = accumulated; // 最终yearlate为数字类型
-                });
-
-                dataListTA.push(...group);
-            });
-
-            return dataListTA;
         },
         // 每页数
         sizeChangeHandle(val) {
