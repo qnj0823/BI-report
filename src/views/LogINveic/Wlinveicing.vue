@@ -633,16 +633,17 @@ export default {
             this.dataListLoading = true
             api.wlSDOpenthenotherApi(this.dictForm).then(res => {
                 console.log(res)
-                window.open('http://bi.yufanjtbip.com:8069/file/%E6%96%87%E6%A1%A3/newfileplanshandongout.xlsx')
+                window.open('http://bi.yufanjtbip.com:8069/file/%E6%96%87%E6%A1%A3/newfileplanshandongotherout.xlsx')
                 this.dataListLoading = false
             })
         },
+        //山东非杭州仓计划
         exportSDnO() {
             console.log(66666)
             this.dataListLoading = true
             api.wlSDOpenthenotherNoApi(this.dictForm).then(res => {
                 console.log(res)
-                window.open('http://bi.yufanjtbip.com:8069/file/%E6%96%87%E6%A1%A3/newfileplanshandongotherout.xlsx')
+                window.open('http://bi.yufanjtbip.com:8069/file/%E6%96%87%E6%A1%A3/newfileplanshandongout.xlsx')
                 this.dataListLoading = false
             })
         },

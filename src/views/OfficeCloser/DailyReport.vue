@@ -21,6 +21,10 @@
                 </el-form-item>
             </el-form-item>
             <el-form-item>
+                <el-input v-model="bullay" placeholder="模糊查询" clearable @keyup.enter.native="searchEnterFun()"
+                    ref="searchInput"></el-input>
+            </el-form-item>
+            <el-form-item>
                 <el-button class="filter-item" size="mini" type="success" icon="el-icon-search"
                     @click="getDataList">查询</el-button>
             </el-form-item>
@@ -31,17 +35,17 @@
         </el-form>
         <el-table class="table" ref="table" :data="currentData" v-loading="dataListLoading"
             style="width: 90%; margin: 0 auto; margin-bottom: 50px;">
-            <el-table-column :show-overflow-tooltip="true" align="center" prop="vouchdate" label="日期1" />
-            <el-table-column :show-overflow-tooltip="true" align="center" prop="areaname" label="城市" />
-            <el-table-column :show-overflow-tooltip="true" align="center" prop="provincename" label="区域" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="vouchdate" label="日期" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="cityname" label="城市" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="areaname" label="区域" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="cSiteName" label="客户(站点)" />
-            <el-table-column :show-overflow-tooltip="true" align="center" prop="js"   label="24年10月累积" />
-            <el-table-column :show-overflow-tooltip="true" align="center" prop="yznr" label="10月报单累积" />
-            <el-table-column :show-overflow-tooltip="true" align="center" prop="yznr" label="同比完成率" />
-            <el-table-column :show-overflow-tooltip="true" align="center" prop="yznr" label="今日同期" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="lastbox" label="24年10月累积" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="currentbox" label="10月报单累积" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="yearcomplet" label="同比完成率" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="lasttodaybox" label="今日同期" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="todaybox" label="今日报单" />
-            <el-table-column :show-overflow-tooltip="true" align="center" prop="yznr" label="今日同期差额" />
-            <el-table-column :show-overflow-tooltip="true" align="center" prop="yznr" label="累积同期差额111" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="tadaydifferen" label="今日同期差额" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="yearlate" label="累积同期差额" />
         </el-table>
         <el-pagination @size-change="sizeChangeHandle" ref="pagination" @current-change="handleCurrentChange"
             :current-page="currentPage" :page-sizes="[20, 40, 60, 80, 100, 1000]" :page-size="pageSize"
@@ -67,7 +71,9 @@ export default {
                 p_vouchdatecur: ''
             },
             dataListLoading: false,
+            bullay: '',
             dataList: [],
+            dataListTA: [],
             currentData: [],
             currentPage: 1,
             pageSize: 20,
@@ -86,10 +92,59 @@ export default {
         getDataList() {
             this.dataListLoading = true
             api.APIdaily_report(this.dataForm).then(res => {
-                console.log(res, 'res')
                 this.dataList = res
+                // 过滤掉provincename为空的对象
+                this.dataList = this.dataList.filter(item => {
+                    // 处理空字符串、null、undefined以及字段不存在的情况
+                    return item.provincename || item.provincename === 0; // 特殊处理0的情况（如果需要）
+                    // 若不需要保留0，直接用：return !!item.provincename;
+                });
+                //
+                this.dataListTA = this.processData(this.dataList);
+                console.log(this.dataListTA, 'this.dataListTA')
+                // 处理数组，同时新增yearcomplet和tadaydifferen字段
+                this.dataListTA = this.dataListTA.map(item => {
+                    // 处理yearcomplet（百分比）
+                    let yearcomplet;
+                    if (item.currentbox === 0 || item.lastbox === 0) {
+                        yearcomplet = '0%';
+                    } else {
+                        const ratio = Number(item.currentbox) / Number(item.lastbox); // 显式转数字，避免类型问题
+                        yearcomplet = (ratio * 100).toFixed(2) + '%';
+                    }
+
+                    // 处理todaybox和lasttodaybox为空的情况（转为0）
+                    const todayBoxVal = item.todaybox || 0; // 空值转为0
+                    const lastTodayBoxVal = item.lasttodaybox || 0; // 空值转为0
+                    // 确保是数字类型（处理可能的字符串数字，如"10"）
+                    const todayNum = Number(todayBoxVal);
+                    const lastTodayNum = Number(lastTodayBoxVal);
+
+                    // 计算tadaydifferen
+                    const tadaydifferen = todayNum - lastTodayNum;
+
+                    return { ...item, yearcomplet, tadaydifferen };
+                });
+
+                // 排序逻辑：先按provincename升序，再按vouchdate降序（日期从晚到早）
+                this.dataListTA = [...this.dataListTA].sort((a, b) => {
+                    // 1. 先按省份升序
+                    if (a.provincename !== b.provincename) {
+                        return a.provincename.localeCompare(b.provincename);
+                    }
+                    // 2. 同一省份内，按日期降序（晚的日期在前）
+                    return a.vouchdate.localeCompare(b.vouchdate);
+                });
+                this.dataListTA = this.dataListTA.filter(item =>
+                    (item.cityname && item.cityname.toLowerCase().includes(this.bullay)) ||
+                    (item.name && item.name.toLowerCase().includes(this.bullay)) ||
+                    (item.areaname && item.areaname.toLowerCase().includes(this.bullay)) ||
+                    (item.cSiteName && item.cSiteName.toLowerCase().includes(this.bullay)) ||
+                    (item.provincename && item.provincename.toLowerCase().includes(this.bullay)) 
+                );
+
                 this.currentData = {
-                    ...this.dataList
+                    ...this.dataListTA
                 };
                 this.dataListLoading = false
                 this.sizeChangeHandle(this.pageSize);
@@ -101,21 +156,68 @@ export default {
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                exportExcel(this.dataList, '销售日订单跟进表.xlsx')
+                exportExcel(this.dataListTA, '销售日订单跟进表.xlsx')
             })
+        },
+        processData(originalArray) {
+            // 工具函数：将空值（null/undefined/''等）转为0，非空值转为数字
+            const getNumberValue = (value) => {
+                // 判定为空值的情况：null、undefined、空字符串、纯空格字符串
+                if (value === null || value === undefined || (typeof value === 'string' && value.trim() === '')) {
+                    return 0;
+                }
+                // 非空值转为数字（兼容数字型、字符串型数字）
+                return Number(value);
+            };
+
+            // 1. 按cSiteName分组（复制原对象，避免修改原始数据）
+            const groups = {};
+            originalArray.forEach(item => {
+                const siteName = item.cSiteName;
+                if (!groups[siteName]) {
+                    groups[siteName] = [];
+                }
+                groups[siteName].push({ ...item });
+            });
+
+            // 2. 处理每组：排序 + 计算yearlate（空字段按0处理）
+            const dataListTA = [];
+            Object.values(groups).forEach(group => {
+                // 按vouchdate升序排序（空日期会排在最前，若需特殊处理可补充逻辑）
+                group.sort((a, b) => {
+                    const dateA = a.vouchdate ? new Date(a.vouchdate) : new Date(0);
+                    const dateB = b.vouchdate ? new Date(b.vouchdate) : new Date(0);
+                    return dateA - dateB;
+                });
+
+                // 计算累加yearlate，空字段通过getNumberValue转为0
+                let accumulated = 0;
+                group.forEach(item => {
+                    const todayboxNum = getNumberValue(item.todaybox);
+                    const lasttodayboxNum = getNumberValue(item.lasttodaybox);
+                    const currentDiff = todayboxNum - lasttodayboxNum;
+
+                    accumulated += currentDiff; // 直接累加（第一项自然是currentDiff，无需判断索引）
+                    item.yearlate = accumulated; // 最终yearlate为数字类型
+                });
+
+                dataListTA.push(...group);
+            });
+
+            return dataListTA;
         },
         // 每页数
         sizeChangeHandle(val) {
             this.pageSize = val;
             this.currentPage = 1;
-            this.currentData = this.dataList.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this
+            this.currentData = this.dataListTA.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this
                 .pageSize);
         },
         // 当前页
         handleCurrentChange(val) {
             console.log(val)
             this.currentPage = val;
-            this.currentData = this.dataList.slice((val - 1) * this.pageSize, val * this.pageSize);
+            this.currentData = this.dataListTA.slice((val - 1) * this.pageSize, val * this.pageSize);
         },
         // 获取今年的日期数据
         calculateCurrentYearDates() {
