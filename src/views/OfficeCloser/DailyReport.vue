@@ -33,7 +33,7 @@
                     @click="exportData">导出</el-button>
             </el-form-item>
         </el-form>
-        
+
         <!-- 三个小表格 -->
         <div class="summary-tables-container" style="width: 90%; margin: 20px auto;">
             <div class="summary-tables-row">
@@ -43,19 +43,19 @@
                     <table class="summary-table-content">
                         <tr>
                             <td class="label-cell">去年同区间累积</td>
-                            <td class="data-cell"></td>
+                            <td class="data-cell">{{ SectionList.lastbox }}</td>
                         </tr>
                         <tr>
                             <td class="label-cell">今年同区间报单</td>
-                            <td class="data-cell"></td>
+                            <td class="data-cell">{{ SectionList.currentbox }}</td>
                         </tr>
                         <tr>
                             <td class="label-cell">区间同比差额</td>
-                            <td class="data-cell"></td>
+                            <td class="data-cell">{{ SectionList.areaDiff }}</td>
                         </tr>
                         <tr>
                             <td class="label-cell">区间同比完成率</td>
-                            <td class="data-cell"></td>
+                            <td class="data-cell">{{ SectionList.areaRate }}</td>
                         </tr>
                     </table>
                 </div>
@@ -66,19 +66,19 @@
                     <table class="summary-table-content">
                         <tr>
                             <td class="label-cell">截止去年同期累积</td>
-                            <td class="data-cell"></td>
+                            <td class="data-cell">{{ dayList.lasttodaybox }}</td>
                         </tr>
                         <tr>
                             <td class="label-cell">截止今日当期累积</td>
-                            <td class="data-cell"></td>
+                            <td class="data-cell">{{ dayList.todaybox }}</td>
                         </tr>
                         <tr>
                             <td class="label-cell">截止今日同比差额</td>
-                            <td class="data-cell"></td>
+                            <td class="data-cell">{{ dayList.daydiff }}</td>
                         </tr>
                         <tr>
                             <td class="label-cell">截止今日同比完成率</td>
-                            <td class="data-cell"></td>
+                            <td class="data-cell">{{ dayList.dayRate }}</td>
                         </tr>
                     </table>
                 </div>
@@ -155,6 +155,8 @@ export default {
             pageSize: 20,
             totalItems: 0,
             labelText: '销售日订单跟进表',
+            SectionList: [],
+            dayList: []
 
         };
     },
@@ -176,23 +178,39 @@ export default {
                     return item.provincename || item.provincename === 0; // 特殊处理0的情况（如果需要）
                     // 若不需要保留0，直接用：return !!item.provincename;
                 });
-                //
+                this.dataList = this.dataList.filter(item =>
+                    (item.cityname && item.cityname.toLowerCase().includes(this.bullay)) ||
+                    (item.name && item.name.toLowerCase().includes(this.bullay)) ||
+                    (item.areaname && item.areaname.toLowerCase().includes(this.bullay)) ||
+                    (item.cSiteName && item.cSiteName.toLowerCase().includes(this.bullay)) ||
+                    (item.provincename && item.provincename.toLowerCase().includes(this.bullay))
+                );
+                //计算区间小表数据
+                this.SectionList = this.sumBoxFields(this.dataList)
+                console.log(this.SectionList, '区间小表')
+                //计算截止今日增幅
+                this.dayList = this.sumStopBoxFields(this.dataList,this.dataForm.p_vouchdatecur)
+                console.log(this.dayList, '今日增幅')
                 this.dataListTA = this.processData(this.dataList);
                 console.log(this.dataListTA, 'this.dataListTA')
                 // 处理数组，同时新增yearcomplet和tadaydifferen字段
                 this.dataListTA = this.dataListTA.map(item => {
-                    // 处理yearcomplet（百分比）
-                    let yearcomplet;
-                    if (item.currentbox === 0 || item.lastbox === 0) {
-                        yearcomplet = '0%';
-                    } else {
-                        const ratio = Number(item.currentbox) / Number(item.lastbox); // 显式转数字，避免类型问题
-                        yearcomplet = (ratio * 100).toFixed(2) + '%';
-                    }
 
                     // 处理todaybox和lasttodaybox为空的情况（转为0）
                     const todayBoxVal = item.todaybox || 0; // 空值转为0
                     const lastTodayBoxVal = item.lasttodaybox || 0; // 空值转为0
+                    const lastBoxVal = item.lastbox || 0; // 空值转为0
+                    const currentBoxVal = item.currentbox || 0; // 空值转为0
+                    // 处理yearcomplet(百分比)
+                    let yearcomplet;
+                    if (currentBoxVal === 0 || lastBoxVal === 0) {
+                        yearcomplet = '0%';
+                    } else {
+                        const ratio = Number(currentBoxVal) / Number(lastBoxVal); // 显式转数字，避免类型问题
+                        yearcomplet = (ratio * 100).toFixed(2) + '%';
+                    }
+
+
                     // 确保是数字类型（处理可能的字符串数字，如"10"）
                     const todayNum = Number(todayBoxVal);
                     const lastTodayNum = Number(lastTodayBoxVal);
@@ -212,14 +230,7 @@ export default {
                     // 2. 同一省份内，按日期降序（晚的日期在前）
                     return a.vouchdate.localeCompare(b.vouchdate);
                 });
-                this.dataListTA = this.dataListTA.filter(item =>
-                    (item.cityname && item.cityname.toLowerCase().includes(this.bullay)) ||
-                    (item.name && item.name.toLowerCase().includes(this.bullay)) ||
-                    (item.areaname && item.areaname.toLowerCase().includes(this.bullay)) ||
-                    (item.cSiteName && item.cSiteName.toLowerCase().includes(this.bullay)) ||
-                    (item.provincename && item.provincename.toLowerCase().includes(this.bullay)) 
-                );
-                
+
                 this.currentData = {
                     ...this.dataListTA
                 };
@@ -235,11 +246,101 @@ export default {
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                exportExcel(this.dataListTA,this.dataForm.p_vouchdatestart,this.dataForm.p_vouchdateend,this.dataForm.p_vouchdatecur, '销售日订单跟进表.xlsx')
+                exportExcel(this.dataListTA, this.dataForm.p_vouchdatestart, this.dataForm.p_vouchdateend, this.dataForm.p_vouchdatecur, '销售日订单跟进表.xlsx')
             })
         },
+        //区间总增幅计算去年同区间累积，今年同区间报单
+        sumBoxFields(inputArray) {
+            // 1. 按 cNccSiteId 去重（保留第一个出现的对象）
+            const uniqueMap = new Map();
+            inputArray.forEach(obj => {
+                const siteId = obj.cNccSiteId;
+                // 仅保留第一次出现的 siteId 对应的对象
+                if (!uniqueMap.has(siteId)) {
+                    uniqueMap.set(siteId, obj);
+                }
+            });
+            // 转为去重后的数组
+            const uniqueArray = Array.from(uniqueMap.values());
+
+            // 2. 计算去重后的总和
+            let totalLasttodaybox = 0;
+            let totalTodaybox = 0;
+
+            uniqueArray.forEach(obj => {
+                const lastVal = Number(obj.lastbox);
+                totalLasttodaybox += isNaN(lastVal) ? 0 : lastVal;
+
+                const todayVal = Number(obj.currentbox);
+                totalTodaybox += isNaN(todayVal) ? 0 : todayVal;
+            });
+
+            // 3. 计算差值和比例
+            const areaDiff = totalTodaybox - totalLasttodaybox;
+            let areaRate = '0%';
+            if (totalLasttodaybox !== 0) {
+                areaRate = (totalTodaybox / totalLasttodaybox * 100).toFixed(2) + '%';
+            }
+
+            return {
+                lastbox: totalLasttodaybox,
+                currentbox: totalTodaybox,
+                areaDiff: areaDiff,
+                areaRate: areaRate
+            };
+        },
+        //截止今日增幅小表
+        sumStopBoxFields(inputArray, pVouchdatecur) {
+            // 1. 过滤：只保留 vouchdate <= pVouchdatecur 的对象
+            // 注意：确保两个日期格式均为 yyyy-mm-dd，可直接字符串比较
+            const filteredArray = inputArray.filter(obj => {
+                const objVouchdate = obj.vouchdate;
+                // 若对象无 vouchdate 字段，默认排除（或按需求改为保留）
+                if (!objVouchdate) return false;
+                // 字符串比较 yyyy-mm-dd 格式的日期（如 "2023-10-01" < "2023-10-02"）
+                return objVouchdate <= pVouchdatecur;
+            });
+
+            // 2. 按 cNccSiteId 去重（若不需要去重，可直接使用 filteredArray 跳过此步）
+            const uniqueMap = new Map();
+            filteredArray.forEach(obj => {
+                const siteId = obj.cNccSiteId;
+                if (!uniqueMap.has(siteId)) {
+                    uniqueMap.set(siteId, obj);
+                }
+            });
+            const uniqueArray = Array.from(uniqueMap.values());
+
+            // 3. 计算总和
+            let totalLaststopbox = 0;
+            let totalTodaystopbox = 0;
+
+            uniqueArray.forEach(obj => {
+                // 强制转换为数字，非数字按 0 处理
+                const lastVal = Number(obj.lasttodaybox);
+                totalLaststopbox += isNaN(lastVal) ? 0 : lastVal;
+
+                const todayVal = Number(obj.todaybox);
+                totalTodaystopbox += isNaN(todayVal) ? 0 : todayVal;
+            });
+
+            // 4. 计算差值和增长率
+            const daydiff = totalTodaystopbox - totalLaststopbox;
+            let dayRate = '0%';
+            if (totalLaststopbox !== 0) {
+                const rate = (totalTodaystopbox / totalLaststopbox - 1) * 100;
+                dayRate = rate.toFixed(2) + '%';
+            }
+
+            return {
+                lasttodaybox: totalLaststopbox,
+                todaybox: totalTodaystopbox,
+                daydiff: daydiff,
+                dayRate: dayRate
+            };
+        },
         processData(originalArray) {
-            // 工具函数：将空值（null/undefined/''等）转为0，非空值转为数字
+            // 工具函数：将空值（null/undefined/''等）转为0,非空值转为数字
             const getNumberValue = (value) => {
                 // 判定为空值的情况：null、undefined、空字符串、纯空格字符串
                 if (value === null || value === undefined || (typeof value === 'string' && value.trim() === '')) {
@@ -249,7 +350,7 @@ export default {
                 return Number(value);
             };
 
-            // 1. 按cSiteName分组（复制原对象，避免修改原始数据）
+            // 1. 按cSiteName分组（复制原对象,避免修改原始数据）
             const groups = {};
             originalArray.forEach(item => {
                 const siteName = item.cSiteName;
@@ -262,14 +363,14 @@ export default {
             // 2. 处理每组：排序 + 计算yearlate（空字段按0处理）
             const dataListTA = [];
             Object.values(groups).forEach(group => {
-                // 按vouchdate升序排序（空日期会排在最前，若需特殊处理可补充逻辑）
+                // 按vouchdate升序排序（空日期会排在最前,若需特殊处理可补充逻辑）
                 group.sort((a, b) => {
                     const dateA = a.vouchdate ? new Date(a.vouchdate) : new Date(0);
                     const dateB = b.vouchdate ? new Date(b.vouchdate) : new Date(0);
                     return dateA - dateB;
                 });
 
-                // 计算累加yearlate，空字段通过getNumberValue转为0
+                // 计算累加yearlate,空字段通过getNumberValue转为0
                 let accumulated = 0;
                 group.forEach(item => {
                     const todayboxNum = getNumberValue(item.todaybox);
@@ -322,11 +423,11 @@ export default {
         // 格式化日期
         formatDate(date) {
             this.year = date.getFullYear();
-            this.month = String(date.getMonth() + 1).padStart(2, '0'); // 月份从0开始，所以加1 
+            this.month = String(date.getMonth() + 1).padStart(2, '0'); // 月份从0开始,所以加1 
             this.day = String(date.getDate()).padStart(2, '0');
             return `${this.year}-${this.month}-${this.day}`;
         },
-        
+
     }
 };
 </script>
@@ -370,32 +471,32 @@ export default {
 .summary-table-content {
     width: 100%;
     border-collapse: collapse;
-    
+
     tr {
         border-bottom: 1px solid #eee;
-        
+
         &:last-child {
             border-bottom: none;
         }
     }
-    
+
     td {
         padding: 6px 8px;
         font-size: 12px;
         border-right: 1px solid #eee;
-        
+
         &:last-child {
             border-right: none;
         }
     }
-    
+
     .label-cell {
         background: #fafafa;
         font-weight: 500;
         width: 60%;
         text-align: left;
     }
-    
+
     .data-cell {
         background: #fff;
         text-align: right;

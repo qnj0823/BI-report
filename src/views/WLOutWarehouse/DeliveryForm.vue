@@ -386,9 +386,19 @@ export default {
                         item.tong = (Math.round(midCount * pieceConverValue) / 1000).toString(); // 四舍五入保留两位
                         item.midCount = ((Number(item.midCount) || 0).toFixed(0)).toString();
                     });
+                    
                     // 按 orderoutMainNumber 排序
                     this.dataList = [...this.dataList].sort((a, b) =>
                         a.orderoutMainNumber.localeCompare(b.orderoutMainNumber)
+                    );
+                    this.dataList = this.dataList.filter(item =>
+                        (item.orderoutNumber && item.orderoutNumber.includes(this.bullay)) ||
+                        (item.cname && item.cname.includes(this.bullay)) ||
+                        (item.pname && item.pname.includes(this.bullay)) ||
+                        (item.cuName && item.cuName.includes(this.bullay)) ||
+                        (item.orderoutMainNumber && item.orderoutMainNumber.includes(this.bullay)) ||
+                        (item.csitename && item.csitename.includes(this.bullay))||
+                        (item.pNo && item.pNo.includes(this.bullay))
                     );
                     this.dataList.forEach((item, index) => {
                         item.sort = index + 1; // 1, 2, 3, ..., array.length
@@ -435,7 +445,8 @@ export default {
                         (item.pname && item.pname.includes(this.bullay)) ||
                         (item.cuName && item.cuName.includes(this.bullay)) ||
                         (item.orderoutMainNumber && item.orderoutMainNumber.includes(this.bullay)) ||
-                        (item.csitename && item.csitename.includes(this.bullay))
+                        (item.csitename && item.csitename.includes(this.bullay))||
+                        (item.pNo && item.pNo.includes(this.bullay))
                     );
                     this.dataList.forEach((item, index) => {
                         item.sort = index + 1; // 1, 2, 3, ..., array.length
