@@ -221,15 +221,37 @@ export default {
                     return { ...item, yearcomplet, tadaydifferen };
                 });
 
-                // 排序逻辑：先按provincename升序，再按vouchdate降序（日期从晚到早）
+                // 排序逻辑：先按provincename升序，再按vouchdate降序，然后按cityname升序，最后按areaname升序
                 this.dataListTA = [...this.dataListTA].sort((a, b) => {
+                    // 安全的字符串比较函数，处理undefined/null值
+                    const safeCompare = (val1, val2) => {
+                        const str1 = val1 || '';
+                        const str2 = val2 || '';
+                        return str1.localeCompare(str2);
+                    };
+
                     // 1. 先按省份升序
                     if (a.provincename !== b.provincename) {
-                        return a.provincename.localeCompare(b.provincename);
+                        return safeCompare(a.provincename, b.provincename);
                     }
                     // 2. 同一省份内，按日期降序（晚的日期在前）
-                    return a.vouchdate.localeCompare(b.vouchdate);
+                    if (a.vouchdate !== b.vouchdate) {
+                        return safeCompare(a.vouchdate, b.vouchdate);
+                    }
+                    // 3. 同一省份同一日期内，按城市升序
+                    if (a.cityname !== b.cityname) {
+                        return safeCompare(a.cityname, b.cityname);
+                    }
+                    // 4. 同一省份同一日期同一城市内，按区域升序
+                    if (a.areaname !== b.areaname) {
+                        return safeCompare(a.areaname, b.areaname);
+                    }
+                    // 5. 最后按客户站点升序（保证完全有序）
+                    return safeCompare(a.cSiteName, b.cSiteName);
                 });
+
+                // 添加日期合计行
+                this.dataListTA = this.addDateSubtotals(this.dataListTA);
 
                 this.currentData = {
                     ...this.dataListTA
@@ -246,98 +268,8 @@ export default {
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                exportExcel(this.dataListTA, this.dataForm.p_vouchdatestart, this.dataForm.p_vouchdateend, this.dataForm.p_vouchdatecur, '销售日订单跟进表.xlsx')
+                exportExcel(this.dataListTA,this.dataForm.p_vouchdatestart,this.dataForm.p_vouchdateend,this.dataForm.p_vouchdatecur, '销售日订单跟进表.xlsx')
             })
-        },
-        //区间总增幅计算去年同区间累积，今年同区间报单
-        sumBoxFields(inputArray) {
-            // 1. 按 cNccSiteId 去重（保留第一个出现的对象）
-            const uniqueMap = new Map();
-            inputArray.forEach(obj => {
-                const siteId = obj.cNccSiteId;
-                // 仅保留第一次出现的 siteId 对应的对象
-                if (!uniqueMap.has(siteId)) {
-                    uniqueMap.set(siteId, obj);
-                }
-            });
-            // 转为去重后的数组
-            const uniqueArray = Array.from(uniqueMap.values());
-
-            // 2. 计算去重后的总和
-            let totalLasttodaybox = 0;
-            let totalTodaybox = 0;
-
-            uniqueArray.forEach(obj => {
-                const lastVal = Number(obj.lastbox);
-                totalLasttodaybox += isNaN(lastVal) ? 0 : lastVal;
-
-                const todayVal = Number(obj.currentbox);
-                totalTodaybox += isNaN(todayVal) ? 0 : todayVal;
-            });
-
-            // 3. 计算差值和比例
-            const areaDiff = totalTodaybox - totalLasttodaybox;
-            let areaRate = '0%';
-            if (totalLasttodaybox !== 0) {
-                areaRate = (totalTodaybox / totalLasttodaybox * 100).toFixed(2) + '%';
-            }
-
-            return {
-                lastbox: totalLasttodaybox,
-                currentbox: totalTodaybox,
-                areaDiff: areaDiff,
-                areaRate: areaRate
-            };
-        },
-        //截止今日增幅小表
-        sumStopBoxFields(inputArray, pVouchdatecur) {
-            // 1. 过滤：只保留 vouchdate <= pVouchdatecur 的对象
-            // 注意：确保两个日期格式均为 yyyy-mm-dd，可直接字符串比较
-            const filteredArray = inputArray.filter(obj => {
-                const objVouchdate = obj.vouchdate;
-                // 若对象无 vouchdate 字段，默认排除（或按需求改为保留）
-                if (!objVouchdate) return false;
-                // 字符串比较 yyyy-mm-dd 格式的日期（如 "2023-10-01" < "2023-10-02"）
-                return objVouchdate <= pVouchdatecur;
-            });
-
-            // 2. 按 cNccSiteId 去重（若不需要去重，可直接使用 filteredArray 跳过此步）
-            const uniqueMap = new Map();
-            filteredArray.forEach(obj => {
-                const siteId = obj.cNccSiteId;
-                if (!uniqueMap.has(siteId)) {
-                    uniqueMap.set(siteId, obj);
-                }
-            });
-            const uniqueArray = Array.from(uniqueMap.values());
-
-            // 3. 计算总和
-            let totalLaststopbox = 0;
-            let totalTodaystopbox = 0;
-
-            uniqueArray.forEach(obj => {
-                // 强制转换为数字，非数字按 0 处理
-                const lastVal = Number(obj.lasttodaybox);
-                totalLaststopbox += isNaN(lastVal) ? 0 : lastVal;
-
-                const todayVal = Number(obj.todaybox);
-                totalTodaystopbox += isNaN(todayVal) ? 0 : todayVal;
-            });
-
-            // 4. 计算差值和增长率
-            const daydiff = totalTodaystopbox - totalLaststopbox;
-            let dayRate = '0%';
-            if (totalLaststopbox !== 0) {
-                const rate = (totalTodaystopbox / totalLaststopbox - 1) * 100;
-                dayRate = rate.toFixed(2) + '%';
-            }
-
-            return {
-                lasttodaybox: totalLaststopbox,
-                todaybox: totalTodaystopbox,
-                daydiff: daydiff,
-                dayRate: dayRate
-            };
         },
         processData(originalArray) {
             // 工具函数：将空值（null/undefined/''等）转为0,非空值转为数字
@@ -386,6 +318,90 @@ export default {
 
             return dataListTA;
         },
+
+        // 添加日期合计行
+        addDateSubtotals(dataArray) {
+            if (!dataArray || dataArray.length === 0) return dataArray;
+
+            const result = [];
+            let currentProvince = '';
+            let currentDate = '';
+            let dateGroup = [];
+
+            // 工具函数：将空值转为0，非空值转为数字
+            const getNumberValue = (value) => {
+                if (value === null || value === undefined || (typeof value === 'string' && value.trim() === '')) {
+                    return 0;
+                }
+                return Number(value);
+            };
+
+            // 计算合计行数据
+            const calculateSubtotal = (group, date, province) => {
+                const subtotal = {
+                    vouchdate: date,
+                    cityname: '小计',
+                    areaname: '',
+                    cSiteName: '',
+                    provincename: province,
+                    lastbox: 0,
+                    currentbox: 0,
+                    yearcomplet: '0%',
+                    lasttodaybox: 0,
+                    todaybox: 0,
+                    tadaydifferen: 0,
+                    yearlate: 0,
+                    isSubtotal: true // 标记为小计行
+                };
+
+                group.forEach(item => {
+                    subtotal.lastbox += getNumberValue(item.lastbox);
+                    subtotal.currentbox += getNumberValue(item.currentbox);
+                    subtotal.lasttodaybox += getNumberValue(item.lasttodaybox);
+                    subtotal.todaybox += getNumberValue(item.todaybox);
+                    subtotal.tadaydifferen += getNumberValue(item.tadaydifferen);
+                    subtotal.yearlate += getNumberValue(item.yearlate);
+                });
+
+                // 计算同比完成率
+                if (subtotal.lastbox > 0) {
+                    const ratio = subtotal.currentbox / subtotal.lastbox;
+                    subtotal.yearcomplet = (ratio * 100).toFixed(2) + '%';
+                }
+
+                return subtotal;
+            };
+
+            // 遍历数据，按省份和日期分组
+            for (let i = 0; i < dataArray.length; i++) {
+                const item = dataArray[i];
+                const itemProvince = item.provincename || '';
+                const itemDate = item.vouchdate || '';
+
+                // 如果省份或日期发生变化，处理之前的分组
+                if ((itemProvince !== currentProvince || itemDate !== currentDate) && dateGroup.length > 0) {
+                    // 添加当前分组的数据
+                    result.push(...dateGroup);
+                    // 添加合计行
+                    result.push(calculateSubtotal(dateGroup, currentDate, currentProvince));
+                    dateGroup = [];
+                }
+
+                // 更新当前省份和日期
+                currentProvince = itemProvince;
+                currentDate = itemDate;
+                dateGroup.push(item);
+            }
+
+            // 处理最后一组数据
+            if (dateGroup.length > 0) {
+                result.push(...dateGroup);
+                result.push(calculateSubtotal(dateGroup, currentDate, currentProvince));
+            }
+
+            return result;
+        },
+
 
         // 每页数
         sizeChangeHandle(val) {
