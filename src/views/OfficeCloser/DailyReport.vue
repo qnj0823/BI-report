@@ -89,19 +89,19 @@
                     <table class="summary-table-content">
                         <tr>
                             <td class="label-cell">去年同期</td>
-                            <td class="data-cell"></td>
+                            <td class="data-cell">{{ tadayList.lasttodaybox }}</td>
                         </tr>
                         <tr>
                             <td class="label-cell">今日报单</td>
-                            <td class="data-cell"></td>
+                            <td class="data-cell">{{ tadayList.todaybox }}</td>
                         </tr>
                         <tr>
                             <td class="label-cell">今日差额</td>
-                            <td class="data-cell"></td>
+                            <td class="data-cell">{{ tadayList.daydiff }}</td>
                         </tr>
                         <tr>
                             <td class="label-cell">日完成率</td>
-                            <td class="data-cell"></td>
+                            <td class="data-cell">{{ tadayList.dayRate }}</td>
                         </tr>
                     </table>
                 </div>
@@ -156,7 +156,9 @@ export default {
             totalItems: 0,
             labelText: '销售日订单跟进表',
             SectionList: [],
-            dayList: []
+            dayList: [],
+            tadayList: [],
+            defaultMerged: {}
 
         };
     },
@@ -185,14 +187,18 @@ export default {
                     (item.cSiteName && item.cSiteName.toLowerCase().includes(this.bullay)) ||
                     (item.provincename && item.provincename.toLowerCase().includes(this.bullay))
                 );
-                //计算区间小表数据
+                //计算区间小表数据小表
                 this.SectionList = this.sumBoxFields(this.dataList)
                 console.log(this.SectionList, '区间小表')
-                //计算截止今日增幅
-                this.dayList = this.sumStopBoxFields(this.dataList,this.dataForm.p_vouchdatecur)
+                //计算截止今日增幅小表
+                this.dayList = this.sumStopBoxFields(this.dataList, this.dataForm.p_vouchdatecur)
                 console.log(this.dayList, '今日增幅')
+                //计算今日增幅小表
+                this.tadayList = this.sumStopBoxdayFields(this.dataList, this.dataForm.p_vouchdatecur)
                 this.dataListTA = this.processData(this.dataList);
                 console.log(this.dataListTA, 'this.dataListTA')
+                this.defaultMerged = this.mergeThreeArraysIntoObject(this.SectionList, this.dayList, this.tadayList);
+                console.log(this.defaultMerged, 'this.defaultMerged')
                 // 处理数组，同时新增yearcomplet和tadaydifferen字段
                 this.dataListTA = this.dataListTA.map(item => {
 
@@ -261,6 +267,24 @@ export default {
 
             })
         },
+
+
+        mergeThreeArraysIntoObject(arr1, arr2, arr3, keyNames = {}) {
+            // 定义默认键名，若未传入则使用默认值
+            const {
+                key1 = 'firstArray',  // 第一个数组对应的子对象键名
+                key2 = 'secondArray', // 第二个数组对应的子对象键名
+                key3 = 'thirdArray'   // 第三个数组对应的子对象键名
+            } = keyNames;
+
+            // 合并为一个对象，三个子对象分别对应原数组
+            return {
+                [key1]: arr1,
+                [key2]: arr2,
+                [key3]: arr3
+            };
+        },
+
         exportData() {
             console.log(this.dataForm.p_vouchdatecur);
             this.$confirm('是否导出表格数据到Excel?', '提示', {
@@ -268,7 +292,7 @@ export default {
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                exportExcel(this.dataListTA,this.dataForm.p_vouchdatestart,this.dataForm.p_vouchdateend,this.dataForm.p_vouchdatecur, '销售日订单跟进表.xlsx')
+                exportExcel(this.dataListTA, this.dataForm.p_vouchdatestart, this.dataForm.p_vouchdateend, this.dataForm.p_vouchdatecur, '销售日订单跟进表.xlsx', this.defaultMerged)
             })
         },
         processData(originalArray) {
@@ -435,39 +459,28 @@ export default {
             }
 
             return {
-                lastbox: totalLasttodaybox,
-                currentbox: totalTodaybox,
-                areaDiff: areaDiff,
-                areaRate: areaRate
+                lastbox: Math.round(totalLasttodaybox),  // 四舍五入为整数
+                currentbox: Math.round(totalTodaybox),
+                areaDiff: Math.round(areaDiff),
+                areaRate: areaRate  // 保留原始格式
             };
         },
-         //截止今日增幅小表
-         sumStopBoxFields(inputArray, pVouchdatecur) {
-            // 1. 过滤：只保留 vouchdate <= pVouchdatecur 的对象
-            // 注意：确保两个日期格式均为 yyyy-mm-dd，可直接字符串比较
+        //截止今日增幅小表
+        sumStopBoxFields(inputArray, pVouchdatecur) {
+            // 1. 过滤：只保留 vouchdate 与传入时间完全匹配的对象
             const filteredArray = inputArray.filter(obj => {
                 const objVouchdate = obj.vouchdate;
-                // 若对象无 vouchdate 字段，默认排除（或按需求改为保留）
+                // 若对象无 vouchdate 字段，默认排除
                 if (!objVouchdate) return false;
-                // 字符串比较 yyyy-mm-dd 格式的日期（如 "2023-10-01" < "2023-10-02"）
+                // 精确匹配 yyyy-mm-dd 格式的日期
                 return objVouchdate <= pVouchdatecur;
             });
 
-            // 2. 按 cNccSiteId 去重（若不需要去重，可直接使用 filteredArray 跳过此步）
-            const uniqueMap = new Map();
-            filteredArray.forEach(obj => {
-                const siteId = obj.cNccSiteId;
-                if (!uniqueMap.has(siteId)) {
-                    uniqueMap.set(siteId, obj);
-                }
-            });
-            const uniqueArray = Array.from(uniqueMap.values());
-
-            // 3. 计算总和
+            // 2. 计算总和（直接使用过滤后的数组，不做去重）
             let totalLaststopbox = 0;
             let totalTodaystopbox = 0;
 
-            uniqueArray.forEach(obj => {
+            filteredArray.forEach(obj => {
                 // 强制转换为数字，非数字按 0 处理
                 const lastVal = Number(obj.lasttodaybox);
                 totalLaststopbox += isNaN(lastVal) ? 0 : lastVal;
@@ -476,7 +489,7 @@ export default {
                 totalTodaystopbox += isNaN(todayVal) ? 0 : todayVal;
             });
 
-            // 4. 计算差值和增长率
+            // 3. 计算差值和增长率
             const daydiff = totalTodaystopbox - totalLaststopbox;
             let dayRate = '0%';
             if (totalLaststopbox !== 0) {
@@ -485,12 +498,61 @@ export default {
             }
 
             return {
-                lasttodaybox: totalLaststopbox,
-                todaybox: totalTodaystopbox,
-                daydiff: daydiff,
-                dayRate: dayRate
+
+                lasttodaybox: Math.round(totalLaststopbox),  // 四舍五入为整数
+                todaybox: Math.round(totalTodaystopbox),
+                daydiff: Math.round(daydiff),
+                dayRate: dayRate  // 保留原始格式
             };
         },
+
+        //今日增幅小表
+        sumStopBoxdayFields(inputArray, pVouchdatecur) {
+            // 1. 过滤：只保留 vouchdate 与传入时间完全匹配的对象
+            const filteredArray = inputArray.filter(obj => {
+                const objVouchdate = obj.vouchdate;
+                // 若对象无 vouchdate 字段，默认排除
+                if (!objVouchdate) return false;
+                // 精确匹配 yyyy-mm-dd 格式的日期
+                return objVouchdate == pVouchdatecur;
+            });
+
+            // 2. 计算总和（直接使用过滤后的数组，不做去重）
+            let totalLaststopbox = 0;
+            let totalTodaystopbox = 0;
+
+            filteredArray.forEach(obj => {
+                // 强制转换为数字，非数字按 0 处理
+                const lastVal = Number(obj.lasttodaybox);
+                totalLaststopbox += isNaN(lastVal) ? 0 : lastVal;
+
+                const todayVal = Number(obj.todaybox);
+                totalTodaystopbox += isNaN(todayVal) ? 0 : todayVal;
+            });
+
+            // 3. 计算差值和增长率
+            const daydiff = totalTodaystopbox - totalLaststopbox;
+            let dayRate = '0%';
+            if (totalLaststopbox !== 0) {
+                const rate = (totalTodaystopbox / totalLaststopbox - 1) * 100;
+                dayRate = rate.toFixed(2) + '%';
+            }
+
+            return {
+                // lasttodaybox: totalLaststopbox,
+                // todaybox: totalTodaystopbox,
+                // daydiff: daydiff,
+                // dayRate: dayRate
+
+                lasttodaybox: Math.round(totalLaststopbox),  // 四舍五入为整数
+                todaybox: Math.round(totalTodaystopbox),
+                daydiff: Math.round(daydiff),
+                dayRate: dayRate  // 保留原始格式
+            };
+        },
+
+
+
 
 
 

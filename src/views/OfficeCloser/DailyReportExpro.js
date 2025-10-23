@@ -277,7 +277,6 @@ export async function exportExcel(tableList, startDate, endDate, currentDate,fil
     if (cityCell.value && typeof cityCell.value === 'string' && 
         (cityCell.value.includes('小计') || cityCell.value.includes('合计') || cityCell.value.includes('总计'))) {
       subtotalRows.add(rowNum);
-      console.log(`发现合计行: 第${rowNum}行`);
     }
   }
   
@@ -405,26 +404,26 @@ function createSummaryTables(worksheet, startRow, summaryData) {
   
   // 区间总增幅表格（A到C列）
   const intervalData = [
-    ['去年同区间累积', summaryData.lastYearInterval || ''],
-    ['今年同区间报单', summaryData.thisYearInterval || ''],
-    ['区间同比差额', summaryData.intervalDifference || ''],
-    ['区间同比完成率', summaryData.intervalCompletionRate || '']
+    ['去年同区间累积', summaryData.firstArray.lastbox || ''],
+    ['今年同区间报单', summaryData.firstArray.currentbox || ''],
+    ['区间同比差额', summaryData.firstArray.areaDiff || ''],
+    ['区间同比完成率', summaryData.firstArray.areaRate || '']
   ];
   
   // 截止今日增幅表格（F到H列）
   const todayTotalData = [
-    ['截止去年同期累积', summaryData.lastYearToday || ''],
-    ['截止今日当期累积', summaryData.thisDayTotal || ''],
-    ['截止今日同比差额', summaryData.todayTotalDifference || ''],
-    ['截止今日同比完成率', summaryData.todayTotalCompletionRate || '']
+    ['截止去年同期累积', summaryData.secondArray.lasttodaybox || ''],
+    ['截止今日当期累积', summaryData.secondArray.todaybox || ''],
+    ['截止今日同比差额', summaryData.secondArray.daydiff || ''],
+    ['截止今日同比完成率', summaryData.secondArray.dayRate || '']
   ];
   
   // 今日增幅表格（K到L列）
   const dailyData = [
-    ['去年同期', summaryData.lastYearSameDay || ''],
-    ['今日报单', summaryData.todayOrders || ''],
-    ['今日差额', summaryData.todayDifference || ''],
-    ['日完成率', summaryData.dailyCompletionRate || '']
+    ['去年同期', summaryData.thirdArray.lasttodaybox || ''],
+    ['今日报单', summaryData.thirdArray.todaybox || ''],
+    ['今日差额', summaryData.thirdArray.daydiff || ''],
+    ['日完成率', summaryData.thirdArray.dayRate || '']
   ];
   
   // 创建四行数据
