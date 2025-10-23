@@ -124,7 +124,7 @@ export async function exportExcel(tableList, startDate, endDate, currentDate,fil
     const currentCity = item.cityname || '';
     const currentRegion = item.areaname || '';
 
-    
+    console.log(`处理第${index}行数据: 日期=${currentDate}, 城市=${currentCity}, 区域=${currentRegion}, 当前行=${currentRow}`);
     
     // 检查日期组变化
     if (currentDateGroup !== currentDate) {
@@ -135,12 +135,30 @@ export async function exportExcel(tableList, startDate, endDate, currentDate,fil
           startRow: dateStartRow,
           endRow: currentRow - 1
         });
+        console.log(`日期合并: ${currentDateGroup} 从行${dateStartRow}到行${currentRow - 1}`);
       }
       // 开始新的日期组
       currentDateGroup = currentDate;
       dateStartRow = currentRow;
       
-      // 日期变化时，重置城市和区域组
+      // 日期变化时，重置城市和区域组（因为城市合并只在同一日期内）
+      if (currentCityGroup !== null && cityStartRow !== null && currentRow - 1 > cityStartRow) {
+        mergeRanges.city.push({
+          value: currentCityGroup,
+          startRow: cityStartRow,
+          endRow: currentRow - 1
+        });
+        console.log(`城市合并(日期变化): ${currentCityGroup} 从行${cityStartRow}到行${currentRow - 1}`);
+      }
+      if (currentRegionGroup !== null && regionStartRow !== null && currentRow - 1 > regionStartRow) {
+        mergeRanges.region.push({
+          value: currentRegionGroup,
+          startRow: regionStartRow,
+          endRow: currentRow - 1
+        });
+        console.log(`区域合并(日期变化): ${currentRegionGroup} 从行${regionStartRow}到行${currentRow - 1}`);
+      }
+      
       currentCityGroup = null;
       currentRegionGroup = null;
       cityStartRow = null;
@@ -156,6 +174,7 @@ export async function exportExcel(tableList, startDate, endDate, currentDate,fil
           startRow: cityStartRow,
           endRow: currentRow - 1
         });
+        console.log(`城市合并: ${currentCityGroup} 从行${cityStartRow}到行${currentRow - 1}`);
       }
       
       // 记录之前的区域组合并范围（城市变化时）
@@ -165,6 +184,7 @@ export async function exportExcel(tableList, startDate, endDate, currentDate,fil
           startRow: regionStartRow,
           endRow: currentRow - 1
         });
+        console.log(`区域合并(城市变化): ${currentRegionGroup} 从行${regionStartRow}到行${currentRow - 1}`);
       }
       
       // 开始新的城市组
@@ -176,7 +196,7 @@ export async function exportExcel(tableList, startDate, endDate, currentDate,fil
       regionStartRow = null;
     }
     
-    // 检查区域组变化（在同一日期和城市内）
+    // 检查区域组变化（在同一城市内）
     if (currentRegionGroup !== currentRegion) {
       // 记录之前的区域组合并范围
       if (currentRegionGroup !== null && regionStartRow !== null && currentRow - 1 > regionStartRow) {
@@ -185,6 +205,7 @@ export async function exportExcel(tableList, startDate, endDate, currentDate,fil
           startRow: regionStartRow,
           endRow: currentRow - 1
         });
+        console.log(`区域合并: ${currentRegionGroup} 从行${regionStartRow}到行${currentRow - 1}`);
       }
       // 开始新的区域组
       currentRegionGroup = currentRegion;
@@ -219,6 +240,7 @@ export async function exportExcel(tableList, startDate, endDate, currentDate,fil
           startRow: dateStartRow,
           endRow: currentRow - 1
         });
+        console.log(`最后日期合并: ${currentDateGroup} 从行${dateStartRow}到行${currentRow - 1}`);
       }
       // 处理最后的城市组
       if (cityStartRow !== null && currentRow - 1 > cityStartRow) {
@@ -227,6 +249,7 @@ export async function exportExcel(tableList, startDate, endDate, currentDate,fil
           startRow: cityStartRow,
           endRow: currentRow - 1
         });
+        console.log(`最后城市合并: ${currentCityGroup} 从行${cityStartRow}到行${currentRow - 1}`);
       }
       // 处理最后的区域组
       if (regionStartRow !== null && currentRow - 1 > regionStartRow) {
@@ -235,11 +258,17 @@ export async function exportExcel(tableList, startDate, endDate, currentDate,fil
           startRow: regionStartRow,
           endRow: currentRow - 1
         });
+        console.log(`最后区域合并: ${currentRegionGroup} 从行${regionStartRow}到行${currentRow - 1}`);
       }
     }
   });
   
   // 执行多层级合并
+  console.log('开始执行合并操作...');
+  console.log('日期合并范围:', mergeRanges.date);
+  console.log('城市合并范围:', mergeRanges.city);
+  console.log('区域合并范围:', mergeRanges.region);
+  
   // 首先收集所有合计行的行号，避免在这些行上进行其他合并
   const subtotalRows = new Set();
   for (let rowNum = mainTableStartRow + 1; rowNum <= currentRow - 1; rowNum++) {
@@ -248,6 +277,7 @@ export async function exportExcel(tableList, startDate, endDate, currentDate,fil
     if (cityCell.value && typeof cityCell.value === 'string' && 
         (cityCell.value.includes('小计') || cityCell.value.includes('合计') || cityCell.value.includes('总计'))) {
       subtotalRows.add(rowNum);
+      console.log(`发现合计行: 第${rowNum}行`);
     }
   }
   
