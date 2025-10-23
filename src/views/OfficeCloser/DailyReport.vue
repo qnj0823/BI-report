@@ -401,6 +401,98 @@ export default {
 
             return result;
         },
+        //区间总增幅计算去年同区间累积，今年同区间报单
+        sumBoxFields(inputArray) {
+            // 1. 按 cNccSiteId 去重（保留第一个出现的对象）
+            const uniqueMap = new Map();
+            inputArray.forEach(obj => {
+                const siteId = obj.cNccSiteId;
+                // 仅保留第一次出现的 siteId 对应的对象
+                if (!uniqueMap.has(siteId)) {
+                    uniqueMap.set(siteId, obj);
+                }
+            });
+            // 转为去重后的数组
+            const uniqueArray = Array.from(uniqueMap.values());
+
+            // 2. 计算去重后的总和
+            let totalLasttodaybox = 0;
+            let totalTodaybox = 0;
+
+            uniqueArray.forEach(obj => {
+                const lastVal = Number(obj.lastbox);
+                totalLasttodaybox += isNaN(lastVal) ? 0 : lastVal;
+
+                const todayVal = Number(obj.currentbox);
+                totalTodaybox += isNaN(todayVal) ? 0 : todayVal;
+            });
+
+            // 3. 计算差值和比例
+            const areaDiff = totalTodaybox - totalLasttodaybox;
+            let areaRate = '0%';
+            if (totalLasttodaybox !== 0) {
+                areaRate = (totalTodaybox / totalLasttodaybox * 100).toFixed(2) + '%';
+            }
+
+            return {
+                lastbox: totalLasttodaybox,
+                currentbox: totalTodaybox,
+                areaDiff: areaDiff,
+                areaRate: areaRate
+            };
+        },
+         //截止今日增幅小表
+         sumStopBoxFields(inputArray, pVouchdatecur) {
+            // 1. 过滤：只保留 vouchdate <= pVouchdatecur 的对象
+            // 注意：确保两个日期格式均为 yyyy-mm-dd，可直接字符串比较
+            const filteredArray = inputArray.filter(obj => {
+                const objVouchdate = obj.vouchdate;
+                // 若对象无 vouchdate 字段，默认排除（或按需求改为保留）
+                if (!objVouchdate) return false;
+                // 字符串比较 yyyy-mm-dd 格式的日期（如 "2023-10-01" < "2023-10-02"）
+                return objVouchdate <= pVouchdatecur;
+            });
+
+            // 2. 按 cNccSiteId 去重（若不需要去重，可直接使用 filteredArray 跳过此步）
+            const uniqueMap = new Map();
+            filteredArray.forEach(obj => {
+                const siteId = obj.cNccSiteId;
+                if (!uniqueMap.has(siteId)) {
+                    uniqueMap.set(siteId, obj);
+                }
+            });
+            const uniqueArray = Array.from(uniqueMap.values());
+
+            // 3. 计算总和
+            let totalLaststopbox = 0;
+            let totalTodaystopbox = 0;
+
+            uniqueArray.forEach(obj => {
+                // 强制转换为数字，非数字按 0 处理
+                const lastVal = Number(obj.lasttodaybox);
+                totalLaststopbox += isNaN(lastVal) ? 0 : lastVal;
+
+                const todayVal = Number(obj.todaybox);
+                totalTodaystopbox += isNaN(todayVal) ? 0 : todayVal;
+            });
+
+            // 4. 计算差值和增长率
+            const daydiff = totalTodaystopbox - totalLaststopbox;
+            let dayRate = '0%';
+            if (totalLaststopbox !== 0) {
+                const rate = (totalTodaystopbox / totalLaststopbox - 1) * 100;
+                dayRate = rate.toFixed(2) + '%';
+            }
+
+            return {
+                lasttodaybox: totalLaststopbox,
+                todaybox: totalTodaystopbox,
+                daydiff: daydiff,
+                dayRate: dayRate
+            };
+        },
+
+
 
 
         // 每页数
