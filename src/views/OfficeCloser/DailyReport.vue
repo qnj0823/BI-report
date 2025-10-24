@@ -190,8 +190,11 @@ export default {
                 //计算区间小表数据小表
                 this.SectionList = this.sumBoxFields(this.dataList)
                 console.log(this.SectionList, '区间小表')
+                //计算截止今日增幅小表,去年同期增幅
+                const dayadd = this.sumBoxdayFields(this.dataList)
+                console.log(dayadd,'dayadd')
                 //计算截止今日增幅小表
-                this.dayList = this.sumStopBoxFields(this.dataList, this.dataForm.p_vouchdatecur)
+                this.dayList = this.sumStopBoxFields(this.dataList, this.dataForm.p_vouchdatecur,dayadd)
                 console.log(this.dayList, '今日增幅')
                 //计算今日增幅小表
                 this.tadayList = this.sumStopBoxdayFields(this.dataList, this.dataForm.p_vouchdatecur)
@@ -465,8 +468,35 @@ export default {
                 areaRate: areaRate  // 保留原始格式
             };
         },
+        //截止今日增幅小表截止去年同期计算
+        sumBoxdayFields(inputArray) {
+            // 1. 按 cNccSiteId 去重（保留第一个出现的对象）
+            const uniqueMap = new Map();
+            inputArray.forEach(obj => {
+                const siteId = obj.cNccSiteId;
+                // 仅保留第一次出现的 siteId 对应的对象
+                if (!uniqueMap.has(siteId)) {
+                    uniqueMap.set(siteId, obj);
+                }
+            });
+            // 转为去重后的数组
+            const uniqueArray = Array.from(uniqueMap.values());
+
+            // 2. 计算去重后的总和
+            let totalLasttodaybox = 0;
+
+            uniqueArray.forEach(obj => {
+                const lastVal = Number(obj.lastdeadbox);
+                totalLasttodaybox += isNaN(lastVal) ? 0 : lastVal;
+
+            });
+
+            return {
+                lastdeadbox: Math.round(totalLasttodaybox),  // 四舍五入为整数
+            };
+        },
         //截止今日增幅小表
-        sumStopBoxFields(inputArray, pVouchdatecur) {
+        sumStopBoxFields(inputArray, pVouchdatecur,deadBoxArray) {
             // 1. 过滤：只保留 vouchdate 与传入时间完全匹配的对象
             const filteredArray = inputArray.filter(obj => {
                 const objVouchdate = obj.vouchdate;
@@ -488,18 +518,18 @@ export default {
                 const todayVal = Number(obj.todaybox);
                 totalTodaystopbox += isNaN(todayVal) ? 0 : todayVal;
             });
-
+            let thelist = deadBoxArray.lastdeadbox 
             // 3. 计算差值和增长率
-            const daydiff = totalTodaystopbox - totalLaststopbox;
+            const daydiff = thelist - totalLaststopbox;
             let dayRate = '0%';
             if (totalLaststopbox !== 0) {
-                const rate = (totalTodaystopbox / totalLaststopbox - 1) * 100;
+                const rate = (thelist / totalLaststopbox - 1) * 100;
                 dayRate = rate.toFixed(2) + '%';
             }
 
             return {
 
-                lasttodaybox: Math.round(totalLaststopbox),  // 四舍五入为整数
+                lasttodaybox: Math.round(thelist),  // 四舍五入为整数
                 todaybox: Math.round(totalTodaystopbox),
                 daydiff: Math.round(daydiff),
                 dayRate: dayRate  // 保留原始格式
