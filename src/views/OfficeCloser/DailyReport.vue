@@ -2,15 +2,19 @@
     <div class='DailyReport'>
         <el-form :inline="true" style="width:90%; margin: 0 auto;">
             <div class="test">{{ this.labelText }}</div>
-            <el-form-item label="日期区间：">
+            <!-- <el-form-item label="日期区间：">
                 <el-date-picker v-model="dataForm.p_vouchdatestart" value-format="yyyy-MM-dd" type="date"
                     placeholder="开始日期" clearable style="width: 100%; "></el-date-picker>
             </el-form-item>
             <el-form-item>
                 <el-date-picker v-model="dataForm.p_vouchdateend" value-format="yyyy-MM-dd" type="date"
                     placeholder="结束日期" clearable :picker-options="pickerend" style="width: 100%"></el-date-picker>
+            </el-form-item> -->
+            <el-form-item label="日期区间：">
+                <el-date-picker v-model="value1" type="daterange" range-separator="至" start-placeholder="开始日期"
+                    end-placeholder="结束日期" format="yyyy-MM-dd" value-format="yyyy-MM-dd">
+                </el-date-picker>
             </el-form-item>
-
             <el-form-item label="当前数据日期：">
                 <el-date-picker v-model="dataForm.p_vouchdatecur" value-format="yyyy-MM-dd" type="date"
                     placeholder="截止日期" clearable :picker-options="pickerOptions" style="width: 100%"></el-date-picker>
@@ -146,6 +150,7 @@ export default {
             dataList: [],
             dataListTA: [],
             currentData: [],
+            value1: [], // 用于绑定日期范围的数组
             currentPage: 1,
             pageSize: 20,
             totalItems: 0,
@@ -157,8 +162,8 @@ export default {
             pickerOptions: {
                 disabledDate: (time) => this.handleDisabledDate(time)
             },
-            pickerend:{
-                disabledDate:(time) => this.handleDisabledend(time)
+            pickerend: {
+                disabledDate: (time) => this.handleDisabledend(time)
             }
         };
     },
@@ -166,10 +171,30 @@ export default {
         this.calculateCurrentYearDates();
         // this.calculateLastYearDates()
     },
+    watch: {
+        // 监听 value1 的变化（日期区间选择变化时触发）
+        value1(newVal) {
+            // newVal 是数组：[开始日期, 结束日期]，未选择时为 []
+            if (newVal && newVal.length === 2) {
+                // 同步到 dataForm
+                this.dataForm.p_vouchdatestart = newVal[0]; // 开始日期
+                this.dataForm.p_vouchdateend = newVal[1];   // 结束日期
+            } else {
+                // 未选择或清除选择时，清空 dataForm 对应字段
+                this.dataForm.p_vouchdatestart = '';
+                this.dataForm.p_vouchdateend = '';
+            }
+        }
+    },
     mounted() {
         this.getDataList()
+        this.value1 = [
+            this.dataForm.p_vouchdatestart,
+            this.dataForm.p_vouchdateend
+        ];
     },
     methods: {
+
         // 定义日期禁用逻辑的函数
         handleDisabledDate(time) {
             const currentTime = time.getTime();
@@ -180,12 +205,12 @@ export default {
             // 禁用：小于开始日期 或 大于结束日期 的日期
             return currentTime < startTime || currentTime > endTime;
         },
-        handleDisabledend(time){
-            const currentTime = time.getTime();
-            const startTime = new Date(this.dataForm.p_vouchdatestart).getTime();
-             // 禁用：小于开始日期 
-             return currentTime < startTime;
-        },
+        // handleDisabledend(time) {
+        //     const currentTime = time.getTime();
+        //     const startTime = new Date(this.dataForm.p_vouchdatestart).getTime();
+        //     // 禁用：小于开始日期 
+        //     return currentTime < startTime;
+        // },
         getDataList() {
             this.dataListLoading = true
             api.APIdaily_report(this.dataForm).then(res => {
