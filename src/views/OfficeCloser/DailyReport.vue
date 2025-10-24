@@ -294,8 +294,39 @@ export default {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
-            }).then(() => {
-                exportExcel(this.dataListTA, this.dataForm.p_vouchdatestart, this.dataForm.p_vouchdateend, this.dataForm.p_vouchdatecur, '销售日订单跟进表.xlsx', this.defaultMerged)
+            }).then(async () => {
+                // 显示loading状态
+                const loading = this.$loading({
+                    lock: true,
+                    text: '正在导出Excel文件，请稍候...\n数据量较大时可能需要等待几秒钟',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.7)'
+                });
+
+                try {
+                    // 添加一个小延迟确保loading显示
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                    // 执行导出操作
+                    await exportExcel(this.dataListTA, this.dataForm.p_vouchdatestart, this.dataForm.p_vouchdateend, this.dataForm.p_vouchdatecur, '销售日订单跟进表.xlsx', this.defaultMerged);
+                    
+                    // 导出成功提示
+                    this.$message({
+                        type: 'success',
+                        message: 'Excel文件导出成功！',
+                        duration: 3000
+                    });
+                } catch (error) {
+                    console.error('导出失败:', error);
+                    this.$message({
+                        type: 'error',
+                        message: '导出失败，请重试！',
+                        duration: 5000
+                    });
+                } finally {
+                    // 关闭loading状态
+                    loading.close();
+                }
             })
         },
         processData(originalArray) {
