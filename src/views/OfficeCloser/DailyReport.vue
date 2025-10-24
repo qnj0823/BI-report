@@ -2,23 +2,18 @@
     <div class='DailyReport'>
         <el-form :inline="true" style="width:90%; margin: 0 auto;">
             <div class="test">{{ this.labelText }}</div>
-            <el-form-item>
-                日期区间：
-                <el-form-item>
-                    <el-date-picker v-model="dataForm.p_vouchdatestart" value-format="yyyy-MM-dd" type="date"
-                        placeholder="开始日期" clearable style="width: 100%"></el-date-picker>
-                </el-form-item>
-                <el-form-item>
-                    <el-date-picker v-model="dataForm.p_vouchdateend" value-format="yyyy-MM-dd" type="date"
-                        placeholder="结束日期" clearable style="width: 100%"></el-date-picker>
-                </el-form-item>
+            <el-form-item label="日期区间：">
+                <el-date-picker v-model="dataForm.p_vouchdatestart" value-format="yyyy-MM-dd" type="date"
+                    placeholder="开始日期" clearable style="width: 100%; "></el-date-picker>
             </el-form-item>
             <el-form-item>
-                当前数据日期：
-                <el-form-item>
-                    <el-date-picker v-model="dataForm.p_vouchdatecur" value-format="yyyy-MM-dd" type="date"
-                        placeholder="开始日期" clearable style="width: 100%"></el-date-picker>
-                </el-form-item>
+                <el-date-picker v-model="dataForm.p_vouchdateend" value-format="yyyy-MM-dd" type="date"
+                    placeholder="结束日期" clearable :picker-options="pickerend" style="width: 100%"></el-date-picker>
+            </el-form-item>
+
+            <el-form-item label="当前数据日期：">
+                <el-date-picker v-model="dataForm.p_vouchdatecur" value-format="yyyy-MM-dd" type="date"
+                    placeholder="截止日期" clearable :picker-options="pickerOptions" style="width: 100%"></el-date-picker>
             </el-form-item>
             <el-form-item>
                 <el-input v-model="bullay" placeholder="模糊查询" clearable @keyup.enter.native="searchEnterFun()"
@@ -158,8 +153,13 @@ export default {
             SectionList: [],
             dayList: [],
             tadayList: [],
-            defaultMerged: {}
-
+            defaultMerged: {},
+            pickerOptions: {
+                disabledDate: (time) => this.handleDisabledDate(time)
+            },
+            pickerend:{
+                disabledDate:(time) => this.handleDisabledend(time)
+            }
         };
     },
     created() {
@@ -170,6 +170,22 @@ export default {
         this.getDataList()
     },
     methods: {
+        // 定义日期禁用逻辑的函数
+        handleDisabledDate(time) {
+            const currentTime = time.getTime();
+            // 转换开始日期和结束日期为时间戳（因两者必存在，无需判断空值）
+            const startTime = new Date(this.dataForm.p_vouchdatestart).getTime();
+            const endTime = new Date(this.dataForm.p_vouchdateend).getTime();
+
+            // 禁用：小于开始日期 或 大于结束日期 的日期
+            return currentTime < startTime || currentTime > endTime;
+        },
+        handleDisabledend(time){
+            const currentTime = time.getTime();
+            const startTime = new Date(this.dataForm.p_vouchdatestart).getTime();
+             // 禁用：小于开始日期 
+             return currentTime < startTime;
+        },
         getDataList() {
             this.dataListLoading = true
             api.APIdaily_report(this.dataForm).then(res => {
@@ -192,9 +208,9 @@ export default {
                 console.log(this.SectionList, '区间小表')
                 //计算截止今日增幅小表,去年同期增幅
                 const dayadd = this.sumBoxdayFields(this.dataList)
-                console.log(dayadd,'dayadd')
+                console.log(dayadd, 'dayadd')
                 //计算截止今日增幅小表
-                this.dayList = this.sumStopBoxFields(this.dataList, this.dataForm.p_vouchdatecur,dayadd)
+                this.dayList = this.sumStopBoxFields(this.dataList, this.dataForm.p_vouchdatecur, dayadd)
                 console.log(this.dayList, '今日增幅')
                 //计算今日增幅小表
                 this.tadayList = this.sumStopBoxdayFields(this.dataList, this.dataForm.p_vouchdatecur)
@@ -306,10 +322,10 @@ export default {
                 try {
                     // 添加一个小延迟确保loading显示
                     await new Promise(resolve => setTimeout(resolve, 100));
-                    
+
                     // 执行导出操作
                     await exportExcel(this.dataListTA, this.dataForm.p_vouchdatestart, this.dataForm.p_vouchdateend, this.dataForm.p_vouchdatecur, '销售日订单跟进表.xlsx', this.defaultMerged);
-                    
+
                     // 导出成功提示
                     this.$message({
                         type: 'success',
@@ -527,7 +543,7 @@ export default {
             };
         },
         //截止今日增幅小表
-        sumStopBoxFields(inputArray, pVouchdatecur,deadBoxArray) {
+        sumStopBoxFields(inputArray, pVouchdatecur, deadBoxArray) {
             // 1. 过滤：只保留 vouchdate 与传入时间完全匹配的对象
             const filteredArray = inputArray.filter(obj => {
                 const objVouchdate = obj.vouchdate;
@@ -549,7 +565,7 @@ export default {
                 const todayVal = Number(obj.todaybox);
                 totalTodaystopbox += isNaN(todayVal) ? 0 : todayVal;
             });
-            let thelist = deadBoxArray.lastdeadbox 
+            let thelist = deadBoxArray.lastdeadbox
             // 3. 计算差值和增长率
             const daydiff = thelist - totalLaststopbox;
             let dayRate = '0%';
