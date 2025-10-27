@@ -27,7 +27,7 @@ export async function exportExcel(tableList, fileName) {
   ];
 
   // 添加标题行（合并单元格）
-  worksheet.mergeCells('A1:D1');//合并单元格
+  worksheet.mergeCells('A1:F1');//合并单元格
   const titleRow = worksheet.getRow(1);
   titleRow.getCell(1).value = labelText;
   titleRow.height = 40; // 行高
@@ -39,7 +39,7 @@ export async function exportExcel(tableList, fileName) {
   };
 
   // 添加表头和数据
-  const subHeaders = ['省区', '销售计划', '生成计划', '实际接单'];
+  const subHeaders = ['省区', '销售总计划','供应链', '鲜露乳', '健爽', '330/310'];
 
   worksheet.addRow(subHeaders);
 
@@ -48,8 +48,10 @@ export async function exportExcel(tableList, fileName) {
     worksheet.addRow([
       item.areaname || '',
       item.piece || '',
-      item.piece || '',
-      item.piece || ''
+      item.factory || '',
+      item.xnl || '',
+      item.js || '',
+      item.yznr || '',
     ]);
   });
 

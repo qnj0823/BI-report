@@ -42,6 +42,9 @@
             <el-form-item>
                 <el-button type="primary" @click="addOrUpdateHandle()">手动</el-button>
             </el-form-item>
+            <el-form-item>
+                <el-button type="success" @click="CalibrateHandle()">校准</el-button>
+            </el-form-item>
         </el-form>
         <!-- 表单弹窗, 新增数据和修改数据 -->
         <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @close="addOrUpdateVisible = false"></add-or-update>

@@ -24,6 +24,13 @@
                     ref="searchInput"></el-input>
             </el-form-item>
             <el-form-item>
+                <el-select v-model="valueText" filterable placeholder="请选择单位体" clearable @change="handleSelectChange">
+                    <el-option v-for="item in undataList" :key="item.companyid" :label="item.companyname"
+                        :value="item.companyname">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item>
                 <el-button class="filter-item" size="mini" type="success" icon="el-icon-search"
                     @click="getDataList">查询</el-button>
             </el-form-item>
@@ -151,6 +158,7 @@ export default {
             dataListTA: [],
             currentData: [],
             value1: [], // 用于绑定日期范围的数组
+            valueText:'',
             currentPage: 1,
             pageSize: 20,
             totalItems: 0,
@@ -159,6 +167,7 @@ export default {
             dayList: [],
             tadayList: [],
             defaultMerged: {},
+            undataList: [],
             pickerOptions: {
                 disabledDate: (time) => this.handleDisabledDate(time)
             },
@@ -211,6 +220,28 @@ export default {
         //     // 禁用：小于开始日期 
         //     return currentTime < startTime;
         // },
+        handleSelectChange(selectedValue) {
+           
+            this.valueText = selectedValue  
+             // 打印选中的值
+            
+            console.log('选中的省份：', selectedValue,this.valueText);
+            // 也可以直接使用 this.value 获取（因为v-model双向绑定）
+            // console.log('选中的省份：', this.value);
+        },
+        //去重函数
+        uniqueByKey(arr, key) {
+            const seen = new Set(); // 记录已出现的字段值
+            return arr.filter(item => {
+                // 处理字段值可能为 undefined/null 的情况
+                const value = item[key];
+                if (seen.has(value)) {
+                    return false; // 已存在，过滤
+                }
+                seen.add(value);
+                return true; // 首次出现，保留
+            });
+        },
         getDataList() {
             this.dataListLoading = true
             api.APIdaily_report(this.dataForm).then(res => {
@@ -221,13 +252,20 @@ export default {
                     return item.provincename || item.provincename === 0; // 特殊处理0的情况（如果需要）
                     // 若不需要保留0，直接用：return !!item.provincename;
                 });
+               //省区去重,然后用做搜索条件
+               this.undataList = this.uniqueByKey(this.dataList, 'companyname')
+                console.log(this.valueText, 'this.valueText')
                 this.dataList = this.dataList.filter(item =>
                     (item.cityname && item.cityname.toLowerCase().includes(this.bullay)) ||
                     (item.name && item.name.toLowerCase().includes(this.bullay)) ||
                     (item.areaname && item.areaname.toLowerCase().includes(this.bullay)) ||
                     (item.cSiteName && item.cSiteName.toLowerCase().includes(this.bullay)) ||
-                    (item.provincename && item.provincename.toLowerCase().includes(this.bullay))
+                    (item.provincename && item.provincename.toLowerCase().includes(this.valueText))
                 );
+                this.dataList = this.dataList.filter(item =>
+                    (item.companyname && item.companyname.toLowerCase().includes(this.valueText))
+                );
+                
                 //计算区间小表数据小表
                 this.SectionList = this.sumBoxFields(this.dataList)
                 console.log(this.SectionList, '区间小表')
@@ -302,6 +340,8 @@ export default {
 
                 // 添加日期合计行
                 this.dataListTA = this.addDateSubtotals(this.dataListTA);
+
+                 
 
                 this.currentData = {
                     ...this.dataListTA
