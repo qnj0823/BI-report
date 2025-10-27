@@ -120,8 +120,8 @@
             <el-table-column :show-overflow-tooltip="true" align="center" prop="cityname" label="城市" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="areaname" label="区域" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="cSiteName" label="客户(站点)" />
-            <el-table-column :show-overflow-tooltip="true" align="center" prop="lastbox" label="24年10月累积" />
-            <el-table-column :show-overflow-tooltip="true" align="center" prop="currentbox" label="10月报单累积" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="lastbox" :label="`24年${month}月累积`" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="currentbox" :label="`${month}月报单累积`" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="yearcomplet" label="同比完成率" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="lasttodaybox" label="今日同期" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="todaybox" label="今日报单" />
@@ -158,7 +158,7 @@ export default {
             dataListTA: [],
             currentData: [],
             value1: [], // 用于绑定日期范围的数组
-            valueText:'',
+            valueText: '',
             currentPage: 1,
             pageSize: 20,
             totalItems: 0,
@@ -168,6 +168,7 @@ export default {
             tadayList: [],
             defaultMerged: {},
             undataList: [],
+            month: '',
             pickerOptions: {
                 disabledDate: (time) => this.handleDisabledDate(time)
             },
@@ -188,6 +189,8 @@ export default {
                 // 同步到 dataForm
                 this.dataForm.p_vouchdatestart = newVal[0]; // 开始日期
                 this.dataForm.p_vouchdateend = newVal[1];   // 结束日期
+                this.month = this.dataForm.p_vouchdateend.split('-')[1];
+                console.log(this.month, 'month')
             } else {
                 // 未选择或清除选择时，清空 dataForm 对应字段
                 this.dataForm.p_vouchdatestart = '';
@@ -221,11 +224,11 @@ export default {
         //     return currentTime < startTime;
         // },
         handleSelectChange(selectedValue) {
-           
-            this.valueText = selectedValue  
-             // 打印选中的值
-            
-            console.log('选中的省份：', selectedValue,this.valueText);
+
+            this.valueText = selectedValue
+            // 打印选中的值
+
+            console.log('选中的省份：', selectedValue, this.valueText);
             // 也可以直接使用 this.value 获取（因为v-model双向绑定）
             // console.log('选中的省份：', this.value);
         },
@@ -252,8 +255,8 @@ export default {
                     return item.provincename || item.provincename === 0; // 特殊处理0的情况（如果需要）
                     // 若不需要保留0，直接用：return !!item.provincename;
                 });
-               //省区去重,然后用做搜索条件
-               this.undataList = this.uniqueByKey(this.dataList, 'companyname')
+                //省区去重,然后用做搜索条件
+                this.undataList = this.uniqueByKey(this.dataList, 'companyname')
                 console.log(this.valueText, 'this.valueText')
                 this.dataList = this.dataList.filter(item =>
                     (item.cityname && item.cityname.toLowerCase().includes(this.bullay)) ||
@@ -265,7 +268,7 @@ export default {
                 this.dataList = this.dataList.filter(item =>
                     (item.companyname && item.companyname.toLowerCase().includes(this.valueText))
                 );
-                
+
                 //计算区间小表数据小表
                 this.SectionList = this.sumBoxFields(this.dataList)
                 console.log(this.SectionList, '区间小表')
@@ -341,7 +344,7 @@ export default {
                 // 添加日期合计行
                 this.dataListTA = this.addDateSubtotals(this.dataListTA);
 
-                 
+
 
                 this.currentData = {
                     ...this.dataListTA

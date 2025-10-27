@@ -91,8 +91,8 @@ export async function exportExcel(tableList, startDate, endDate, currentDate,fil
   // 主数据表格开始行
   const mainTableStartRow = currentRow;
   
-  // 主表格表头
-  const headers = ['日期', '城市', '区域', '客户(站点)', '', '24年10月\n累积', '10月报单累积', '同比\n完成率', '今日\n同期', '今日\n报单', '今日同期差额', '累积同期差额'];
+  // 主表格表头  
+  const headers = ['日期', '城市', '区域', '客户(站点)', '', `24年${monthEnd}月\n累积`, `${monthEnd}月报单累积`, '同比\n完成率', '今日\n同期', '今日\n报单', '今日同期差额', '累积同期差额'];
   const headerRow = worksheet.getRow(currentRow);
   headers.forEach((header, index) => {
     headerRow.getCell(index + 1).value = header;
