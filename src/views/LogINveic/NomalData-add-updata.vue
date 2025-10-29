@@ -106,6 +106,18 @@ export default {
                 wlSiteCode: '12117991',
                 days: '8',
                 createdate: ''
+            }, {
+                areaName: '四川',
+                deliverydate: '',//到货周期
+                vouchdate: '',//下单日期
+                factoryProductCode: '10400018',
+                factoryProductName: '328g噜渴零食有鸣定制常温酸奶饮品',
+                productCode: '1520100055',
+                piece: '',
+                wlSiteName: 'LOOK雨帆自提',
+                wlSiteCode: '12117991',
+                days: '8',
+                createdate: ''
             }],
         }
     },

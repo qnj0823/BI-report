@@ -43,9 +43,14 @@
                 <el-button type="primary" @click="addOrUpdateHandle()">手动</el-button>
             </el-form-item>
             <el-form-item>
-                <el-button type="success" @click="CalibrateHandle()">校准</el-button>
+                <el-button type="success" @click="CalibrateHandle('1')">校准</el-button>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="success" @click="CalibrateHandle()">发送</el-button>
             </el-form-item>
         </el-form>
+        <!-- 表单弹窗, 校准和发送数据 -->
+        <add-or-Calibr v-if="addOrCalibrVisible" ref="addOrCalibr" @close="addOrCalibrVisible = false"></add-or-Calibr>
         <!-- 表单弹窗, 新增数据和修改数据 -->
         <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @close="addOrUpdateVisible = false"></add-or-update>
         <!-- <el-form :inline="true" style="width: 100%; margin: 0 auto;">
@@ -114,10 +119,13 @@
 <script>
 import * as api from '@/api/frame/customer.js'
 import AddOrUpdate from './Wlinveicing-add-updata'
+import AddOrCalibr from './Wlin-add-updata'
+
 import axios from 'axios';
 export default {
     components: {
         AddOrUpdate,
+        AddOrCalibr
     },
     name: 'Wlin-page',
     data() {
@@ -126,6 +134,7 @@ export default {
             dataListLoading: false,
             showModal: false,
             showModalspeci: false,
+            addOrCalibrVisible:false,
             postData: {
                 datestart: '',
                 dateend: ''
@@ -205,6 +214,13 @@ export default {
             this.addOrUpdateVisible = true
             this.$nextTick(() => {
                 this.$refs.addOrUpdate.init(id, data)
+            })
+        },
+        //校准 / 发送
+        CalibrateHandle(id){
+            this.addOrCalibrVisible = true
+            this.$nextTick(() => {
+                this.$refs.addOrCalibr.init(id)
             })
         },
         async getfast() {
@@ -345,7 +361,7 @@ export default {
                 this.butnshowSDNO = false
                 this.buttonText = '导出新鲜活力开单表'
             } else if (data == '安徽') {
-                this.butnshow = true
+                this.butnshow = false
                 this.butnshow1 = false
                 this.butnshow2 = false
                 this.butnshow3 = false

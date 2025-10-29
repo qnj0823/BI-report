@@ -1,26 +1,8 @@
 <template>
     <!-- 基于 Element UI 新增和修改弹窗 -->
-    <el-dialog :title="!dataForm.id ? '新增-ADD' : '修改-EDITE'" :close-on-click-modal="false" :visible.sync="visible">
+    <el-dialog :title="!dataForm.id ? '发送' : '校准'" :close-on-click-modal="false" :visible.sync="visible">
 
-        <el-form :inline="true" style="margin-top: 10px;" :model="dataForm1" @submit.native.prevent>
-            <el-form-item>
-                <el-input v-model="dataForm2.file" placeholder="选择文件" readonly></el-input>
-                <input type="file" ref="fileInput" style="display: none" @change="handleFileUpload">
-            </el-form-item>
-            <el-form-item>
-                <el-button type="primary" @click="openFileInput">选择文件</el-button>
-                <el-button type="success" @click="uploadFile">导入</el-button>
-            </el-form-item>
-        </el-form>
-        <el-table :data="this.result">
-            <el-table-column :show-overflow-tooltip="true" align="center" prop="name" label="文件名" />
-            <el-table-column :show-overflow-tooltip="true" align="center" prop="path" label="文件地址" />
-            <el-table-column header-align="center" align="center" width="150" label="操作">
-                <template slot-scope="scope">
-                    <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
-                </template>
-            </el-table-column>
-        </el-table>
+
         <!-- 邮件发送 -->
         <el-form :model="dataForm" :rules="rules" ref=dataFormRef label-width="160px">
             <el-form-item label="发送名称" prop="fgsbscName">
@@ -34,7 +16,7 @@
                 </el-select>
             </el-form-item>
             <el-form-item label="内容" prop="body">
-                <el-input v-model="dataForm.body" disabled style="width: 100%;" placeholder="内容">
+                <el-input v-model="dataForm.body" style="width: 100%;" placeholder="内容">
                 </el-input>
             </el-form-item>
         </el-form>
@@ -63,13 +45,18 @@ export default {
                 body: ''
             },
             areaLst: [
-                { index: 1, name: '湖南计划表' },
-                { index: 2, name: '湖北计划表' },
-                { index: 3, name: '广州计划表' },
-                { index: 4, name: '江西计划表' },
-                { index: 5, name: '河南计划表' },
-                { index: 6, name: '西南计划表' },
-                { index: 7, name: '陕西计划表' }],
+                { index: 1, name: '一号机计划开单-广西' },
+                { index: 2, name: '一号机计划开单-河南' },
+                { index: 3, name: '一号机计划表-江西' },
+                { index: 4, name: '一号机计划开单-湖北' },
+                { index: 5, name: '一号机开单表-江西' },
+                { index: 6, name: '二号机计划表-浙江上海福建' },
+                { index: 7, name: '二号机计划表-江苏' },
+                { index: 8, name: '二号机计划开单-山东' },
+                { index: 9, name: '三号机计划开单-陕西' },
+                { index: 10, name: '三号机计划开单-西南' },
+                { index: 11, name: '三号机计划开单-湖南' }
+            ],
             selectedPROValue: '',
             selectedPROLable: '',
             dataForm2: {
@@ -122,59 +109,24 @@ export default {
             // 组合成完整的时间字符串
             const timeString = `${year}-${formatMonth}-${formatDay} ${formatHours}:${formatMinutes}:${formatSeconds}`;
 
-            
+
             const selectedProItem = this.areaLst.find(item => item.index === value);
             this.selectedPROLable = selectedProItem.name
             // this.dataForm.subject = selectedProItem.name
-            this.dataForm.subject = selectedProItem.name + timeString
 
-        },
-        //选择文件
-        openFileInput() {
-            this.$refs.fileInput.click();
-        },
-        handleFileUpload(event) {
-            this.files = event.target.files[0]
-            this.dataForm2.file = event.target.files[0].name;
-            console.log(this.files, this.dataForm2.file)
-        },
-        //导入
-        uploadFile() {
-            this.dataListLoading = true
-            if (this.dataForm2.file) {
-                let formData = new FormData();
-                console.log(this.files)
-                formData.append("file", this.files);
-                formData.append('name', this.files.name) // 添加文件名
+            if (this.dataForm.id) {
+                this.dataForm.subject = selectedProItem.name + '-校准' + timeString
 
-                api.addup(formData).then(res => {
-                    console.log(res, 'res', res.path, res.name)
-                    const fullPath = res.path;
-                    const shortPath = 'http://bi.yufanjtbip.com:8069' + (fullPath.replace("/home/eladmin", ""));
-
-                    this.result.push({
-                        id: this.result.length + 1,
-                        path: shortPath,
-                        name: res.name
-                    });
-                    this.dataForm.body = this.result.map(item => item.path).join(',');
-
-                    console.log(this.result)
-                    this.$message.success('导入成功')
-                    this.dataListLoading = false
-                })
-                    .catch(error => {
-                        this.dataListLoading = false
-                        this.$message.error("导入失败");
-                    });
+                this.dataForm.body = this.dataForm.subject
             } else {
-                this.$message.error("请先选择文件");
+                this.dataForm.subject = selectedProItem.name + '-发送' + timeString
+
+                this.dataForm.body = this.dataForm.subject
             }
+
+
         },
-        deleteHandle(id) {
-            this.result = this.result.filter(item => item.id !== id);
-            this.dataForm.body = this.result.map(item => item.path).join(',');
-        },
+
 
         //取消
         Cancel() {
@@ -183,7 +135,7 @@ export default {
             this.$emit('refreshDataList')
         },
 
-        init(id, data) { // 初始化表单验证规则
+        init(id) { // 初始化表单验证规则
             this.dataForm.id = id || 0
             this.visible = true
             this.$nextTick(() => {

@@ -1082,12 +1082,37 @@ export function trackReturnGoodsdel(ids) {
   })
 }
 
-//物流--物流站点与光明产品到货周期对应表(导入)
+//物流--物流站点与光明产品到货周期对应表(导入小月复盖)
 export function importproCycleAPi(formData) {
   return request({
     url: 'api/wlWlsiteOrFactoryproductDeliveryCycleSet/importorderdata',
     method: 'POST',
-    data:formData,
+    data: formData,
+    // headers: { 'Content-Type': 'multipart/form-data' }
+  })
+}
+
+//物流--物流站点与光明产品到货周期对应表(导入大月复盖)
+export function importproCyclemaxAPi(formData) {
+  return request({
+    url: 'api/wlWlsiteOrFactoryproductDeliveryCycleSet/importorderdatamax',
+    method: 'POST',
+    data: formData,
+    // headers: { 'Content-Type': 'multipart/form-data' }
+  })
+}
+
+
+
+//物流--物流站点与光明产品到货周期对应表(导入追加)
+export function importproCycleaddAPi(formData) {
+  return request({
+    url: 'api/wlWlsiteOrFactoryproductDeliveryCycleSet/importorderdataadd',
+    method: 'POST',
+    data: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data' // 设置请求头为 multipart/form-data
+    }
   })
 }
 
@@ -1320,9 +1345,9 @@ export function wlarrivedbuildApi(params) {
 //查询管理部去年低温基数(每天)
 export function APILowTempLBaseCHECK(params) {
   return request({
-      url: 'api/basicSqAndCompanyLowTempBase/all',
-      params,
-      method: 'get'
+    url: 'api/basicSqAndCompanyLowTempBase/all',
+    params,
+    method: 'get'
   })
 }
 
@@ -1755,17 +1780,17 @@ export function RPIWechupsimportAPI(params) {
 //查询(管理部)大区&单位体负责人数据表
 export function APIDqAndCompanyCHECK(params) {
   return request({
-      url: 'api/basicDqAndCompany',
-      params,
-      method: 'get'
+    url: 'api/basicDqAndCompany',
+    params,
+    method: 'get'
   })
 }
 
 //查询站点销售任务目标日跟进表
 export function APIdaily_report(params) {
   return request({
-      url: 'api/report/get_pro_site_daily_report',
-      params,
-      method: 'get'
+    url: 'api/report/get_pro_site_daily_report',
+    params,
+    method: 'get'
   })
 }

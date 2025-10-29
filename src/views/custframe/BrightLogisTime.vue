@@ -16,18 +16,31 @@
                     @click="addOrUpdateHandle()">新增</el-button>
             </el-form-item>
         </el-form>
-        <!-- <el-form :inline="true">
+        <el-form :inline="true">
             <el-button class="filter-item" size="mini" type="success" @click="uploug('湖南')">湖南</el-button>
-            <el-button class="filter-item" size="mini" type="success" @click="uploug('湖北')" >湖北</el-button>
+            <el-button class="filter-item" size="mini" type="success" @click="uploug('湖北')">湖北</el-button>
+            <el-button class="filter-item" size="mini" type="success" @click="uploug('四川')">四川</el-button>
+            <el-button class="filter-item" size="mini" type="success" @click="uploug('云南')">云南</el-button>
+            <el-button class="filter-item" size="mini" type="success" @click="uploug('贵州')">贵州</el-button>
+            <el-button class="filter-item" size="mini" type="success" @click="uploug('重庆')">重庆</el-button>
+            <el-button class="filter-item" size="mini" type="success" @click="uploug('江西')">江西</el-button>
+            <el-button class="filter-item" size="mini" type="success" @click="uploug('安徽')">安徽</el-button>
+            <el-button class="filter-item" size="mini" type="success" @click="uploug('河南')">河南</el-button>
+            <el-button class="filter-item" size="mini" type="success" @click="uploug('陕西')">陕西</el-button>
+            <el-button class="filter-item" size="mini" type="success" @click="uploug('福建')">福建</el-button>
+            <el-button class="filter-item" size="mini" type="success" @click="uploug('江苏')">江苏</el-button>
+            <el-button class="filter-item" size="mini" type="success" @click="uploug('浙江')">浙江</el-button>
+
+            <!-- <el-button class="filter-item" size="mini" type="success" @click="uploug('广东')">广东</el-button> -->
             <el-form-item>
                 <el-input v-model="dataForm2.file" placeholder="选择文件" readonly></el-input>
                 <input type="file" ref="fileInput" style="display: none" @change="handleFileUpload">
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" :disabled="disablede" @click="openFileInput">选择文件</el-button>
-                <el-button type="success" :disabled="disablede" @click="uploadFile">导入</el-button>
+                <el-button type="success" :disabled="disablede" @click="HandleuploadFile">导入</el-button>
             </el-form-item>
-        </el-form> -->
+        </el-form>
         <!-- 站点排序 -->
         <el-table ref="table" v-loading="dataListLoading" :data="currentData" style="width: 100%;">
             <el-table-column :show-overflow-tooltip="true" align="center" prop="areaName" label="区域" />
@@ -54,12 +67,17 @@
         <!-- 表单弹窗, 新增数据和修改数据 -->
         <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @close="addOrUpdateVisible = false"
             @refreshDataList="getDataList"></add-or-update>
+        <!-- 选出导出类型弹窗 -->
+        <AddUpdate v-if="addUpdateVisible" ref="addUpdate" @close="addUpdateVisible = false"
+            @select-type="handleReceiveType">
+        </AddUpdate>
     </div>
 </template>
 
 <script>
 import * as api from '@/api/frame/customer.js'
 import AddOrUpdate from './BrightLogisTime-add-updata'
+import AddUpdate from './Brig-add-updata'
 import {
     exportExcel
 } from './BrightLogisTimeExpro.js'
@@ -67,6 +85,7 @@ export default {
     name: 'wl-page',
     components: {
         AddOrUpdate,
+        AddUpdate
     },
     data() {
         return {
@@ -89,19 +108,32 @@ export default {
             dataListLoading: false,
             bullay: '',
             addOrUpdateVisible: false,
+            addUpdateVisible: false,
             currentData: [],
             currentPage: 1,
             pageSize: 20,
             totalItems: 0,
+            types: ''
         };
     },
     mounted() {
         this.getDataList()
     },
     methods: {
+        handleReceiveType(type) {
+            if (type) {
+                this.disablede = false
+                this.types = type
+            }
+
+        },
         uploug(area) {
-            this.disablede = false
+
             this.area_name = area
+            this.addUpdateVisible = true
+            this.$nextTick(() => {
+                this.$refs.addUpdate.init(area)
+            })
         },
         //选择文件
         openFileInput() {
@@ -112,15 +144,27 @@ export default {
             this.dataForm2.file = event.target.files[0].name;
             console.log(this.files, this.dataForm2.file)
         },
+
+        HandleuploadFile() {
+            if (this.types == '小月') {
+                this.uploadFile('importproCycleAPi')
+            } else if (this.types == '大月') {
+                this.uploadFile('importproCyclemaxAPi')
+            } else if (this.types == '追加') {
+                this.uploadFile('importproCycleaddAPi')
+            }
+        },
         //导入
-        uploadFile() {
+        uploadFile(API) {
             this.dataListLoading = true
             if (this.dataForm2.file) {
                 let formData = new FormData();
                 console.log(this.files)
                 formData.append("file", this.files);
                 formData.append("area_name", this.area_name);
-                api.importproCycleAPi(formData).then(res => {
+                console.log(formData, 'formData')
+
+                api[API](formData).then(res => {
                     this.$message.success('导入成功')
                     this.dataListLoading = false
                     this.getDataList()
