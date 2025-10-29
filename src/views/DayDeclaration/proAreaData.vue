@@ -23,6 +23,7 @@
             </el-form-item>
         </el-form>
         <el-table class="table" ref="table" :data="dataList" v-loading="dataListLoading"
+            :row-class-name="tableRowClassName"
             style="width: 75%; margin: 0 auto; margin-bottom: 50px;">
             <el-table-column :show-overflow-tooltip="true" align="center" prop="areaname" label="省区" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="piece" label="销售总计划" />
@@ -141,6 +142,9 @@ export default {
                 console.log(this.factoryList, ' this.factoryList')
                 this.dataList = this.mergeFactoryData(this.dataList, this.factoryList)
                 this.dataList = this.dataList.filter(item => item.areaname);
+
+                // 添加工厂总计行
+                this.dataList = this.addFactoryTotals(this.dataList);
 
                 this.dataListLoading = false
                 console.log(this.dataList)
@@ -270,9 +274,75 @@ export default {
             }
 
             return result; // 直接返回数组对象
-        }
+        },
+        addFactoryTotals(dataList) {
+            // 深拷贝数组，避免修改原数组
+            const result = JSON.parse(JSON.stringify(dataList));
+            
+            // 计算光明工厂总计（除了海南工厂的所有数据）
+            let guangmingTotal = {
+                areaname: '光明工厂总计',
+                factory: '',
+                piece: 0,
+                xnl: 0,
+                js: 0,
+                yznr: 0,
+                isTotal: true // 标记为总计行
+            };
+            
+            // 计算海南工厂总计
+            let hainanTotal = {
+                areaname: '海南工厂总计',
+                factory: '',
+                piece: 0,
+                xnl: 0,
+                js: 0,
+                yznr: 0,
+                isTotal: true // 标记为总计行
+            };
+            
+            // 遍历数据进行分类汇总
+            result.forEach(item => {
+                const piece = Number(item.piece) || 0;
+                const xnl = Number(item.xnl) || 0;
+                const js = Number(item.js) || 0;
+                const yznr = Number(item.yznr) || 0;
+                
+                if (item.factory === '海南工厂') {
+                    // 海南工厂的数据
+                    hainanTotal.piece += piece;
+                    hainanTotal.xnl += xnl;
+                    hainanTotal.js += js;
+                    hainanTotal.yznr += yznr;
+                } else {
+                    // 其他工厂的数据归入光明工厂总计
+                    guangmingTotal.piece += piece;
+                    guangmingTotal.xnl += xnl;
+                    guangmingTotal.js += js;
+                    guangmingTotal.yznr += yznr;
+                }
+            });
+            
+            // 将总计行添加到数据列表末尾
+            result.push(guangmingTotal);
+            result.push(hainanTotal);
+            
+            return result;
+         },
+         tableRowClassName({row, rowIndex}) {
+             // 为总计行添加特殊样式类名
+             if (row.isTotal) {
+                 return 'total-row';
+             }
+             return '';
+         }
     }
 };
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+// 总计行样式
+::v-deep .total-row {
+    font-weight: bold;
+}
+</style>

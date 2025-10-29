@@ -83,7 +83,25 @@ export async function exportExcel(tableList, fileName) {
 
   // 设置样式（表头、数据行、小计行等）
   styleHeaderRows(worksheet);
-  styleDataRows(worksheet)
+  styleDataRows(worksheet);
+  
+  // 处理光明工厂总计和海南工厂总计行样式（必须在styleDataRows之后执行）
+  worksheet.eachRow((row, rowNum) => {
+    const areaName = row.getCell(1).value;
+    
+    // 处理光明工厂总计和海南工厂总计行
+    if (areaName === "光明工厂总计" || areaName === "海南工厂总计") {
+      row.eachCell(cell => {
+        cell.style = {
+          ...cell.style,
+          font: {
+            ...cell.style.font,
+            bold: true
+          }
+        };
+      });
+    }
+  });
   // 隐藏指定列（例如隐藏第4列）
   worksheet.getColumn(4).hidden = false;
 
