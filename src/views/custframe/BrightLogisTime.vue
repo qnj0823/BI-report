@@ -17,20 +17,21 @@
             </el-form-item>
         </el-form>
         <el-form :inline="true">
-            <el-button class="filter-item" size="mini" type="success" @click="uploug('湖南')">湖南</el-button>
-            <el-button class="filter-item" size="mini" type="success" @click="uploug('湖北')">湖北</el-button>
-            <el-button class="filter-item" size="mini" type="success" @click="uploug('四川')">四川</el-button>
-            <el-button class="filter-item" size="mini" type="success" @click="uploug('云南')">云南</el-button>
-            <el-button class="filter-item" size="mini" type="success" @click="uploug('贵州')">贵州</el-button>
-            <el-button class="filter-item" size="mini" type="success" @click="uploug('重庆')">重庆</el-button>
-            <el-button class="filter-item" size="mini" type="success" @click="uploug('江西')">江西</el-button>
-            <el-button class="filter-item" size="mini" type="success" @click="uploug('安徽')">安徽</el-button>
-            <el-button class="filter-item" size="mini" type="success" @click="uploug('河南')">河南</el-button>
-            <el-button class="filter-item" size="mini" type="success" @click="uploug('陕西')">陕西</el-button>
-            <el-button class="filter-item" size="mini" type="success" @click="uploug('福建')">福建</el-button>
-            <el-button class="filter-item" size="mini" type="success" @click="uploug('江苏')">江苏</el-button>
-            <el-button class="filter-item" size="mini" type="success" @click="uploug('浙江')">浙江</el-button>
-
+            <el-form-item>
+                <el-button class="filter-item" size="mini" type="success" @click="uploug('湖南')">湖南</el-button>
+                <el-button class="filter-item" size="mini" type="success" @click="uploug('湖北')">湖北</el-button>
+                <el-button class="filter-item" size="mini" type="success" @click="uploug('四川')">四川</el-button>
+                <el-button class="filter-item" size="mini" type="success" @click="uploug('云南')">云南</el-button>
+                <el-button class="filter-item" size="mini" type="success" @click="uploug('贵州')">贵州</el-button>
+                <el-button class="filter-item" size="mini" type="success" @click="uploug('重庆')">重庆</el-button>
+                <el-button class="filter-item" size="mini" type="success" @click="uploug('江西')">江西</el-button>
+                <el-button class="filter-item" size="mini" type="success" @click="uploug('安徽')">安徽</el-button>
+                <el-button class="filter-item" size="mini" type="success" @click="uploug('河南')">河南</el-button>
+                <el-button class="filter-item" size="mini" type="success" @click="uploug('陕西')">陕西</el-button>
+                <el-button class="filter-item" size="mini" type="success" @click="uploug('福建')">福建</el-button>
+                <el-button class="filter-item" size="mini" type="success" @click="uploug('江苏')">江苏</el-button>
+                <el-button class="filter-item" size="mini" type="success" @click="uploug('浙江')">浙江</el-button>
+            </el-form-item>
             <!-- <el-button class="filter-item" size="mini" type="success" @click="uploug('广东')">广东</el-button> -->
             <el-form-item>
                 <el-input v-model="dataForm2.file" placeholder="选择文件" readonly></el-input>

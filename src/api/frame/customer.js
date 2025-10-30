@@ -1110,9 +1110,18 @@ export function importproCycleaddAPi(formData) {
     url: 'api/wlWlsiteOrFactoryproductDeliveryCycleSet/importorderdataadd',
     method: 'POST',
     data: formData,
-    headers: {
-      'Content-Type': 'multipart/form-data' // 设置请求头为 multipart/form-data
-    }
+    
+  })
+}
+
+
+//物流--物流站点与光明产品到货周期对应表特殊规则(导入追加)
+export function importproCycleSpaceaddAPi(formData) {
+  return request({
+    url: 'api/wlWlsiteOrFactoryproductDeliveryCycleSetOther/importorderdataadd',
+    method: 'POST',
+    data: formData,
+   
   })
 }
 
