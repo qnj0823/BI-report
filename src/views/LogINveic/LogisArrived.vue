@@ -24,6 +24,7 @@
                 <el-button size="mini" class="filter-item" type="primary" @click="getguizhou">贵州</el-button>
                 <el-button size="mini" class="filter-item" type="primary" @click="getshanghai">浙江</el-button>
                 <el-button size="mini" class="filter-item" type="primary" @click="getfujian">福建</el-button>
+                <el-button size="mini" class="filter-item" type="primary" @click="getanhui">安徽</el-button>
                 <!-- <el-button size="mini" class="filter-item" type="primary" @click="getshanghai">上海</el-button> -->
                 <el-button size="mini" class="filter-item" type="warning" icon="el-icon-download" @click="exportData"
                     v-if="showExportButton">导出</el-button>
@@ -32,6 +33,7 @@
                 <el-button size="mini" class="filter-item" type="primary" @click="calculateZJ">计算(浙江)</el-button>
                 <el-button size="mini" class="filter-item" type="primary" @click="calculateFJ">计算(福建)</el-button>
                 <el-button size="mini" class="filter-item" type="primary" @click="calculateGX">计算(广西)</el-button>
+                <el-button size="mini" class="filter-item" type="primary" @click="calculateAH">计算(安徽)</el-button>
             </el-form-item>
         </el-form>
         <div class="test">{{ this.labelText }}</div>
@@ -177,6 +179,17 @@ export default {
             shanghaiForm: {
                 p_vouchdateend: '',
                 p_areaname: '上海',
+                p_orgname: '雨帆食品集团股份有限公司'
+            },
+            anhuiForm: {
+                p_vouchdateend: '',
+                p_areaname: '安徽',
+                p_orgname: '雨帆食品集团股份有限公司'
+            },
+            anhuiCalForm: {
+                p_vouchdatecur: '',
+                p_vouchdateend: '',
+                p_areaname: '安徽',
                 p_orgname: '雨帆食品集团股份有限公司'
             },
 
@@ -502,6 +515,52 @@ export default {
 
             // 将 map 中的值转为数组
             return Array.from(map.values());
+        },
+        //安徽
+        getanhui() {
+            this.dataListLoading = true
+            this.showExportButton = false
+            this.areas = '安徽'
+            this.anhuiForm.p_vouchdateend = this.dataForm.p_vouchdateend
+            const [year, month, day] = this.dataForm.p_vouchdateend.split('-').map(Number);
+            this.labelText = `${this.areas}区域到货明细表--截止${year}年${month}月${day}日`; // 如果没有选择日期，显示默认文本
+            api.wlarrivedApi(this.anhuiForm).then(res => {
+                this.dataList = res
+                this.dataList = this.mergeBoxFields(this.dataList)
+                this.dataList = this.dataList.map(item => ({
+                    ...item, // 展开原对象的所有属性
+                    ["box" + item.productCode]: item.box // 新增动态属性
+                }));
+                ///数据合并（根据wlSiteCode分组）
+                this.dataList = this.mergeDataList(this.dataList);
+                //计算小计
+                this.dataList = this.dataList.map(item => {
+                    let sum = 0;
+                    for (const key in item) {
+                        // 跳过保留字段
+                        if (['areaName', 'days', 'wlSiteCode', 'wlSiteName'].includes(key)) continue;
+                        // 其他字段转为数字并累加
+                        sum += Number(item[key]) || 0;
+                    }
+                    // 返回新对象（保留原字段 + 新增 sum）
+                    return { ...item, sum };
+                });
+                //计算总计
+                this.calculateTotals(this.dataList, {
+                    excludeFields: ['vcol6_name', 'vcol6_code', 'vcol2_name', 'vcol2', 'vnote'],
+                    totalFields: {
+                        vcol2_name: "总计",
+                        wlSiteCode: "TOTAL",
+                        wlSiteName: "总计",
+                        days: 0
+                    },
+                    addToOriginal: true
+                })
+                // this.calculateTotals(this.dataList);
+                this.dataListLoading = false
+                this.showExportButton = true
+                console.log(this.dataList, 'this.dataList')
+            })
         },
         //重庆
         getchingqin() {
@@ -2467,6 +2526,17 @@ export default {
             })
 
         },
+        calculateAH() {
+            this.anhuiCalForm.p_vouchdatecur = this.dataForm.p_vouchdateend
+            this.anhuiCalForm.p_vouchdateend = this.dataForm.p_vouchdateend
+            this.dataListLoading = true
+            api.getrunArrivedAHApi(this.anhuiCalForm).then(res => {
+                this.dataListLoading = false
+            })
+        },
+
+        
+
         wlpersonList() {
             api.wlsitepersonApi(this.siteForm).then(res => {
                 this.siteList = res

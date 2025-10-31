@@ -1264,6 +1264,17 @@ export function getrunArrivedFJApi(params) {
   })
 }
 
+//返回全部(物流表(根据订单日期重新计算[安徽]))
+export function getrunArrivedAHApi(params) {
+  return request({
+    url: 'api/wlWlsiteOrFactoryproductOrderDeliveryCycle/get_runOrderArrived_anhui',
+    params,
+    method: 'get'
+  })
+}
+
+
+
 //返回全部(物流及开单表(广东)--导出EXCEL)
 export function wlnewguangdongApi(params) {
   return request({

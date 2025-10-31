@@ -23,8 +23,7 @@
             </el-form-item>
         </el-form>
         <el-table class="table" ref="table" :data="dataList" v-loading="dataListLoading"
-            :row-class-name="tableRowClassName"
-            style="width: 75%; margin: 0 auto; margin-bottom: 50px;">
+            :row-class-name="tableRowClassName" style="width: 75%; margin: 0 auto; margin-bottom: 50px;">
             <el-table-column :show-overflow-tooltip="true" align="center" prop="areaname" label="省区" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="piece" label="销售总计划" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="factory" label="供应链" />
@@ -141,7 +140,14 @@ export default {
                 this.factoryList = this.updateFactoryByCycle(this.factoryList)
                 console.log(this.factoryList, ' this.factoryList')
                 this.dataList = this.mergeFactoryData(this.dataList, this.factoryList)
-                this.dataList = this.dataList.filter(item => item.areaname);
+                // this.dataList = this.dataList.filter(item => item.areaname);
+                this.dataList = this.dataList.map(item => {
+                    // 如果没有areaname字段，或者areaname为空值
+                    if (!item.hasOwnProperty('areaname') || !item.areaname) {
+                        return { ...item, areaname: "其它" };
+                    }
+                    return item;
+                });
 
                 // 添加工厂总计行
                 this.dataList = this.addFactoryTotals(this.dataList);
@@ -183,7 +189,7 @@ export default {
                 "广东省", "广西省", "海南省", "湖南省", "四川省",
                 "重庆市", "浙江省", "江西省", "云南省", "上海市",
                 "湖北省", "江苏省", "河南省", "山东省", "贵州省",
-                "福建省", "山西省", "陕西省", "安徽省",  "广西壮族自治区",  "西藏自治区",
+                "福建省", "山西省", "陕西省", "安徽省", "广西壮族自治区", "西藏自治区","其它",
                 "海南look常温", "海南look椰汁", "海南look果汁"
             ];
 
@@ -278,7 +284,7 @@ export default {
         addFactoryTotals(dataList) {
             // 深拷贝数组，避免修改原数组
             const result = JSON.parse(JSON.stringify(dataList));
-            
+
             // 计算光明工厂总计（除了海南工厂的所有数据）
             let guangmingTotal = {
                 areaname: '光明工厂总计',
@@ -289,7 +295,7 @@ export default {
                 yznr: 0,
                 isTotal: true // 标记为总计行
             };
-            
+
             // 计算海南工厂总计
             let hainanTotal = {
                 areaname: '海南工厂总计',
@@ -300,14 +306,14 @@ export default {
                 yznr: 0,
                 isTotal: true // 标记为总计行
             };
-            
+
             // 遍历数据进行分类汇总
             result.forEach(item => {
                 const piece = Number(item.piece) || 0;
                 const xnl = Number(item.xnl) || 0;
                 const js = Number(item.js) || 0;
                 const yznr = Number(item.yznr) || 0;
-                
+
                 if (item.factory === '海南工厂') {
                     // 海南工厂的数据
                     hainanTotal.piece += piece;
@@ -322,20 +328,20 @@ export default {
                     guangmingTotal.yznr += yznr;
                 }
             });
-            
+
             // 将总计行添加到数据列表末尾
             result.push(guangmingTotal);
             result.push(hainanTotal);
-            
+
             return result;
-         },
-         tableRowClassName({row, rowIndex}) {
-             // 为总计行添加特殊样式类名
-             if (row.isTotal) {
-                 return 'total-row';
-             }
-             return '';
-         }
+        },
+        tableRowClassName({ row, rowIndex }) {
+            // 为总计行添加特殊样式类名
+            if (row.isTotal) {
+                return 'total-row';
+            }
+            return '';
+        }
     }
 };
 </script>
