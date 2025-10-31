@@ -47,7 +47,7 @@
         </el-table>
         <el-pagination @size-change="sizeChangeHandle" ref="pagination" @current-change="handleCurrentChange"
             :current-page="currentPage" :page-sizes="[20, 40, 60, 80, 100, 1000]" :page-size="pageSize"
-            layout="total, sizes, prev, pager, next, jumper" :total="dataList.totalElements">
+            layout="total, sizes, prev, pager, next, jumper" :total="dataList.length">
         </el-pagination>
 
         <!-- 表单弹窗, 新增数据和修改数据 -->

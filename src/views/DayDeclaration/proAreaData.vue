@@ -72,6 +72,9 @@ export default {
                 { province: "山西省", factory: "武汉工厂" },
                 { province: "陕西省", factory: "武汉工厂" },
                 { province: "安徽省", factory: "武汉工厂" },
+                { province: "天津市", factory: "武汉工厂" },
+                { province: "北京市", factory: "武汉工厂" },
+                { province: "山西省", factory: "武汉工厂" },
                 { province: "西藏自治区", factory: "成都工厂" },
                 { province: "海南look常温", factory: "海南工厂" },
                 { province: "海南look椰汁", factory: "海南工厂" },
@@ -187,7 +190,7 @@ export default {
             // 定义排序顺序
             const customOrder = [
                 "广东省", "广西省", "海南省", "湖南省", "四川省",
-                "重庆市", "浙江省", "江西省", "云南省", "上海市",
+                "重庆市", "浙江省", "江西省", "云南省", "上海市","天津市",
                 "湖北省", "江苏省", "河南省", "山东省", "贵州省",
                 "福建省", "山西省", "陕西省", "安徽省", "广西壮族自治区", "西藏自治区","其它",
                 "海南look常温", "海南look椰汁", "海南look果汁"
