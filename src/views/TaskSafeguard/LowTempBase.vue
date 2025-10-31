@@ -58,10 +58,10 @@
 
 <script>
 import * as api from '@/api/management/management.js'
+import {
+    exportExcel
+} from './LowTempBaseExpro.js'
 // import AddOrUpdate from './yearlowfound-add-updata'
-// import {
-//     exportExcel
-// } from './yearlowfoundExpro.js'
 export default {
     // components: {
     //     AddOrUpdate,
@@ -97,7 +97,7 @@ export default {
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                exportExcel(this.dataList.content, '去年低温基数.xlsx')
+                exportExcel(this.dataList, '去年低温基数.xlsx')
             })
         },
         //选择文件
