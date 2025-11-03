@@ -76,7 +76,7 @@
             <el-button type="primary" v-show="butnshow1" @click="exportData('pdf')">{{ buttonText }}</el-button>
             <el-button type="primary" v-show="butnshow2" @click="exportData('qxhl')">导出清新活力计划表</el-button>
             <el-button type="primary" v-show="butnshow3" @click="exportData('yn')">导出云南计划表</el-button>
-            <el-button type="primary" v-show="butnshowSD" @click="exportData('SDHZ')">导出山东杭州仓计划表</el-button>
+            <!-- <el-button type="primary" v-show="butnshowSD" @click="exportData('SDHZ')">导出山东杭州仓计划表</el-button> -->
             <el-button type="primary" v-show="butnshowSDNO" @click="exportData('SDnO')">导出山东非杭州仓计划</el-button>
             <!-- <el-button type="primary" v-show="butnshow3" @click="exportData('sc')">导出四川计划表</el-button> -->
 
