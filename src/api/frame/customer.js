@@ -852,7 +852,14 @@ export function wlSDOpenthenotherNoApi(params) {
 }
 
 
-
+//返回全部(物流及开单表(山西计划与开单)--导出EXCEL)
+export function wldataShanxiApi(params) {
+  return request({
+    url: 'api/report/get_pro_wl_product_or_factory_site_data_shanxi',
+    params,
+    method: 'get'
+  })
+}
 
 
 

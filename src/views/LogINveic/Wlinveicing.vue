@@ -134,7 +134,7 @@ export default {
             dataListLoading: false,
             showModal: false,
             showModalspeci: false,
-            addOrCalibrVisible:false,
+            addOrCalibrVisible: false,
             postData: {
                 datestart: '',
                 dateend: ''
@@ -217,7 +217,7 @@ export default {
             })
         },
         //校准 / 发送
-        CalibrateHandle(id){
+        CalibrateHandle(id) {
             this.addOrCalibrVisible = true
             this.$nextTick(() => {
                 this.$refs.addOrCalibr.init(id)
@@ -436,7 +436,16 @@ export default {
                 this.butnshowSD = true
                 this.butnshowSDNO = true
                 // this.buttonText = '导出新鲜活力导出表' butnshowKD
-            } else {
+            } else if (data == '山西') {
+                this.butnshowKD = true
+                this.butnshow = false
+                this.butnshow1 = false
+                this.butnshow2 = false
+                this.butnshow3 = false
+                this.butnshowSD = false
+                this.butnshowSDNO = false
+                // this.buttonText = '导出新鲜活力导出表' butnshowKD
+            }else {
                 this.butnshowKD = true
                 this.butnshow = false
                 this.butnshow1 = false
@@ -567,7 +576,7 @@ export default {
             console.log(this.dictForm, 'this.dictForm')
             if (this.dictForm.p_areaname == '湖北') {
                 const isDev = process.env.NODE_ENV === 'development';
-                console.log(isDev,666666)
+                console.log(isDev, 666666)
                 const baseURL = isDev ? 'http://172.16.100.199:9000' : '';
                 //湖北
                 api.wlProductexcelnewhbApi(this.dictForm).then(res => {
@@ -579,7 +588,7 @@ export default {
                                 data: this.switchForm,
                             }, // 请求体（POST data），这里可以留空或传其他数据
                             {
-                                
+
                                 headers: {
                                     'Accept': 'application/json, text/plain, */*',
                                     'Content-Type': 'application/json',
@@ -641,6 +650,12 @@ export default {
             } else if (this.dictForm.p_areaname == '山东') {
                 api.wlSDOpenthenApi(this.dictForm).then(res => {
                     window.open('http://bi.yufanjtbip.com:8069/file/%E6%96%87%E6%A1%A3/newfileshandongout.xlsx')
+                    this.dataListLoading = false
+
+                })
+            } else if (this.dictForm.p_areaname == '山西') {
+                api.wldataShanxiApi(this.dictForm).then(res => {
+                    window.open('http://bi.yufanjtbip.com:8069/file/%E6%96%87%E6%A1%A3/newfileplanshanxidataout.xlsx')
                     this.dataListLoading = false
 
                 })
