@@ -861,6 +861,25 @@ export function wldataShanxiApi(params) {
   })
 }
 
+//返回全部(物流及开单表(北京天津)--导出EXCEL)
+export function wlnewBjtjApi(params) {
+  return request({
+    url: 'api/report/get_pro_wl_product_or_factory_excel_new_bjtj',
+    params,
+    method: 'get'
+  })
+}
+
+//返回全部(物流及开单表(北京天津计划)--导出EXCEL)
+export function wlnewBjtjPlanApi(params) {
+  return request({
+    url: 'api/report/get_pro_wl_product_or_factory_excel_new_bjtj_plan',
+    params,
+    method: 'get'
+  })
+}
+
+
 
 
 

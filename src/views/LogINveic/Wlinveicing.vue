@@ -23,6 +23,10 @@
                     @click="getDataList('四川', '雨帆食品集团股份有限公司')">
                     西南
                 </el-button>
+                <el-button v-if="showSouthtb" size="mini" class="filter-item" type="primary"
+                    @click="getDataList('北京', '雨帆食品集团股份有限公司')">
+                    京津
+                </el-button>
 
                 <el-button v-if="showhubei" size="mini" class="filter-item" type="primary"
                     @click="getDataList('湖北', '海南雨帆之家餐饮供应链管理有限公司')">
@@ -186,6 +190,10 @@ export default {
         southwestProvinces() {
             return ['四川', '云南', '重庆', '贵州'];
         },
+        // 北京天津地区
+        beijingTianjin() {
+            return ['北京', '天津'];
+        },
 
         // 是否需要显示西南按钮
         showSouthwest() {
@@ -193,11 +201,18 @@ export default {
                 this.southwestProvinces.includes(item.pK_AREACL_NAME)
             );
         },
+        // 是否需要显示 京津冀按钮
+        showSouthtb() {
+            return this.newArray.some(item =>
+                this.beijingTianjin.includes(item.pK_AREACL_NAME)
+            );
+        },
 
-        // 非西南地区的列表
+        // 非西南地区与北京天津的列表
         nonSouthwestAreas() {
             return this.newArray.filter(item =>
-                !this.southwestProvinces.includes(item.pK_AREACL_NAME)
+                !this.southwestProvinces.includes(item.pK_AREACL_NAME) &&
+                !this.beijingTianjin.includes(item.pK_AREACL_NAME)
             );
         },
     },
@@ -445,7 +460,16 @@ export default {
                 this.butnshowSD = false
                 this.butnshowSDNO = false
                 // this.buttonText = '导出新鲜活力导出表' butnshowKD
-            }else {
+            } else if (data == '北京') {
+                this.butnshowKD = true
+                this.butnshow = true
+                this.butnshow1 = false
+                this.butnshow2 = false
+                this.butnshow3 = false
+                this.butnshowSD = false
+                this.butnshowSDNO = false
+                // this.buttonText = '导出新鲜活力导出表' butnshowKD
+            } else {
                 this.butnshowKD = true
                 this.butnshow = false
                 this.butnshow1 = false
@@ -659,6 +683,12 @@ export default {
                     this.dataListLoading = false
 
                 })
+            } else if (this.dictForm.p_areaname == '北京') {
+                api.wlnewBjtjApi(this.dictForm).then(res => {
+                    window.open('http://bi.yufanjtbip.com:8069/file/%E6%96%87%E6%A1%A3/newfilehubjtjout.xlsx')
+                    this.dataListLoading = false
+
+                })
             }
         },
         //山东杭州仓计划
@@ -770,6 +800,12 @@ export default {
                     this.dataListLoading = false
 
                 })
+            } else if (this.dictForm.p_areaname == '北京') {
+                api.wlnewBjtjPlanApi(this.dictForm).then(res => {
+                    window.open('http://bi.yufanjtbip.com:8069/file/%E6%96%87%E6%A1%A3/newfilehuplanbjtjout.xlsx')
+                    this.dataListLoading = false
+
+                })
             }
         },
         //特殊计划
@@ -821,12 +857,10 @@ export default {
             console.log(val)
             this.currentPage = val;
             this.currentData = this.dataList.slice((val - 1) * this.pageSize, val * this.pageSize);
-            
+
         },
     }
 };
 </script>
 
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>
