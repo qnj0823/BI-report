@@ -33,7 +33,7 @@
                 <!-- <el-button type="primary" @click="getDataList('浙江')">浙江</el-button>
                 <el-button type="primary" @click="getDataList('浙江')">福建</el-button> -->
                 <el-button size="mini" class="filter-item" type="warning" icon="el-icon-download"
-                @click="exportData">导出</el-button>
+                    @click="exportData">导出</el-button>
             </el-form-item>
         </el-form>
         <!-- 站点排序 -->
@@ -86,11 +86,11 @@ export default {
             },
             dataList: [],
             childMessage: '',
-            test:'',
+            test: '',
             dataListLoading: false,
             show: true,
             bullay: '',
-            seek:'',
+            seek: '',
             addOrUpdateVisible: false,
         };
     },
@@ -143,12 +143,26 @@ export default {
             this.dataListLoading = true
             api.BDSiteFactorycheckApi(this.dataForm).then(res => {
                 this.dataList = res.content
-                this.dataList = this.dataList.filter(item =>
-                    item.areaname.toLowerCase().includes(this.bullay)
-                );
-                this.dataList = this.dataList.filter(item =>
-                    item.sitename.includes(this.seek)
-                );
+                // this.dataList = this.dataList.filter(item =>
+                //     item.areaname.toLowerCase().includes(this.bullay)
+                // );
+                // this.dataList = this.dataList.filter(item =>
+                //     item.sitename.includes(this.seek)
+                // );
+                this.dataList = this.dataList.filter(item => {
+                    // 1. 先判断 areaname 是否存在且为字符串
+                    if (typeof item.areaname !== 'string') {
+                        return false; // 非字符串类型直接过滤（或根据需求处理）
+                    }
+                    // 2. 确保 this.bullay 是字符串（避免 includes 传入非字符串导致的问题）
+                    const bullayStr = typeof this.bullay === 'string' ? this.bullay : '';
+                    // 3. 安全调用 toLowerCase() 和 includes()
+                    return item.areaname.toLowerCase().includes(bullayStr);
+                });
+                this.dataList = this.dataList.filter(item => {
+                    // 确保 sitename 存在且是字符串，再调用 includes()
+                    return typeof item.sitename === 'string' && item.sitename.includes(this.seek);
+                });
                 this.dataList = this.dataList.sort((a, b) => {
                     return a.orderid - b.orderid; // 升序排序  
                     // 如果需要降序排序，可以使用: return b.orderId - a.orderId;  
