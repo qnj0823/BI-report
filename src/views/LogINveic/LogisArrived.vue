@@ -24,7 +24,8 @@
                 <el-button size="mini" class="filter-item" type="primary" @click="getguizhou">贵州</el-button>
                 <el-button size="mini" class="filter-item" type="primary" @click="getshanghai">浙江</el-button>
                 <el-button size="mini" class="filter-item" type="primary" @click="getfujian">福建</el-button>
-                <el-button size="mini" class="filter-item" type="primary" @click="getanhui">安徽</el-button>
+                <el-button size="mini" class="filter-item" type="primary" @click="getjiangsu">江苏</el-button>
+                <!-- <el-button size="mini" class="filter-item" type="primary" @click="getanhui">安徽</el-button> -->
                 <!-- <el-button size="mini" class="filter-item" type="primary" @click="getshanghai">上海</el-button> -->
                 <el-button size="mini" class="filter-item" type="warning" icon="el-icon-download" @click="exportData"
                     v-if="showExportButton">导出</el-button>
@@ -33,7 +34,8 @@
                 <el-button size="mini" class="filter-item" type="primary" @click="calculateZJ">计算(浙江)</el-button>
                 <el-button size="mini" class="filter-item" type="primary" @click="calculateFJ">计算(福建)</el-button>
                 <el-button size="mini" class="filter-item" type="primary" @click="calculateGX">计算(广西)</el-button>
-                <el-button size="mini" class="filter-item" type="primary" @click="calculateAH">计算(安徽)</el-button>
+                <el-button size="mini" class="filter-item" type="primary" @click="calculateJS">计算(江苏)</el-button>
+                <!-- <el-button size="mini" class="filter-item" type="primary" @click="calculateAH">计算(安徽)</el-button> -->
             </el-form-item>
         </el-form>
         <div class="test">{{ this.labelText }}</div>
@@ -89,6 +91,10 @@ import {
 import {
     exportExcelzj
 } from './LogisArrivedzjExpro.js'
+
+import {
+    exportExceljs
+} from './LogisArrivedjsExpro.js'
 
 import {
     exportExcelfj
@@ -169,6 +175,11 @@ export default {
             fujianForm: {
                 p_vouchdateend: '',
                 p_areaname: '福建',
+                p_orgname: '雨帆食品集团股份有限公司'
+            },
+            jiangsuForm: {
+                p_vouchdateend: '',
+                p_areaname: '江苏',
                 p_orgname: '雨帆食品集团股份有限公司'
             },
             fujianForm1: {
@@ -294,6 +305,52 @@ export default {
                 }
             ],
             FJfinalResult: [],
+            JSfinalResult: [],
+            JSDataList1: [{
+                oldsite: ['苏苏州昆山玉山', '苏苏州太仓贾旭东'],
+            }],
+            JSDataList: [
+                {
+                    oldsite: ['苏苏州吴中何伟', '苏苏州园区杨圣召', '苏苏州吴江李海军', '苏苏州虎丘杨振武'],
+                    newsite: '苏苏州吴中邱裕铭'
+                },
+                {
+                    oldsite: ['苏苏州直营部'],
+                    newsite: '苏苏州相城田君'
+                },
+                {
+                    oldsite: ['苏常州钟楼葛树胜'],
+                    newsite: '苏常州武进澜鑫'
+                },
+                {
+                    oldsite: ['苏常州市区直营', '苏常州溧阳赵宇', '苏常州金坛张志良', '苏常州天宁刘正'],
+                    newsite: '苏常州新北正良原食品'
+                },
+                {
+                    oldsite: ['苏无锡惠山陈君'],
+                    newsite: '苏无锡锡山瑞宝'
+                },
+                {
+                    oldsite: ['苏南京袁国旗', '苏南京江宁优润'],
+                    newsite: '苏南京江宁君一诺'
+                },
+                {
+                    oldsite: ['苏南京恒缘丰', '苏南京江北聚帆', '苏南京溧水依依'],
+                    newsite: '苏南京建邺雨花鹏誉'
+                },
+                {
+                    oldsite: ['苏南京浦口吉顺', '苏南京栖霞博源久'],
+                    newsite: '苏南京秦淮鼓楼米米'
+                },
+                {
+                    oldsite: ['苏镇江丁卯帆之雨'],
+                    newsite: '苏无锡新腾百货'
+                },
+                {
+                    oldsite: ['苏泰州姜堰熠辉', '苏泰州兴化熠辉王凯'],
+                    newsite: '苏泰州熠辉'
+                },
+            ],
             ZJDataList: [
                 {
                     oldsite: ['浙温州永嘉玉熙'],
@@ -1100,6 +1157,32 @@ export default {
             });
             return result;
         },
+         matchAndAddSortFields1(onderList, transformedArray) {
+            const result = [];
+            transformedArray.forEach((item, index) => {
+                const sortValue = `A${index + 1}`; // A1, A2, A3...
+                const oldsiteArray = item.oldsite;
+                console.log(oldsiteArray, 'oldsiteArray');
+
+                // 遍历每个 oldsite 进行匹配
+                oldsiteArray.forEach(oldsite => {
+                    // 在 onderList 中查找匹配的对象
+                    const matchedObjects = onderList.filter(dataItem =>
+                        dataItem.wlSiteName == oldsite
+                    );
+
+                    // 为匹配的对象添加 sort 字段，并过滤掉 sum >= 50 的对象
+                    const objectsWithSort = matchedObjects
+                        .map(matchedItem => ({
+                            ...matchedItem,
+                            sort: sortValue
+                        }))
+
+                    result.push(...objectsWithSort);
+                });
+            });
+            return result;
+        },
         //特殊规则三
         matchAndAddSort(onderList, transformedArray) {
             const result = [];
@@ -1639,6 +1722,216 @@ export default {
                 })
             })
         },
+        getjiangsu() {
+            this.areas = '江苏'
+            this.wlForm.blurry = this.areas
+            this.dataListLoading = true
+            this.showExportButton = false
+            const [year, month, day] = this.dataForm.p_vouchdateend.split('-').map(Number);
+            this.labelText = `${this.areas}区域到货明细表--截止${year}年${month}月${day}日`; // 如果没有选择日期，显示默认文本
+            this.dateLable = `${month}月${day}日`
+            console.log(this.dateLable)
+            this.jiangsuForm.p_vouchdateend = this.dataForm.p_vouchdateend
+            //转时间
+            const date = new Date(this.dataForm.p_vouchdateend);
+            date.setDate(date.getDate() - 2);
+            // this.hainanForm.p_vouchdateend = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+            this.hainanForm.p_vouchdateend = this.dataForm.p_vouchdateend
+
+            api.WlsiteAndContactsAPI(this.wlForm).then(res => {
+                console.log(res, 'res6666')
+                this.wlDataList = res
+                this.wlDataList = this.wlDataList.filter(item => item.areaName == '江苏');
+                api.wlarrivedApi(this.jiangsuForm).then(res => {
+                    this.dataList = res
+                    this.dataList = this.mergeBoxFields(this.dataList)
+                    this.dataList = this.mergeObjectsByCodes(this.dataList);
+                    this.dataList = this.dataList.map(item => ({
+                        ...item, // 展开原对象的所有属性
+                        ["box" + item.productCode]: item.box // 新增动态属性
+                    }));
+                    this.dataList = Object.values(
+                        this.dataList.reduce((acc, item) => {
+                            const key = item.wlSiteCode; // 使用 wlSiteCode 作为分组依据
+
+                            if (!acc[key]) {
+                                // 初始化新对象，并删除不合并的字段
+                                acc[key] = { ...item }; // 先复制所有字段
+
+                                // 删除不合并的字段
+                                const fieldsToRemove = [
+                                    'box',
+                                    'deliverydate',
+                                    'factoryProductCode',
+                                    'factoryProductName',
+                                    'piece',
+                                    'productCode',
+                                    'vouchdate',
+                                    'tel'
+                                ];
+                                fieldsToRemove.forEach(field => delete acc[key][field]);
+                            } else {
+                                // 合并其他字段(如 jtProductCode）
+                                Object.keys(item).forEach(field => {
+                                    // 如果字段不在排除列表，则合并
+                                    if (![
+                                        'wlSiteCode',
+                                        'box',
+                                        'deliverydate',
+                                        'factoryProductCode',
+                                        'factoryProductName',
+                                        'piece',
+                                        'productCode',
+                                        'vouchdate'
+                                    ].includes(field)) {
+                                        acc[key][field] = item[field]; // 后出现的值会覆盖前面的
+                                    }
+                                });
+                            }
+
+                            return acc;
+                        }, {})
+                    );
+                    this.dataList = this.dataList.map(item => {
+                        let sum = 0;
+                        for (const key in item) {
+                            // 跳过保留字段
+                            if (['areaName', 'days', 'wlSiteCode', 'wlSiteName', 'tel', 'address', 'contacts'].includes(key)) continue;
+                            // 其他字段转为数字并累加
+                            sum += Number(item[key]) || 0;
+                        }
+                        // 返回新对象(保留原字段 + 新增 sum）
+                        return { ...item, sum };
+                    });
+
+                    // 初始化总计对象
+                    const totalObj = {
+                        areaName: "江苏总计",
+                        contacts: '江苏总计',
+                        tel: '江苏总计',
+                        days: 0,
+                        wlSiteCode: "TOTAL",
+                        wlSiteName: "江苏总计"
+                    };
+
+                    // 遍历数组中的每个对象
+                    this.dataList.forEach(item => {
+                        // 遍历每个对象的属性
+                        Object.keys(item).forEach(key => {
+                            // 跳过不需要求和的字段
+                            if (['areaName', 'days', 'wlSiteCode', 'wlSiteName', 'tel', 'contacts', 'vnote'].includes(key)) {
+                                return;
+                            }
+
+                            // 初始化总计对象中的字段(如果不存在)
+                            if (!totalObj.hasOwnProperty(key)) {
+                                totalObj[key] = 0;
+                            }
+
+                            // 将值转为数字并累加
+                            const value = Number(item[key]) || 0;
+                            totalObj[key] += value;
+                        });
+
+                        // 累加days字段(如果需要)
+                        totalObj.days += Number(item.days) || 0;
+                    });
+
+                    // 将总计对象添加到原数组（如果需要)
+                    this.dataList.push(totalObj);
+                    // 直接修改原数组
+                    this.dataList.forEach((item, index) => {
+                        // 如果不是最后三个元素，则添加 startDate
+                        if (index < this.dataList.length - 1) {
+                            item.startDate = this.dateLable;
+                        }
+                    });
+
+                    this.dataList = this.dataList.map(dataItem => {
+                        // 在wlDataList中查找匹配的对象
+                        const matchedItem = this.wlDataList.find(wlItem =>
+                            wlItem.wlSiteName === dataItem.wlSiteName
+                        );
+
+                        // 如果找到匹配项，则添加需要的字段
+                        if (matchedItem) {
+                            return {
+                                ...dataItem, // 保留原有属性
+                                address: matchedItem.address, // 添加address
+                                contacts: matchedItem.contacts, // 添加contacts
+                                tel: matchedItem.tel // 添加tel
+                            };
+                        }
+
+                        // 如果没有找到匹配项，返回原对象
+                        return dataItem;
+                    });
+
+
+                    //第二个特殊
+                    const matchedResults = this.matchAndAddSortFields1(this.dataList, this.JSDataList1);
+
+                    const matresult = this.processGroupsBySum(matchedResults);
+
+                    console.log(matchedResults, 'matchedResults')
+
+                    const filteredSites = this.filterSites(this.JSDataList, this.dataList);
+                    const filteredResult = this.filterByNewsiteMatch(filteredSites, this.dataList);
+                    const onderList = this.matchSitesToOnderList(filteredResult, this.dataList);
+
+                    const transformedArray = this.transformFilteredResult(filteredResult);
+                    const calculatedList = this.sortAndCalculateOnderList(onderList, transformedArray);
+
+                    const uniqueArray = Array.from(
+                        new Map(
+                            calculatedList.map(item => [item.wlSiteName, item])
+                        ).values()
+                    );
+
+                    this.JSfinalResult = this.calculateGroupTotals(uniqueArray);
+                    console.log(matresult, 'matresult')
+
+                    // 如果 JSfinalResult 可能为 undefined，先初始化
+                    this.JSfinalResult = this.JSfinalResult || [];
+
+                    // 将 matresult 数组元素添加到 JSfinalResult
+                    this.JSfinalResult.push(...matresult);
+
+                    this.dataList = this.jiangsuData1_1(this.dataList)
+                    this.dataList = this.jiangsuData1_2(this.dataList)
+                    this.dataList = this.jiangsuData1_3(this.dataList)
+                    this.dataList = this.jiangsuData1_4(this.dataList)
+                    this.dataList = this.jiangsuData1_5(this.dataList)
+                    this.dataList = this.jiangsuData1_6(this.dataList)
+                    this.dataList = this.jiangsuData1_7(this.dataList)
+                    this.dataList = this.jiangsuData1_8(this.dataList)
+                    this.dataList = this.jiangsuData1_9(this.dataList)
+                    this.dataList = this.jiangsuData1_10(this.dataList)
+                    this.dataList = this.jiangsuData1_11(this.dataList)
+
+
+                    // 直接修改原数
+                    this.dataList.forEach((item, index) => {
+                        // 如果不是最后三个元素，则添加 startDate
+                        if (index < this.dataList.length - 1) {
+                            item.startDate = this.dateLable;
+                        }
+                    });
+
+                    this.dataList = this.dataList.filter(item =>
+                        item.wlSiteName.includes(this.bullay)
+                    );
+                    console.log(this.dataList)
+                    this.dataListLoading = false
+                    this.showExportButton = true
+                })
+            })
+        },
+
+
+
+
+
         //数据合并(根据wlSiteCode分组)
         mergeDataList(dataList) {
             return Object.values(
@@ -2526,6 +2819,13 @@ export default {
             })
 
         },
+        calculateJS() {
+            this.jiangsuForm.p_vouchdateend = this.dataForm.p_vouchdateend
+            this.dataListLoading = true
+            api.getrunArrivedJSApi(this.jiangsuForm).then(res => {
+                this.dataListLoading = false
+            })
+        },
         calculateAH() {
             this.anhuiCalForm.p_vouchdatecur = this.dataForm.p_vouchdateend
             this.anhuiCalForm.p_vouchdateend = this.dataForm.p_vouchdateend
@@ -2535,7 +2835,7 @@ export default {
             })
         },
 
-        
+
 
         wlpersonList() {
             api.wlsitepersonApi(this.siteForm).then(res => {
@@ -4808,6 +5108,566 @@ export default {
             return result;
         },
 
+        jiangsuData1_1(data) {
+            // 1. 定义要比较的两个站点
+            const siteA = "苏苏州太仓贾旭东"; // 请替换为实际站点名称
+            const siteB = "苏苏州昆山玉山"; // 请替换为实际站点名称
+
+            // 2. 找到两个站点的对象
+            const siteAObj = data.find(item => item.wlSiteName === siteA);
+            const siteBObj = data.find(item => item.wlSiteName === siteB);
+
+            if (!siteAObj || !siteBObj) {
+                console.log(`未找到 ${siteA} 或 ${siteB} 的对象`);
+                return data;
+            }
+
+            // 3. 比较 sum 值
+            const sumA = parseFloat(siteAObj.sum) || 0;
+            const sumB = parseFloat(siteBObj.sum) || 0;
+
+            console.log(`${siteA} 的 sum: ${sumA}, ${siteB} 的 sum: ${sumB}`);
+
+            // 4. 确定哪个站点保留，哪个被合并
+            let targetSite, sourceSite, sourceSiteName;
+
+            if (sumA >= sumB) {
+                // siteA 的 sum 更多，保留 siteA，合并 siteB
+                targetSite = siteAObj;
+                sourceSite = siteBObj;
+                sourceSiteName = siteB;
+                console.log(`${siteA} 的 sum 更多，将合并 ${siteB}`);
+            } else {
+                // siteB 的 sum 更多，保留 siteB，合并 siteA
+                targetSite = siteBObj;
+                sourceSite = siteAObj;
+                sourceSiteName = siteA;
+                console.log(`${siteB} 的 sum 更多，将合并 ${siteA}`);
+            }
+
+            // 5. 定义要保护的字段（不合并的字段）
+            const fieldsToRemove = [
+                "wlSiteName", "wlSiteCode", "tel", "productName",
+                "contacts", "areaName", "address"
+            ];
+
+            // 6. 合并源站点的数值字段到目标站点
+            const allFields = Object.keys(sourceSite);
+            allFields.forEach(field => {
+                if (!fieldsToRemove.includes(field)) {
+                    const numValue = parseFloat(sourceSite[field]);
+                    if (!isNaN(numValue)) {
+                        if (targetSite[field] === undefined) {
+                            targetSite[field] = 0;
+                        }
+                        const targetNum = parseFloat(targetSite[field]);
+                        if (!isNaN(targetNum)) {
+                            targetSite[field] = targetNum + numValue;
+                        }
+                    }
+                }
+            });
+
+            // 7. 过滤掉被合并的站点
+            const result = data.filter(item =>
+                item.wlSiteName !== sourceSiteName
+            );
+
+            console.log(`合并完成，保留了 ${targetSite.wlSiteName}，合并了 ${sourceSiteName}`);
+            return result;
+        },
+
+        jiangsuData1_2(data) {
+            // 1. 找到目标对象(wlSiteName === "苏苏州吴中邱裕铭")
+            const targetSite = data.find(item => item.wlSiteName === "苏苏州吴中邱裕铭");
+
+            if (!targetSite) {
+                console.log("未找到 wlSiteName 为 '苏苏州吴中邱裕铭' 的对象");
+                return data;
+            }
+
+            // 2. 需要匹配的站点名称(不包括 "浙杭州上城紫芸")
+            const siteNames = [
+                '苏苏州吴中何伟', '苏苏州园区杨圣召', '苏苏州吴江李海军', '苏苏州虎丘杨振武'
+            ];
+
+            // 3. 遍历数据，处理符合条件的对象
+            const result = data.filter(item => {
+                if (siteNames.includes(item.wlSiteName)) {
+                    if (item.sum < 50) {
+                        // 获取所有字段名
+                        const allFields = Object.keys(item);
+                        const fieldsToRemove = ["wlSiteName", "wlSiteCode", "tel", "productName", "contacts", "areaName", "address"];
+
+                        // 遍历所有字段，把非 fieldsToRemove 的字段转为数字后相加到 targetSite
+                        allFields.forEach(field => {
+                            if (!fieldsToRemove.includes(field)) {
+                                // 尝试将值转为数字
+                                const numValue = parseFloat(item[field]);
+                                if (!isNaN(numValue)) { // 如果是有效数字
+                                    // 如果 targetSite 没有该字段，初始化为 0
+                                    if (targetSite[field] === undefined) {
+                                        targetSite[field] = 0;
+                                    }
+                                    // 确保 targetSite[field] 是数字(如果不是，尝试转换)
+                                    const targetNum = parseFloat(targetSite[field]);
+                                    if (!isNaN(targetNum)) {
+                                        targetSite[field] = targetNum + numValue;
+                                    }
+                                }
+                            }
+                        });
+                        // 过滤掉这个对象(sum < 50 的站点)
+                        return false;
+                    }
+                }
+                // 保留其他对象(sum >= 50 或非目标站点)
+                return true;
+            });
+            return result;
+        },
+        jiangsuData1_3(data) {
+            // 1. 找到目标对象(wlSiteName === "苏苏州相城田君")
+            const targetSite = data.find(item => item.wlSiteName === "苏苏州相城田君");
+
+            if (!targetSite) {
+                console.log("未找到 wlSiteName 为 '苏苏州相城田君' 的对象");
+                return data;
+            }
+
+            // 2. 需要匹配的站点名称(不包括 "浙杭州上城紫芸")
+            const siteNames = [
+                '苏苏州直营部',
+            ];
+
+            // 3. 遍历数据，处理符合条件的对象
+            const result = data.filter(item => {
+                if (siteNames.includes(item.wlSiteName)) {
+                    if (item.sum < 50) {
+                        // 获取所有字段名
+                        const allFields = Object.keys(item);
+                        const fieldsToRemove = ["wlSiteName", "wlSiteCode", "tel", "productName", "contacts", "areaName", "address"];
+
+                        // 遍历所有字段，把非 fieldsToRemove 的字段转为数字后相加到 targetSite
+                        allFields.forEach(field => {
+                            if (!fieldsToRemove.includes(field)) {
+                                // 尝试将值转为数字
+                                const numValue = parseFloat(item[field]);
+                                if (!isNaN(numValue)) { // 如果是有效数字
+                                    // 如果 targetSite 没有该字段，初始化为 0
+                                    if (targetSite[field] === undefined) {
+                                        targetSite[field] = 0;
+                                    }
+                                    // 确保 targetSite[field] 是数字(如果不是，尝试转换)
+                                    const targetNum = parseFloat(targetSite[field]);
+                                    if (!isNaN(targetNum)) {
+                                        targetSite[field] = targetNum + numValue;
+                                    }
+                                }
+                            }
+                        });
+                        // 过滤掉这个对象(sum < 50 的站点)
+                        return false;
+                    }
+                }
+                // 保留其他对象(sum >= 50 或非目标站点)
+                return true;
+            });
+            return result;
+        },
+        jiangsuData1_4(data) {
+            // 1. 找到目标对象(wlSiteName === "苏常州武进澜鑫")
+            const targetSite = data.find(item => item.wlSiteName === "苏常州武进澜鑫");
+
+            if (!targetSite) {
+                console.log("未找到 wlSiteName 为 '苏常州武进澜鑫' 的对象");
+                return data;
+            }
+
+            // 2. 需要匹配的站点名称(不包括 "浙杭州上城紫芸")
+            const siteNames = [
+                '苏常州钟楼葛树胜',
+            ];
+
+            // 3. 遍历数据，处理符合条件的对象
+            const result = data.filter(item => {
+                if (siteNames.includes(item.wlSiteName)) {
+                    if (item.sum < 50) {
+                        // 获取所有字段名
+                        const allFields = Object.keys(item);
+                        const fieldsToRemove = ["wlSiteName", "wlSiteCode", "tel", "productName", "contacts", "areaName", "address"];
+
+                        // 遍历所有字段，把非 fieldsToRemove 的字段转为数字后相加到 targetSite
+                        allFields.forEach(field => {
+                            if (!fieldsToRemove.includes(field)) {
+                                // 尝试将值转为数字
+                                const numValue = parseFloat(item[field]);
+                                if (!isNaN(numValue)) { // 如果是有效数字
+                                    // 如果 targetSite 没有该字段，初始化为 0
+                                    if (targetSite[field] === undefined) {
+                                        targetSite[field] = 0;
+                                    }
+                                    // 确保 targetSite[field] 是数字(如果不是，尝试转换)
+                                    const targetNum = parseFloat(targetSite[field]);
+                                    if (!isNaN(targetNum)) {
+                                        targetSite[field] = targetNum + numValue;
+                                    }
+                                }
+                            }
+                        });
+                        // 过滤掉这个对象(sum < 50 的站点)
+                        return false;
+                    }
+                }
+                // 保留其他对象(sum >= 50 或非目标站点)
+                return true;
+            });
+            return result;
+        },
+        jiangsuData1_5(data) {
+            // 1. 找到目标对象(wlSiteName === "苏常州新北正良原食品")
+            const targetSite = data.find(item => item.wlSiteName === "苏常州新北正良原食品");
+
+            if (!targetSite) {
+                console.log("未找到 wlSiteName 为 '苏常州新北正良原食品' 的对象");
+                return data;
+            }
+
+            // 2. 需要匹配的站点名称(不包括 "浙杭州上城紫芸")
+            const siteNames = [
+                '苏常州市区直营', '苏常州溧阳赵宇', '苏常州金坛张志良', '苏常州天宁刘正'
+            ];
+
+            // 3. 遍历数据，处理符合条件的对象
+            const result = data.filter(item => {
+                if (siteNames.includes(item.wlSiteName)) {
+                    if (item.sum < 50) {
+                        // 获取所有字段名
+                        const allFields = Object.keys(item);
+                        const fieldsToRemove = ["wlSiteName", "wlSiteCode", "tel", "productName", "contacts", "areaName", "address"];
+
+                        // 遍历所有字段，把非 fieldsToRemove 的字段转为数字后相加到 targetSite
+                        allFields.forEach(field => {
+                            if (!fieldsToRemove.includes(field)) {
+                                // 尝试将值转为数字
+                                const numValue = parseFloat(item[field]);
+                                if (!isNaN(numValue)) { // 如果是有效数字
+                                    // 如果 targetSite 没有该字段，初始化为 0
+                                    if (targetSite[field] === undefined) {
+                                        targetSite[field] = 0;
+                                    }
+                                    // 确保 targetSite[field] 是数字(如果不是，尝试转换)
+                                    const targetNum = parseFloat(targetSite[field]);
+                                    if (!isNaN(targetNum)) {
+                                        targetSite[field] = targetNum + numValue;
+                                    }
+                                }
+                            }
+                        });
+                        // 过滤掉这个对象(sum < 50 的站点)
+                        return false;
+                    }
+                }
+                // 保留其他对象(sum >= 50 或非目标站点)
+                return true;
+            });
+            return result;
+        },
+        jiangsuData1_6(data) {
+            // 1. 找到目标对象(wlSiteName === "苏无锡锡山瑞宝")
+            const targetSite = data.find(item => item.wlSiteName === "苏无锡锡山瑞宝");
+
+            if (!targetSite) {
+                console.log("未找到 wlSiteName 为 '苏无锡锡山瑞宝' 的对象");
+                return data;
+            }
+
+            // 2. 需要匹配的站点名称(不包括 "浙杭州上城紫芸")
+            const siteNames = [
+                '苏无锡惠山陈君',
+            ];
+
+            // 3. 遍历数据，处理符合条件的对象
+            const result = data.filter(item => {
+                if (siteNames.includes(item.wlSiteName)) {
+                    if (item.sum < 50) {
+                        // 获取所有字段名
+                        const allFields = Object.keys(item);
+                        const fieldsToRemove = ["wlSiteName", "wlSiteCode", "tel", "productName", "contacts", "areaName", "address"];
+
+                        // 遍历所有字段，把非 fieldsToRemove 的字段转为数字后相加到 targetSite
+                        allFields.forEach(field => {
+                            if (!fieldsToRemove.includes(field)) {
+                                // 尝试将值转为数字
+                                const numValue = parseFloat(item[field]);
+                                if (!isNaN(numValue)) { // 如果是有效数字
+                                    // 如果 targetSite 没有该字段，初始化为 0
+                                    if (targetSite[field] === undefined) {
+                                        targetSite[field] = 0;
+                                    }
+                                    // 确保 targetSite[field] 是数字(如果不是，尝试转换)
+                                    const targetNum = parseFloat(targetSite[field]);
+                                    if (!isNaN(targetNum)) {
+                                        targetSite[field] = targetNum + numValue;
+                                    }
+                                }
+                            }
+                        });
+                        // 过滤掉这个对象(sum < 50 的站点)
+                        return false;
+                    }
+                }
+                // 保留其他对象(sum >= 50 或非目标站点)
+                return true;
+            });
+            return result;
+        },
+        jiangsuData1_7(data) {
+            // 1. 找到目标对象(wlSiteName === "苏南京江宁君一诺")
+            const targetSite = data.find(item => item.wlSiteName === "苏南京江宁君一诺");
+
+            if (!targetSite) {
+                console.log("未找到 wlSiteName 为 '苏南京江宁君一诺' 的对象");
+                return data;
+            }
+
+            // 2. 需要匹配的站点名称(不包括 "浙杭州上城紫芸")
+            const siteNames = [
+                '苏南京袁国旗', '苏南京江宁优润'
+            ];
+
+            // 3. 遍历数据，处理符合条件的对象
+            const result = data.filter(item => {
+                if (siteNames.includes(item.wlSiteName)) {
+                    if (item.sum < 50) {
+                        // 获取所有字段名
+                        const allFields = Object.keys(item);
+                        const fieldsToRemove = ["wlSiteName", "wlSiteCode", "tel", "productName", "contacts", "areaName", "address"];
+
+                        // 遍历所有字段，把非 fieldsToRemove 的字段转为数字后相加到 targetSite
+                        allFields.forEach(field => {
+                            if (!fieldsToRemove.includes(field)) {
+                                // 尝试将值转为数字
+                                const numValue = parseFloat(item[field]);
+                                if (!isNaN(numValue)) { // 如果是有效数字
+                                    // 如果 targetSite 没有该字段，初始化为 0
+                                    if (targetSite[field] === undefined) {
+                                        targetSite[field] = 0;
+                                    }
+                                    // 确保 targetSite[field] 是数字(如果不是，尝试转换)
+                                    const targetNum = parseFloat(targetSite[field]);
+                                    if (!isNaN(targetNum)) {
+                                        targetSite[field] = targetNum + numValue;
+                                    }
+                                }
+                            }
+                        });
+                        // 过滤掉这个对象(sum < 50 的站点)
+                        return false;
+                    }
+                }
+                // 保留其他对象(sum >= 50 或非目标站点)
+                return true;
+            });
+            return result;
+        },
+        jiangsuData1_8(data) {
+            // 1. 找到目标对象(wlSiteName === "苏南京建邺雨花鹏誉")
+            const targetSite = data.find(item => item.wlSiteName === "苏南京建邺雨花鹏誉");
+
+            if (!targetSite) {
+                console.log("未找到 wlSiteName 为 '苏南京建邺雨花鹏誉' 的对象");
+                return data;
+            }
+
+            // 2. 需要匹配的站点名称(不包括 "浙杭州上城紫芸")
+            const siteNames = [
+                '苏南京恒缘丰', '苏南京江北聚帆', '苏南京溧水依依'
+            ];
+
+            // 3. 遍历数据，处理符合条件的对象
+            const result = data.filter(item => {
+                if (siteNames.includes(item.wlSiteName)) {
+                    if (item.sum < 50) {
+                        // 获取所有字段名
+                        const allFields = Object.keys(item);
+                        const fieldsToRemove = ["wlSiteName", "wlSiteCode", "tel", "productName", "contacts", "areaName", "address"];
+
+                        // 遍历所有字段，把非 fieldsToRemove 的字段转为数字后相加到 targetSite
+                        allFields.forEach(field => {
+                            if (!fieldsToRemove.includes(field)) {
+                                // 尝试将值转为数字
+                                const numValue = parseFloat(item[field]);
+                                if (!isNaN(numValue)) { // 如果是有效数字
+                                    // 如果 targetSite 没有该字段，初始化为 0
+                                    if (targetSite[field] === undefined) {
+                                        targetSite[field] = 0;
+                                    }
+                                    // 确保 targetSite[field] 是数字(如果不是，尝试转换)
+                                    const targetNum = parseFloat(targetSite[field]);
+                                    if (!isNaN(targetNum)) {
+                                        targetSite[field] = targetNum + numValue;
+                                    }
+                                }
+                            }
+                        });
+                        // 过滤掉这个对象(sum < 50 的站点)
+                        return false;
+                    }
+                }
+                // 保留其他对象(sum >= 50 或非目标站点)
+                return true;
+            });
+            return result;
+        },
+        jiangsuData1_9(data) {
+            // 1. 找到目标对象(wlSiteName === "苏南京秦淮鼓楼米米")
+            const targetSite = data.find(item => item.wlSiteName === "苏南京秦淮鼓楼米米");
+
+            if (!targetSite) {
+                console.log("未找到 wlSiteName 为 '苏南京秦淮鼓楼米米' 的对象");
+                return data;
+            }
+
+            // 2. 需要匹配的站点名称(不包括 "浙杭州上城紫芸")
+            const siteNames = [
+                '苏南京浦口吉顺', '苏南京栖霞博源久'
+            ];
+
+            // 3. 遍历数据，处理符合条件的对象
+            const result = data.filter(item => {
+                if (siteNames.includes(item.wlSiteName)) {
+                    if (item.sum < 50) {
+                        // 获取所有字段名
+                        const allFields = Object.keys(item);
+                        const fieldsToRemove = ["wlSiteName", "wlSiteCode", "tel", "productName", "contacts", "areaName", "address"];
+
+                        // 遍历所有字段，把非 fieldsToRemove 的字段转为数字后相加到 targetSite
+                        allFields.forEach(field => {
+                            if (!fieldsToRemove.includes(field)) {
+                                // 尝试将值转为数字
+                                const numValue = parseFloat(item[field]);
+                                if (!isNaN(numValue)) { // 如果是有效数字
+                                    // 如果 targetSite 没有该字段，初始化为 0
+                                    if (targetSite[field] === undefined) {
+                                        targetSite[field] = 0;
+                                    }
+                                    // 确保 targetSite[field] 是数字(如果不是，尝试转换)
+                                    const targetNum = parseFloat(targetSite[field]);
+                                    if (!isNaN(targetNum)) {
+                                        targetSite[field] = targetNum + numValue;
+                                    }
+                                }
+                            }
+                        });
+                        // 过滤掉这个对象(sum < 50 的站点)
+                        return false;
+                    }
+                }
+                // 保留其他对象(sum >= 50 或非目标站点)
+                return true;
+            });
+            return result;
+        },
+        jiangsuData1_10(data) {
+            // 1. 找到目标对象(wlSiteName === "苏无锡新腾百货")
+            const targetSite = data.find(item => item.wlSiteName === "苏无锡新腾百货");
+
+            if (!targetSite) {
+                console.log("未找到 wlSiteName 为 '苏无锡新腾百货' 的对象");
+                return data;
+            }
+
+            // 2. 需要匹配的站点名称(不包括 "浙杭州上城紫芸")
+            const siteNames = [
+                '苏镇江丁卯帆之雨',
+            ];
+
+            // 3. 遍历数据，处理符合条件的对象
+            const result = data.filter(item => {
+                if (siteNames.includes(item.wlSiteName)) {
+                    if (item.sum < 50) {
+                        // 获取所有字段名
+                        const allFields = Object.keys(item);
+                        const fieldsToRemove = ["wlSiteName", "wlSiteCode", "tel", "productName", "contacts", "areaName", "address"];
+
+                        // 遍历所有字段，把非 fieldsToRemove 的字段转为数字后相加到 targetSite
+                        allFields.forEach(field => {
+                            if (!fieldsToRemove.includes(field)) {
+                                // 尝试将值转为数字
+                                const numValue = parseFloat(item[field]);
+                                if (!isNaN(numValue)) { // 如果是有效数字
+                                    // 如果 targetSite 没有该字段，初始化为 0
+                                    if (targetSite[field] === undefined) {
+                                        targetSite[field] = 0;
+                                    }
+                                    // 确保 targetSite[field] 是数字(如果不是，尝试转换)
+                                    const targetNum = parseFloat(targetSite[field]);
+                                    if (!isNaN(targetNum)) {
+                                        targetSite[field] = targetNum + numValue;
+                                    }
+                                }
+                            }
+                        });
+                        // 过滤掉这个对象(sum < 50 的站点)
+                        return false;
+                    }
+                }
+                // 保留其他对象(sum >= 50 或非目标站点)
+                return true;
+            });
+            return result;
+        },
+        jiangsuData1_11(data) {
+            // 1. 找到目标对象(wlSiteName === "苏泰州熠辉")
+            const targetSite = data.find(item => item.wlSiteName === "苏泰州熠辉");
+
+            if (!targetSite) {
+                console.log("未找到 wlSiteName 为 '苏泰州熠辉' 的对象");
+                return data;
+            }
+
+            // 2. 需要匹配的站点名称(不包括 "浙杭州上城紫芸")
+            const siteNames = [
+                '苏泰州姜堰熠辉', '苏泰州兴化熠辉王凯'
+            ];
+
+            // 3. 遍历数据，处理符合条件的对象
+            const result = data.filter(item => {
+                if (siteNames.includes(item.wlSiteName)) {
+                    if (item.sum < 50) {
+                        // 获取所有字段名
+                        const allFields = Object.keys(item);
+                        const fieldsToRemove = ["wlSiteName", "wlSiteCode", "tel", "productName", "contacts", "areaName", "address"];
+
+                        // 遍历所有字段，把非 fieldsToRemove 的字段转为数字后相加到 targetSite
+                        allFields.forEach(field => {
+                            if (!fieldsToRemove.includes(field)) {
+                                // 尝试将值转为数字
+                                const numValue = parseFloat(item[field]);
+                                if (!isNaN(numValue)) { // 如果是有效数字
+                                    // 如果 targetSite 没有该字段，初始化为 0
+                                    if (targetSite[field] === undefined) {
+                                        targetSite[field] = 0;
+                                    }
+                                    // 确保 targetSite[field] 是数字(如果不是，尝试转换)
+                                    const targetNum = parseFloat(targetSite[field]);
+                                    if (!isNaN(targetNum)) {
+                                        targetSite[field] = targetNum + numValue;
+                                    }
+                                }
+                            }
+                        });
+                        // 过滤掉这个对象(sum < 50 的站点)
+                        return false;
+                    }
+                }
+                // 保留其他对象(sum >= 50 或非目标站点)
+                return true;
+            });
+            return result;
+        },
+
         getproductList() {
             api.wlProductaFactcheckApi(this.dictForm).then(res => {
                 this.proList = res.content
@@ -4835,6 +5695,8 @@ export default {
                     exportExcelzj(this.dataList, this.dataForm.p_vouchdateend, '浙江区域物流报表.xlsx', this.zjfinalResult)
                 } else if (this.areas == '福建') {
                     exportExcelfj(this.dataList, this.dataForm.p_vouchdateend, '福建区域物流报表.xlsx', this.FJfinalResult)
+                } else if (this.areas == '江苏') {
+                    exportExceljs(this.dataList, this.dataForm.p_vouchdateend, '江苏区域物流报表.xlsx', this.JSfinalResult)
                 } else {
                     exportExcel(this.dataList, this.dataForm.p_vouchdateend, `湖南区域物流报表.xlsx`, this.siteList, this.areas)
                 }
