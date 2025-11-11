@@ -1396,6 +1396,16 @@ export function wlarrivedbuildApi(params) {
     method: 'get'
   })
 }
+
+//物流表(山东)
+export function wlarrivedShanDongApi(params) {
+  return request({
+    url: 'api/wlWlsiteOrFactoryproductOrderDeliveryCycle/get_data_shandong',
+    params,
+    method: 'get'
+  })
+}
+
 //查询管理部去年低温基数(每天)
 export function APILowTempLBaseCHECK(params) {
   return request({

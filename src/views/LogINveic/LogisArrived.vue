@@ -25,6 +25,7 @@
                 <el-button size="mini" class="filter-item" type="primary" @click="getshanghai">浙江</el-button>
                 <el-button size="mini" class="filter-item" type="primary" @click="getfujian">福建</el-button>
                 <el-button size="mini" class="filter-item" type="primary" @click="getjiangsu">江苏</el-button>
+                <el-button size="mini" class="filter-item" type="primary" @click="getshandong">山东</el-button>
                 <!-- <el-button size="mini" class="filter-item" type="primary" @click="getanhui">安徽</el-button> -->
                 <!-- <el-button size="mini" class="filter-item" type="primary" @click="getshanghai">上海</el-button> -->
                 <el-button size="mini" class="filter-item" type="warning" icon="el-icon-download" @click="exportData"
@@ -180,6 +181,11 @@ export default {
             jiangsuForm: {
                 p_vouchdateend: '',
                 p_areaname: '江苏',
+                p_orgname: '雨帆食品集团股份有限公司'
+            },
+            shandongForm: {
+                p_vouchdateend: '',
+                p_areaname: '山东',
                 p_orgname: '雨帆食品集团股份有限公司'
             },
             fujianForm1: {
@@ -563,6 +569,29 @@ export default {
             // 遍历数组，按 wlSiteName 和 productCode 分组
             for (const item of data) {
                 const key = `${item.wlSiteName}_${item.productCode}`;
+                if (!map.has(key)) {
+                    // 如果是新组合，直接添加到 map 中
+                    map.set(key, {
+                        ...item,
+                        box: Number(item.box) || 0 // 转为数字，避免非数字情况
+                    });
+                } else {
+                    // 如果已存在，合并 box 字段
+                    const existing = map.get(key);
+                    existing.box += Number(item.box) || 0;
+                }
+            }
+
+            // 将 map 中的值转为数组
+            return Array.from(map.values());
+        },
+        mergeBoxFieldsShandong(data) {
+            const result = [];
+            const map = new Map();
+
+            // 遍历数组，按 wlSiteName 和 productCode 分组
+            for (const item of data) {
+                const key = `${item.vcol2Name}_${item.cproductcode}`;
                 if (!map.has(key)) {
                     // 如果是新组合，直接添加到 map 中
                     map.set(key, {
@@ -1930,7 +1959,7 @@ export default {
 
                     this.dataList = this.jiangsuData1_1(this.dataList)
                     this.dataList = this.jiangsuData1_2(this.dataList, this.JSDataList)
-              
+
                     // 直接修改原数
                     this.dataList.forEach((item, index) => {
                         // 如果不是最后三个元素，则添加 startDate
@@ -1949,7 +1978,80 @@ export default {
             })
         },
 
+        getshandong() {
+            this.areas = '山东'
+            // this.wlForm.blurry = this.areas
+            this.dataListLoading = true
+            this.showExportButton = false
+            const [year, month, day] = this.dataForm.p_vouchdateend.split('-').map(Number);
+            this.labelText = `${this.areas}区域到货明细表--截止${year}年${month}月${day}日`; // 如果没有选择日期，显示默认文本
+            this.dateLable = `${month}月${day}日`
+            console.log(this.dateLable)
+            this.shandongForm.p_vouchdateend = this.dataForm.p_vouchdateend
+            //转时间
+            const date = new Date(this.dataForm.p_vouchdateend);
+            date.setDate(date.getDate() - 2);
+            api.wlarrivedShanDongApi({
+                p_vouchdateend: this.dataForm.p_vouchdateend
+            }).then(res => {
+                console.log(res)
+                this.dataList = res
+                this.dataList = this.mergeBoxFieldsShandong(this.dataList)
+                this.dataList = this.dataList.map(item => ({
+                    ...item, // 展开原对象的所有属性
+                    ["box" + item.cproductcode]: item.box // 新增动态属性
+                }));
+                this.dataList = this.dataList.map(({ vcol2Name, ...rest }) => ({
+                    ...rest,
+                    wlSiteName: vcol2Name
+                }));
+                this.dataList = this.mergeSitesAndRemoveFields(this.dataList);
 
+                // 为每一行追加合计（sum），仅累加 box* 动态列
+                this.dataList = this.dataList.map(item => {
+                    let rowSum = 0;
+                    Object.keys(item).forEach(key => {
+                        if (!key.startsWith('box')) return;
+                        const val = Number(item[key]);
+                        if (Number.isFinite(val)) {
+                            rowSum += val;
+                        }
+                    });
+                    return { ...item, sum: rowSum };
+                });
+
+                // 在末尾追加合计行
+                const totalObj = {
+                    wlSiteName: `合计`
+                };
+                this.dataList.forEach(item => {
+                    Object.keys(item).forEach(key => {
+                        // 仅累加 box* 动态列
+                        if (!key.startsWith('box')) return;
+
+                        // 初始化总计对象中的字段(如果不存在)
+                        if (!Object.prototype.hasOwnProperty.call(totalObj, key)) {
+                            totalObj[key] = 0;
+                        }
+                        const value = Number(item[key]) || 0;
+                        totalObj[key] += value;
+                    });
+                });
+                // 计算总计行的 sum，仅按 box* 动态列
+                let totalSum = 0;
+                Object.keys(totalObj).forEach(key => {
+                    if (!key.startsWith('box')) return;
+                    totalSum += Number(totalObj[key]) || 0;
+                });
+                totalObj.sum = totalSum;
+
+                this.dataList.push(totalObj);
+
+                console.log(this.dataList)
+                this.dataListLoading = false
+                this.showExportButton = true
+            })
+        },
 
 
 
@@ -2497,10 +2599,10 @@ export default {
                             gudingculatedList.map(item => [item.wlSiteName, item])
                         ).values()
                     );
-                   const gudingGXfinalResult = this.calculateGroupTotals(gudinguniqueArray);
-                    console.log(gudingList,'gudingList')
+                    const gudingGXfinalResult = this.calculateGroupTotals(gudinguniqueArray);
+                    console.log(gudingList, 'gudingList')
 
-                   
+
 
                     // 如果 GXfinalResult 可能为 undefined，先初始化
                     this.GXfinalResult = this.GXfinalResult || [];
@@ -2509,7 +2611,7 @@ export default {
                     // this.GXfinalResult.push(...matresult);
                     this.GXfinalResult.push(...treematresult);
                     this.GXfinalResult.push(...gudingGXfinalResult);
-                    
+
 
 
 
@@ -3187,6 +3289,31 @@ export default {
                     resultMap.set(key, {
                         ...obj,
                         box: parseFloat(obj.box) || 0
+                    });
+                }
+            });
+
+            return Array.from(resultMap.values());
+        },
+        mergeSitesAndRemoveFields(data) {
+            if (!Array.isArray(data)) return [];
+
+            const resultMap = new Map();
+
+            data.forEach(item => {
+                const siteName = item.wlSiteName;
+                const { box, cproductname, cproductcode, ...cleanItem } = item;
+
+                if (!resultMap.has(siteName)) {
+                    resultMap.set(siteName, cleanItem);
+                } else {
+                    const existing = resultMap.get(siteName);
+                    Object.keys(cleanItem).forEach(key => {
+                        if (key !== 'wlSiteName') {
+                            const val = parseFloat(cleanItem[key]) || 0;
+                            const existingVal = parseFloat(existing[key]) || 0;
+                            existing[key] = existingVal + val;
+                        }
                     });
                 }
             });
@@ -5278,7 +5405,7 @@ export default {
                 const { oldsite, newsite } = config;
 
                 // 1. 找到目标对象
-                const targetSite = data.find(item => item.wlSiteName === newsite);
+                const targetSite = data.find(item => item.wlSiteName == newsite);
 
                 if (!targetSite) {
                     console.log(`未找到 wlSiteName 为 '${newsite}' 的对象`);
@@ -5288,7 +5415,7 @@ export default {
                 // 2. 遍历需要匹配的站点名称
                 oldsite.forEach(siteName => {
                     // 在数据中查找匹配的对象
-                    const sourceSites = data.filter(item => item.wlSiteName === siteName && item.sum < 50);
+                    const sourceSites = data.filter(item => item.wlSiteName == siteName && item.sum < 50);
 
                     // 处理每个符合条件的源站点
                     sourceSites.forEach(sourceSite => {
@@ -5302,7 +5429,7 @@ export default {
                                 const numValue = parseFloat(sourceSite[field]);
                                 if (!isNaN(numValue)) { // 如果是有效数字
                                     // 如果 targetSite 没有该字段，初始化为 0
-                                    if (targetSite[field] === undefined) {
+                                    if (targetSite[field] == undefined) {
                                         targetSite[field] = 0;
                                     }
                                     // 确保 targetSite[field] 是数字(如果不是，尝试转换)
@@ -5362,6 +5489,8 @@ export default {
                     exportExcelfj(this.dataList, this.dataForm.p_vouchdateend, '福建区域物流报表.xlsx', this.FJfinalResult)
                 } else if (this.areas == '江苏') {
                     exportExceljs(this.dataList, this.dataForm.p_vouchdateend, '江苏区域物流报表.xlsx', this.JSfinalResult)
+                } else if (this.areas == '山东') {
+                    window.open('http://bi.yufanjtbip.com:8069/file/%E6%96%87%E6%A1%A3/newfilepdatashandongout.xlsx')
                 } else {
                     exportExcel(this.dataList, this.dataForm.p_vouchdateend, `湖南区域物流报表.xlsx`, this.siteList, this.areas)
                 }
