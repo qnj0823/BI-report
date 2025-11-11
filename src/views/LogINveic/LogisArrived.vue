@@ -247,9 +247,6 @@ export default {
                 }, {
                     oldsite: ['桂百色田东冠程', '桂南宁良庆福润'],
                     newsite: '桂百色平果牛牛顺'
-                }, {
-                    oldsite: ['桂柳州柳江何芳'],
-                    newsite: '桂柳州米德'
                 }
             ],
             GXDataList1: [
@@ -261,6 +258,15 @@ export default {
                 {
                     oldsite: ['桂贺州富川聚益', '桂贺州钟山小何']
                 },
+            ],
+            GXDataList3: [
+                {
+                    oldsite: ['桂柳州柳北李建重', '桂柳州城中严明高'],
+                    newsite: '桂柳州米德'
+                }, {
+                    oldsite: ['桂南宁宾阳汇成', '桂南宁上林海硕'],
+                    newsite: '桂南宁横县湘旺'
+                }
             ],
             GXfinalResult: [],
             FJDataList: [
@@ -993,6 +999,31 @@ export default {
 
             return result;
         },
+        //放国定点规则
+        filterSites1(zjDataList, dataList) {
+            const result = [];
+
+            // 遍历ZJDataList中的每个对象
+            for (const zjItem of zjDataList) {
+                // 遍历每个对象的oldsite数组
+                for (const oldsite of zjItem.oldsite) {
+                    // 在dataList中查找匹配的站点
+                    const matchedItem = dataList.find(item => item.wlSiteName == oldsite);
+                    console.log(matchedItem, 'matchedItem')
+
+                    // 如果找到匹配项（移除sum < 50的判断，保留特殊站点判断或也一并移除）
+                    if (matchedItem) {
+                        // 如果你也想移除“闽龙岩永定凯哥商行”的特殊判断，直接写成 if (matchedItem) 即可
+                        result.push({
+                            oldsite: oldsite,
+                            newsite: zjItem.newsite
+                        });
+                    }
+                }
+            }
+
+            return result;
+        },
         //判断放入的站点是否存在
         filterByNewsiteMatch(filteredSites, dataList) {
             // 使用filter方法创建新数组，只保留匹配成功的对象
@@ -1157,7 +1188,7 @@ export default {
             });
             return result;
         },
-         matchAndAddSortFields1(onderList, transformedArray) {
+        matchAndAddSortFields1(onderList, transformedArray) {
             const result = [];
             transformedArray.forEach((item, index) => {
                 const sortValue = `A${index + 1}`; // A1, A2, A3...
@@ -2445,8 +2476,8 @@ export default {
                     });
 
                     //第二个特殊
-                    const matchedResults = this.matchAndAddSortFields(this.dataList, this.GXDataList1);
-                    const matresult = this.processGroupsBySum(matchedResults);
+                    // const matchedResults = this.matchAndAddSortFields(this.dataList, this.GXDataList1);
+                    // const matresult = this.processGroupsBySum(matchedResults);
 
                     //第三种
                     const treematchedResults = this.matchAndAddSort(this.dataList, this.GXDataList2);
@@ -2464,16 +2495,31 @@ export default {
                             calculatedList.map(item => [item.wlSiteName, item])
                         ).values()
                     );
-
                     this.GXfinalResult = this.calculateGroupTotals(uniqueArray);
-                    console.log(matresult, 'matresult')
+                    //放固定点规则
+                    const gudingList = this.filterSites1(this.GXDataList3, this.dataList)
+                    const gudingResult = this.filterByNewsiteMatch(gudingList, this.dataList);
+                    const gudingonderList = this.matchSitesToOnderList(gudingResult, this.dataList);
+                    const gudingformedArray = this.transformFilteredResult(gudingResult);
+                    const gudingculatedList = this.sortAndCalculateOnderList(gudingonderList, gudingformedArray);
+                    const gudinguniqueArray = Array.from(
+                        new Map(
+                            gudingculatedList.map(item => [item.wlSiteName, item])
+                        ).values()
+                    );
+                   const gudingGXfinalResult = this.calculateGroupTotals(gudinguniqueArray);
+                    console.log(gudingList,'gudingList')
+
+                   
 
                     // 如果 GXfinalResult 可能为 undefined，先初始化
                     this.GXfinalResult = this.GXfinalResult || [];
 
                     // 将 matresult 数组元素添加到 zjfinalResult
-                    this.GXfinalResult.push(...matresult);
+                    // this.GXfinalResult.push(...matresult);
                     this.GXfinalResult.push(...treematresult);
+                    this.GXfinalResult.push(...gudingGXfinalResult);
+                    
 
 
 
@@ -2484,8 +2530,8 @@ export default {
                     this.dataList = this.processData2(this.dataList)
                     this.dataList = this.processData3(this.dataList)
                     this.dataList = this.processDataall(this.dataList)
-                    this.dataList = this.processDataall1(this.dataList)
-
+                    // this.dataList = this.processDataall1(this.dataList)
+                    this.dataList = this.processData2_1(this.dataList)
                     this.dataList = this.processData1_1(this.dataList)
                     this.dataList = this.processData1_2(this.dataList)
                     this.dataList = this.processData1_3(this.dataList)
@@ -3810,13 +3856,64 @@ export default {
 
             // 2. 需要匹配的站点名称（不包括 "桂柳州米德"）
             const siteNames = [
-                "桂柳州柳江何芳"
+                "桂柳州柳北李建重", "桂柳州城中严明高"
             ];
 
             // 3. 遍历数据，处理符合条件的对象
             const result = data.filter(item => {
                 if (siteNames.includes(item.wlSiteName)) {
-                    if (item.sum < 50) {
+                    if (item.sum > 0) {
+                        // 获取所有字段名
+                        const allFields = Object.keys(item);
+                        const fieldsToRemove = ["wlSiteName", "wlSiteCode", "tel", "productName", "contacts", "areaName", "address"];
+
+                        // 遍历所有字段，把非 fieldsToRemove 的字段转为数字后相加到 targetSite
+                        allFields.forEach(field => {
+                            if (!fieldsToRemove.includes(field)) {
+                                // 尝试将值转为数字
+                                const numValue = parseFloat(item[field]);
+                                if (!isNaN(numValue)) { // 如果是有效数字
+                                    // 如果 targetSite 没有该字段，初始化为 0
+                                    if (targetSite[field] === undefined) {
+                                        targetSite[field] = 0;
+                                    }
+                                    // 确保 targetSite[field] 是数字（如果不是，尝试转换）
+                                    const targetNum = parseFloat(targetSite[field]);
+                                    if (!isNaN(targetNum)) {
+                                        targetSite[field] = targetNum + numValue;
+                                    }
+                                }
+                            }
+                        });
+
+                        // 过滤掉这个对象（sum < 50 的站点）
+                        return false;
+                    }
+                }
+                // 保留其他对象（sum >= 50 或非目标站点）
+                return true;
+            });
+
+            return result;
+        },
+        processData2_1(data) {
+            // 1. 找到目标对象（wlSiteName === "桂南宁横县湘旺"）
+            const targetSite = data.find(item => item.wlSiteName === "桂南宁横县湘旺");
+
+            if (!targetSite) {
+                console.log("未找到 wlSiteName 为 '桂南宁横县湘旺' 的对象");
+                return data;
+            }
+
+            // 2. 需要匹配的站点名称（不包括 "桂南宁横县湘旺"）
+            const siteNames = [
+                "桂南宁宾阳汇成", "桂南宁上林海硕"
+            ];
+
+            // 3. 遍历数据，处理符合条件的对象
+            const result = data.filter(item => {
+                if (siteNames.includes(item.wlSiteName)) {
+                    if (item.sum > 0) {
                         // 获取所有字段名
                         const allFields = Object.keys(item);
                         const fieldsToRemove = ["wlSiteName", "wlSiteCode", "tel", "productName", "contacts", "areaName", "address"];
