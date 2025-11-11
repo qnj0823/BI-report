@@ -5399,6 +5399,8 @@ export default {
 
             // 定义要保护的字段
             const fieldsToRemove = ["wlSiteName", "wlSiteCode", "tel", "productName", "contacts", "areaName", "address"];
+            // 存储存在的newsite集合
+            const existingNewsites = new Set();
 
             // 遍历每个配置项
             siteConfigs.forEach(config => {
@@ -5411,6 +5413,9 @@ export default {
                     console.log(`未找到 wlSiteName 为 '${newsite}' 的对象`);
                     return; // 继续下一个配置
                 }
+
+                // 将存在的newsite添加到集合中
+                existingNewsites.add(newsite);
 
                 // 2. 遍历需要匹配的站点名称
                 oldsite.forEach(siteName => {
@@ -5446,15 +5451,24 @@ export default {
                 });
             });
 
-            // 过滤掉所有被合并的源站点（sum < 50 且在 oldsite 中的站点）
+            // 过滤掉所有被合并的源站点（仅当对应的newsite存在时）
             const result = data.filter(item => {
-                // 检查当前站点是否在任一配置的 oldsite 中且 sum < 50
-                const shouldBeRemoved = siteConfigs.some(config =>
+                // 检查当前站点是否在任一配置的oldsite中且sum < 50
+                const isSourceSite = siteConfigs.some(config =>
                     config.oldsite.includes(item.wlSiteName) && item.sum < 50
                 );
+                console.log(isSourceSite,'isSourceSite')
+                if (!isSourceSite) {
+                    return true; // 不是源站点，保留
+                }
 
-                // 如果应该被移除，返回 false；否则保留
-                return !shouldBeRemoved;
+                // 检查该源站点对应的配置中，newsite是否存在
+                const hasValidNewsite = siteConfigs.some(config =>
+                    config.oldsite.includes(item.wlSiteName) && existingNewsites.has(config.newsite)
+                );
+
+                // 如果存在有效的newsite，则移除该源站点；否则保留
+                return !hasValidNewsite;
             });
 
             return result;
