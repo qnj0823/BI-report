@@ -1929,18 +1929,8 @@ export default {
                     this.JSfinalResult.push(...matresult);
 
                     this.dataList = this.jiangsuData1_1(this.dataList)
-                    this.dataList = this.jiangsuData1_2(this.dataList)
-                    this.dataList = this.jiangsuData1_3(this.dataList)
-                    this.dataList = this.jiangsuData1_4(this.dataList)
-                    this.dataList = this.jiangsuData1_5(this.dataList)
-                    this.dataList = this.jiangsuData1_6(this.dataList)
-                    this.dataList = this.jiangsuData1_7(this.dataList)
-                    this.dataList = this.jiangsuData1_8(this.dataList)
-                    this.dataList = this.jiangsuData1_9(this.dataList)
-                    this.dataList = this.jiangsuData1_10(this.dataList)
-                    this.dataList = this.jiangsuData1_11(this.dataList)
-
-
+                    this.dataList = this.jiangsuData1_2(this.dataList, this.JSDataList)
+              
                     // 直接修改原数
                     this.dataList.forEach((item, index) => {
                         // 如果不是最后三个元素，则添加 startDate
@@ -5274,33 +5264,42 @@ export default {
             return result;
         },
 
-        jiangsuData1_2(data) {
-            // 1. 找到目标对象(wlSiteName === "苏苏州吴中邱裕铭")
-            const targetSite = data.find(item => item.wlSiteName === "苏苏州吴中邱裕铭");
-
-            if (!targetSite) {
-                console.log("未找到 wlSiteName 为 '苏苏州吴中邱裕铭' 的对象");
+        jiangsuData1_2(data, siteConfigs) {
+            if (!Array.isArray(data) || !Array.isArray(siteConfigs)) {
+                console.error("参数必须是数组");
                 return data;
             }
 
-            // 2. 需要匹配的站点名称(不包括 "浙杭州上城紫芸")
-            const siteNames = [
-                '苏苏州吴中何伟', '苏苏州园区杨圣召', '苏苏州吴江李海军', '苏苏州虎丘杨振武'
-            ];
+            // 定义要保护的字段
+            const fieldsToRemove = ["wlSiteName", "wlSiteCode", "tel", "productName", "contacts", "areaName", "address"];
 
-            // 3. 遍历数据，处理符合条件的对象
-            const result = data.filter(item => {
-                if (siteNames.includes(item.wlSiteName)) {
-                    if (item.sum < 50) {
+            // 遍历每个配置项
+            siteConfigs.forEach(config => {
+                const { oldsite, newsite } = config;
+
+                // 1. 找到目标对象
+                const targetSite = data.find(item => item.wlSiteName === newsite);
+
+                if (!targetSite) {
+                    console.log(`未找到 wlSiteName 为 '${newsite}' 的对象`);
+                    return; // 继续下一个配置
+                }
+
+                // 2. 遍历需要匹配的站点名称
+                oldsite.forEach(siteName => {
+                    // 在数据中查找匹配的对象
+                    const sourceSites = data.filter(item => item.wlSiteName === siteName && item.sum < 50);
+
+                    // 处理每个符合条件的源站点
+                    sourceSites.forEach(sourceSite => {
                         // 获取所有字段名
-                        const allFields = Object.keys(item);
-                        const fieldsToRemove = ["wlSiteName", "wlSiteCode", "tel", "productName", "contacts", "areaName", "address"];
+                        const allFields = Object.keys(sourceSite);
 
                         // 遍历所有字段，把非 fieldsToRemove 的字段转为数字后相加到 targetSite
                         allFields.forEach(field => {
                             if (!fieldsToRemove.includes(field)) {
                                 // 尝试将值转为数字
-                                const numValue = parseFloat(item[field]);
+                                const numValue = parseFloat(sourceSite[field]);
                                 if (!isNaN(numValue)) { // 如果是有效数字
                                     // 如果 targetSite 没有该字段，初始化为 0
                                     if (targetSite[field] === undefined) {
@@ -5314,454 +5313,23 @@ export default {
                                 }
                             }
                         });
-                        // 过滤掉这个对象(sum < 50 的站点)
-                        return false;
-                    }
-                }
-                // 保留其他对象(sum >= 50 或非目标站点)
-                return true;
+
+                        console.log(`已将 ${sourceSite.wlSiteName} (sum: ${sourceSite.sum}) 合并到 ${targetSite.wlSiteName}`);
+                    });
+                });
             });
-            return result;
-        },
-        jiangsuData1_3(data) {
-            // 1. 找到目标对象(wlSiteName === "苏苏州相城田君")
-            const targetSite = data.find(item => item.wlSiteName === "苏苏州相城田君");
 
-            if (!targetSite) {
-                console.log("未找到 wlSiteName 为 '苏苏州相城田君' 的对象");
-                return data;
-            }
-
-            // 2. 需要匹配的站点名称(不包括 "浙杭州上城紫芸")
-            const siteNames = [
-                '苏苏州直营部',
-            ];
-
-            // 3. 遍历数据，处理符合条件的对象
+            // 过滤掉所有被合并的源站点（sum < 50 且在 oldsite 中的站点）
             const result = data.filter(item => {
-                if (siteNames.includes(item.wlSiteName)) {
-                    if (item.sum < 50) {
-                        // 获取所有字段名
-                        const allFields = Object.keys(item);
-                        const fieldsToRemove = ["wlSiteName", "wlSiteCode", "tel", "productName", "contacts", "areaName", "address"];
+                // 检查当前站点是否在任一配置的 oldsite 中且 sum < 50
+                const shouldBeRemoved = siteConfigs.some(config =>
+                    config.oldsite.includes(item.wlSiteName) && item.sum < 50
+                );
 
-                        // 遍历所有字段，把非 fieldsToRemove 的字段转为数字后相加到 targetSite
-                        allFields.forEach(field => {
-                            if (!fieldsToRemove.includes(field)) {
-                                // 尝试将值转为数字
-                                const numValue = parseFloat(item[field]);
-                                if (!isNaN(numValue)) { // 如果是有效数字
-                                    // 如果 targetSite 没有该字段，初始化为 0
-                                    if (targetSite[field] === undefined) {
-                                        targetSite[field] = 0;
-                                    }
-                                    // 确保 targetSite[field] 是数字(如果不是，尝试转换)
-                                    const targetNum = parseFloat(targetSite[field]);
-                                    if (!isNaN(targetNum)) {
-                                        targetSite[field] = targetNum + numValue;
-                                    }
-                                }
-                            }
-                        });
-                        // 过滤掉这个对象(sum < 50 的站点)
-                        return false;
-                    }
-                }
-                // 保留其他对象(sum >= 50 或非目标站点)
-                return true;
+                // 如果应该被移除，返回 false；否则保留
+                return !shouldBeRemoved;
             });
-            return result;
-        },
-        jiangsuData1_4(data) {
-            // 1. 找到目标对象(wlSiteName === "苏常州武进澜鑫")
-            const targetSite = data.find(item => item.wlSiteName === "苏常州武进澜鑫");
 
-            if (!targetSite) {
-                console.log("未找到 wlSiteName 为 '苏常州武进澜鑫' 的对象");
-                return data;
-            }
-
-            // 2. 需要匹配的站点名称(不包括 "浙杭州上城紫芸")
-            const siteNames = [
-                '苏常州钟楼葛树胜',
-            ];
-
-            // 3. 遍历数据，处理符合条件的对象
-            const result = data.filter(item => {
-                if (siteNames.includes(item.wlSiteName)) {
-                    if (item.sum < 50) {
-                        // 获取所有字段名
-                        const allFields = Object.keys(item);
-                        const fieldsToRemove = ["wlSiteName", "wlSiteCode", "tel", "productName", "contacts", "areaName", "address"];
-
-                        // 遍历所有字段，把非 fieldsToRemove 的字段转为数字后相加到 targetSite
-                        allFields.forEach(field => {
-                            if (!fieldsToRemove.includes(field)) {
-                                // 尝试将值转为数字
-                                const numValue = parseFloat(item[field]);
-                                if (!isNaN(numValue)) { // 如果是有效数字
-                                    // 如果 targetSite 没有该字段，初始化为 0
-                                    if (targetSite[field] === undefined) {
-                                        targetSite[field] = 0;
-                                    }
-                                    // 确保 targetSite[field] 是数字(如果不是，尝试转换)
-                                    const targetNum = parseFloat(targetSite[field]);
-                                    if (!isNaN(targetNum)) {
-                                        targetSite[field] = targetNum + numValue;
-                                    }
-                                }
-                            }
-                        });
-                        // 过滤掉这个对象(sum < 50 的站点)
-                        return false;
-                    }
-                }
-                // 保留其他对象(sum >= 50 或非目标站点)
-                return true;
-            });
-            return result;
-        },
-        jiangsuData1_5(data) {
-            // 1. 找到目标对象(wlSiteName === "苏常州新北正良原食品")
-            const targetSite = data.find(item => item.wlSiteName === "苏常州新北正良原食品");
-
-            if (!targetSite) {
-                console.log("未找到 wlSiteName 为 '苏常州新北正良原食品' 的对象");
-                return data;
-            }
-
-            // 2. 需要匹配的站点名称(不包括 "浙杭州上城紫芸")
-            const siteNames = [
-                '苏常州市区直营', '苏常州溧阳赵宇', '苏常州金坛张志良', '苏常州天宁刘正'
-            ];
-
-            // 3. 遍历数据，处理符合条件的对象
-            const result = data.filter(item => {
-                if (siteNames.includes(item.wlSiteName)) {
-                    if (item.sum < 50) {
-                        // 获取所有字段名
-                        const allFields = Object.keys(item);
-                        const fieldsToRemove = ["wlSiteName", "wlSiteCode", "tel", "productName", "contacts", "areaName", "address"];
-
-                        // 遍历所有字段，把非 fieldsToRemove 的字段转为数字后相加到 targetSite
-                        allFields.forEach(field => {
-                            if (!fieldsToRemove.includes(field)) {
-                                // 尝试将值转为数字
-                                const numValue = parseFloat(item[field]);
-                                if (!isNaN(numValue)) { // 如果是有效数字
-                                    // 如果 targetSite 没有该字段，初始化为 0
-                                    if (targetSite[field] === undefined) {
-                                        targetSite[field] = 0;
-                                    }
-                                    // 确保 targetSite[field] 是数字(如果不是，尝试转换)
-                                    const targetNum = parseFloat(targetSite[field]);
-                                    if (!isNaN(targetNum)) {
-                                        targetSite[field] = targetNum + numValue;
-                                    }
-                                }
-                            }
-                        });
-                        // 过滤掉这个对象(sum < 50 的站点)
-                        return false;
-                    }
-                }
-                // 保留其他对象(sum >= 50 或非目标站点)
-                return true;
-            });
-            return result;
-        },
-        jiangsuData1_6(data) {
-            // 1. 找到目标对象(wlSiteName === "苏无锡锡山瑞宝")
-            const targetSite = data.find(item => item.wlSiteName === "苏无锡锡山瑞宝");
-
-            if (!targetSite) {
-                console.log("未找到 wlSiteName 为 '苏无锡锡山瑞宝' 的对象");
-                return data;
-            }
-
-            // 2. 需要匹配的站点名称(不包括 "浙杭州上城紫芸")
-            const siteNames = [
-                '苏无锡惠山陈君',
-            ];
-
-            // 3. 遍历数据，处理符合条件的对象
-            const result = data.filter(item => {
-                if (siteNames.includes(item.wlSiteName)) {
-                    if (item.sum < 50) {
-                        // 获取所有字段名
-                        const allFields = Object.keys(item);
-                        const fieldsToRemove = ["wlSiteName", "wlSiteCode", "tel", "productName", "contacts", "areaName", "address"];
-
-                        // 遍历所有字段，把非 fieldsToRemove 的字段转为数字后相加到 targetSite
-                        allFields.forEach(field => {
-                            if (!fieldsToRemove.includes(field)) {
-                                // 尝试将值转为数字
-                                const numValue = parseFloat(item[field]);
-                                if (!isNaN(numValue)) { // 如果是有效数字
-                                    // 如果 targetSite 没有该字段，初始化为 0
-                                    if (targetSite[field] === undefined) {
-                                        targetSite[field] = 0;
-                                    }
-                                    // 确保 targetSite[field] 是数字(如果不是，尝试转换)
-                                    const targetNum = parseFloat(targetSite[field]);
-                                    if (!isNaN(targetNum)) {
-                                        targetSite[field] = targetNum + numValue;
-                                    }
-                                }
-                            }
-                        });
-                        // 过滤掉这个对象(sum < 50 的站点)
-                        return false;
-                    }
-                }
-                // 保留其他对象(sum >= 50 或非目标站点)
-                return true;
-            });
-            return result;
-        },
-        jiangsuData1_7(data) {
-            // 1. 找到目标对象(wlSiteName === "苏南京江宁君一诺")
-            const targetSite = data.find(item => item.wlSiteName === "苏南京江宁君一诺");
-
-            if (!targetSite) {
-                console.log("未找到 wlSiteName 为 '苏南京江宁君一诺' 的对象");
-                return data;
-            }
-
-            // 2. 需要匹配的站点名称(不包括 "浙杭州上城紫芸")
-            const siteNames = [
-                '苏南京袁国旗', '苏南京江宁优润'
-            ];
-
-            // 3. 遍历数据，处理符合条件的对象
-            const result = data.filter(item => {
-                if (siteNames.includes(item.wlSiteName)) {
-                    if (item.sum < 50) {
-                        // 获取所有字段名
-                        const allFields = Object.keys(item);
-                        const fieldsToRemove = ["wlSiteName", "wlSiteCode", "tel", "productName", "contacts", "areaName", "address"];
-
-                        // 遍历所有字段，把非 fieldsToRemove 的字段转为数字后相加到 targetSite
-                        allFields.forEach(field => {
-                            if (!fieldsToRemove.includes(field)) {
-                                // 尝试将值转为数字
-                                const numValue = parseFloat(item[field]);
-                                if (!isNaN(numValue)) { // 如果是有效数字
-                                    // 如果 targetSite 没有该字段，初始化为 0
-                                    if (targetSite[field] === undefined) {
-                                        targetSite[field] = 0;
-                                    }
-                                    // 确保 targetSite[field] 是数字(如果不是，尝试转换)
-                                    const targetNum = parseFloat(targetSite[field]);
-                                    if (!isNaN(targetNum)) {
-                                        targetSite[field] = targetNum + numValue;
-                                    }
-                                }
-                            }
-                        });
-                        // 过滤掉这个对象(sum < 50 的站点)
-                        return false;
-                    }
-                }
-                // 保留其他对象(sum >= 50 或非目标站点)
-                return true;
-            });
-            return result;
-        },
-        jiangsuData1_8(data) {
-            // 1. 找到目标对象(wlSiteName === "苏南京建邺雨花鹏誉")
-            const targetSite = data.find(item => item.wlSiteName === "苏南京建邺雨花鹏誉");
-
-            if (!targetSite) {
-                console.log("未找到 wlSiteName 为 '苏南京建邺雨花鹏誉' 的对象");
-                return data;
-            }
-
-            // 2. 需要匹配的站点名称(不包括 "浙杭州上城紫芸")
-            const siteNames = [
-                '苏南京恒缘丰', '苏南京江北聚帆', '苏南京溧水依依'
-            ];
-
-            // 3. 遍历数据，处理符合条件的对象
-            const result = data.filter(item => {
-                if (siteNames.includes(item.wlSiteName)) {
-                    if (item.sum < 50) {
-                        // 获取所有字段名
-                        const allFields = Object.keys(item);
-                        const fieldsToRemove = ["wlSiteName", "wlSiteCode", "tel", "productName", "contacts", "areaName", "address"];
-
-                        // 遍历所有字段，把非 fieldsToRemove 的字段转为数字后相加到 targetSite
-                        allFields.forEach(field => {
-                            if (!fieldsToRemove.includes(field)) {
-                                // 尝试将值转为数字
-                                const numValue = parseFloat(item[field]);
-                                if (!isNaN(numValue)) { // 如果是有效数字
-                                    // 如果 targetSite 没有该字段，初始化为 0
-                                    if (targetSite[field] === undefined) {
-                                        targetSite[field] = 0;
-                                    }
-                                    // 确保 targetSite[field] 是数字(如果不是，尝试转换)
-                                    const targetNum = parseFloat(targetSite[field]);
-                                    if (!isNaN(targetNum)) {
-                                        targetSite[field] = targetNum + numValue;
-                                    }
-                                }
-                            }
-                        });
-                        // 过滤掉这个对象(sum < 50 的站点)
-                        return false;
-                    }
-                }
-                // 保留其他对象(sum >= 50 或非目标站点)
-                return true;
-            });
-            return result;
-        },
-        jiangsuData1_9(data) {
-            // 1. 找到目标对象(wlSiteName === "苏南京秦淮鼓楼米米")
-            const targetSite = data.find(item => item.wlSiteName === "苏南京秦淮鼓楼米米");
-
-            if (!targetSite) {
-                console.log("未找到 wlSiteName 为 '苏南京秦淮鼓楼米米' 的对象");
-                return data;
-            }
-
-            // 2. 需要匹配的站点名称(不包括 "浙杭州上城紫芸")
-            const siteNames = [
-                '苏南京浦口吉顺', '苏南京栖霞博源久'
-            ];
-
-            // 3. 遍历数据，处理符合条件的对象
-            const result = data.filter(item => {
-                if (siteNames.includes(item.wlSiteName)) {
-                    if (item.sum < 50) {
-                        // 获取所有字段名
-                        const allFields = Object.keys(item);
-                        const fieldsToRemove = ["wlSiteName", "wlSiteCode", "tel", "productName", "contacts", "areaName", "address"];
-
-                        // 遍历所有字段，把非 fieldsToRemove 的字段转为数字后相加到 targetSite
-                        allFields.forEach(field => {
-                            if (!fieldsToRemove.includes(field)) {
-                                // 尝试将值转为数字
-                                const numValue = parseFloat(item[field]);
-                                if (!isNaN(numValue)) { // 如果是有效数字
-                                    // 如果 targetSite 没有该字段，初始化为 0
-                                    if (targetSite[field] === undefined) {
-                                        targetSite[field] = 0;
-                                    }
-                                    // 确保 targetSite[field] 是数字(如果不是，尝试转换)
-                                    const targetNum = parseFloat(targetSite[field]);
-                                    if (!isNaN(targetNum)) {
-                                        targetSite[field] = targetNum + numValue;
-                                    }
-                                }
-                            }
-                        });
-                        // 过滤掉这个对象(sum < 50 的站点)
-                        return false;
-                    }
-                }
-                // 保留其他对象(sum >= 50 或非目标站点)
-                return true;
-            });
-            return result;
-        },
-        jiangsuData1_10(data) {
-            // 1. 找到目标对象(wlSiteName === "苏无锡新腾百货")
-            const targetSite = data.find(item => item.wlSiteName === "苏无锡新腾百货");
-
-            if (!targetSite) {
-                console.log("未找到 wlSiteName 为 '苏无锡新腾百货' 的对象");
-                return data;
-            }
-
-            // 2. 需要匹配的站点名称(不包括 "浙杭州上城紫芸")
-            const siteNames = [
-                '苏镇江丁卯帆之雨',
-            ];
-
-            // 3. 遍历数据，处理符合条件的对象
-            const result = data.filter(item => {
-                if (siteNames.includes(item.wlSiteName)) {
-                    if (item.sum < 50) {
-                        // 获取所有字段名
-                        const allFields = Object.keys(item);
-                        const fieldsToRemove = ["wlSiteName", "wlSiteCode", "tel", "productName", "contacts", "areaName", "address"];
-
-                        // 遍历所有字段，把非 fieldsToRemove 的字段转为数字后相加到 targetSite
-                        allFields.forEach(field => {
-                            if (!fieldsToRemove.includes(field)) {
-                                // 尝试将值转为数字
-                                const numValue = parseFloat(item[field]);
-                                if (!isNaN(numValue)) { // 如果是有效数字
-                                    // 如果 targetSite 没有该字段，初始化为 0
-                                    if (targetSite[field] === undefined) {
-                                        targetSite[field] = 0;
-                                    }
-                                    // 确保 targetSite[field] 是数字(如果不是，尝试转换)
-                                    const targetNum = parseFloat(targetSite[field]);
-                                    if (!isNaN(targetNum)) {
-                                        targetSite[field] = targetNum + numValue;
-                                    }
-                                }
-                            }
-                        });
-                        // 过滤掉这个对象(sum < 50 的站点)
-                        return false;
-                    }
-                }
-                // 保留其他对象(sum >= 50 或非目标站点)
-                return true;
-            });
-            return result;
-        },
-        jiangsuData1_11(data) {
-            // 1. 找到目标对象(wlSiteName === "苏泰州熠辉")
-            const targetSite = data.find(item => item.wlSiteName === "苏泰州熠辉");
-
-            if (!targetSite) {
-                console.log("未找到 wlSiteName 为 '苏泰州熠辉' 的对象");
-                return data;
-            }
-
-            // 2. 需要匹配的站点名称(不包括 "浙杭州上城紫芸")
-            const siteNames = [
-                '苏泰州姜堰熠辉', '苏泰州兴化熠辉王凯'
-            ];
-
-            // 3. 遍历数据，处理符合条件的对象
-            const result = data.filter(item => {
-                if (siteNames.includes(item.wlSiteName)) {
-                    if (item.sum < 50) {
-                        // 获取所有字段名
-                        const allFields = Object.keys(item);
-                        const fieldsToRemove = ["wlSiteName", "wlSiteCode", "tel", "productName", "contacts", "areaName", "address"];
-
-                        // 遍历所有字段，把非 fieldsToRemove 的字段转为数字后相加到 targetSite
-                        allFields.forEach(field => {
-                            if (!fieldsToRemove.includes(field)) {
-                                // 尝试将值转为数字
-                                const numValue = parseFloat(item[field]);
-                                if (!isNaN(numValue)) { // 如果是有效数字
-                                    // 如果 targetSite 没有该字段，初始化为 0
-                                    if (targetSite[field] === undefined) {
-                                        targetSite[field] = 0;
-                                    }
-                                    // 确保 targetSite[field] 是数字(如果不是，尝试转换)
-                                    const targetNum = parseFloat(targetSite[field]);
-                                    if (!isNaN(targetNum)) {
-                                        targetSite[field] = targetNum + numValue;
-                                    }
-                                }
-                            }
-                        });
-                        // 过滤掉这个对象(sum < 50 的站点)
-                        return false;
-                    }
-                }
-                // 保留其他对象(sum >= 50 或非目标站点)
-                return true;
-            });
             return result;
         },
 
