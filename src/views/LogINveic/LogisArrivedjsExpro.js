@@ -898,8 +898,8 @@ function setExcelStyle(data) {
   // 2. 初始化列宽设置
   data['!cols'] = [
     { wpx: 100 }, { wpx: 100 }, { wpx: 100 }, { wpx: 160 },
-    { wpx: 80 }, { wpx: 80 }, { wpx: 80 }, { wpx: 80 },
-    { wpx: 80 }, { wpx: 80 }, { wpx: 80 }, { wpx: 80 }, { wpx: 80 }, { wpx: 80 }, { wpx: 80 }, { wpx: 80 }, { wpx: 100 }, { wpx: 100 }, { wpx: 100 }, { wpx: 100 }, { wpx: 100 }, { wpx: 380 } // 最后一列宽度为0（隐藏列）
+    { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 54 },
+    { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 380 } // 最后一列宽度为0（隐藏列）
   ];
 
   // 3. 设置行高（两种单位任选其一）
