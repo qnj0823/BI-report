@@ -84,6 +84,7 @@ export async function exportExcel(tableList, fileName) {
   // 设置样式（表头、数据行、小计行等）
   styleHeaderRows(worksheet);
   styleDataRows(worksheet);
+  mergeColumn(worksheet,3)
   
   // 处理光明工厂总计和海南工厂总计行样式（必须在styleDataRows之后执行）
   worksheet.eachRow((row, rowNum) => {
@@ -109,6 +110,8 @@ export async function exportExcel(tableList, fileName) {
   const buffer = await workbook.xlsx.writeBuffer();
   saveAs(new Blob([buffer]), fileName);
 }
+
+
 
 // 样式函数示例第二行第三行
 function styleHeaderRows(worksheet) {
@@ -151,6 +154,35 @@ function styleHeaderRows(worksheet) {
   // row3.eachCell(cell => {
   //   cell.style = headerStyle;
   // });
+}
+function mergeColumn(worksheet, columnIndex, startRow = 2) {
+  const endRow = worksheet.rowCount;
+  const columnLetter = worksheet.getColumn(columnIndex).letter;
+  
+  let mergeStart = startRow;
+  let currentValue = worksheet.getCell(`${columnLetter}${mergeStart}`).value;
+  
+  for (let i = startRow + 1; i <= endRow + 1; i++) {
+    const cellValue = i <= endRow ? worksheet.getCell(`${columnLetter}${i}`).value : null;
+    
+    // 检查值是否发生变化、到达最后一行、或者遇到空值
+    if (cellValue !== currentValue || i > endRow || !currentValue || !cellValue) {
+      // 只有当起始值不为空时才进行合并
+      if (mergeStart < i - 1 && currentValue) {
+        const mergeRange = `${columnLetter}${mergeStart}:${columnLetter}${i - 1}`;
+        worksheet.mergeCells(mergeRange);
+        
+        const cell = worksheet.getCell(`${columnLetter}${mergeStart}`);
+        cell.alignment = {
+          vertical: 'middle',
+          horizontal: 'center'
+        };
+      }
+      
+      mergeStart = i;
+      currentValue = cellValue;
+    }
+  }
 }
 //设置表体样式从第四行开始
 function styleDataRows(worksheet) {

@@ -55,27 +55,27 @@ export default {
             factoryList: [
                 { province: "广东省", factory: "广州工厂" },
                 { province: "广西壮族自治区", factory: "广州工厂" },
-                { province: "海南省", factory: "海南工厂" },
                 { province: "湖南省", factory: "望城工厂" },
                 { province: "四川省", factory: "成都工厂" },
                 { province: "重庆市", factory: "成都工厂" },
-                { province: "浙江省", factory: "金华工厂" },
-                { province: "江西省", factory: "武汉工厂" },
                 { province: "云南省", factory: "成都工厂" },
-                { province: "上海市", factory: "金华工厂" },
-                { province: "湖北省", factory: "武汉工厂" },
-                { province: "江苏省", factory: "" },
-                { province: "河南省", factory: "武汉工厂" },
-                { province: "山东省", factory: "射阳工厂" },
                 { province: "贵州省", factory: "成都工厂" },
+                { province: "西藏自治区", factory: "成都工厂" },
+                { province: "浙江省", factory: "金华工厂" },
+                { province: "上海市", factory: "金华工厂" },
                 { province: "福建省", factory: "金华工厂" },
+                { province: "江西省", factory: "武汉工厂" },
+                { province: "湖北省", factory: "武汉工厂" },
+                { province: "河南省", factory: "武汉工厂" },
                 { province: "山西省", factory: "武汉工厂" },
                 { province: "陕西省", factory: "武汉工厂" },
                 { province: "安徽省", factory: "武汉工厂" },
                 { province: "天津市", factory: "武汉工厂" },
                 { province: "北京市", factory: "武汉工厂" },
                 { province: "山西省", factory: "武汉工厂" },
-                { province: "西藏自治区", factory: "成都工厂" },
+                { province: "江苏省", factory: "" },
+                { province: "山东省", factory: "射阳工厂" },
+                { province: "海南省", factory: "海南工厂" },
                 { province: "海南look常温", factory: "海南工厂" },
                 { province: "海南look椰汁", factory: "海南工厂" },
                 { province: "海南look果汁", factory: "海南工厂" }
@@ -139,7 +139,6 @@ export default {
             api.GetareaDataAPi(this.dataForm).then(res => {
                 this.dataList = res
                 this.dataList = this.addMultipleFieldsAndRemoveSource(this.dataList)
-                this.dataList = this.sortByCustomOrder(this.dataList)
                 this.factoryList = this.updateFactoryByCycle(this.factoryList)
                 console.log(this.factoryList, ' this.factoryList')
                 this.dataList = this.mergeFactoryData(this.dataList, this.factoryList)
@@ -151,7 +150,7 @@ export default {
                     }
                     return item;
                 });
-
+                this.dataList = this.sortByCustomOrder(this.dataList)
                 // 添加工厂总计行
                 this.dataList = this.addFactoryTotals(this.dataList);
 
@@ -189,11 +188,12 @@ export default {
         sortByCustomOrder(dataArray) {
             // 定义排序顺序
             const customOrder = [
-                "广东省", "广西省", "海南省", "湖南省", "四川省",
-                "重庆市", "浙江省", "江西省", "云南省", "上海市","天津市",
-                "湖北省", "江苏省", "河南省", "山东省", "贵州省",
-                "福建省", "山西省", "陕西省", "安徽省", "广西壮族自治区", "西藏自治区","其它",
-                "海南look常温", "海南look椰汁", "海南look果汁"
+                "广东省", "广西壮族自治区", "湖南省", "四川省", "重庆市",
+                "云南省", "贵州省", "西藏自治区", "浙江省", "上海市",
+                "福建省", "江西省", "湖北省", "河南省", "山西省",
+                "陕西省", "安徽省", "天津市", "北京市", "山西省",
+                "江苏省", "山东省", "海南省", "海南look常温",
+                "海南look椰汁", "海南look果汁","其它"
             ];
 
             // 深拷贝数组
