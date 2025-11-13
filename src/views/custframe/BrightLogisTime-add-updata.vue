@@ -2,7 +2,7 @@
     <!-- 基于 Element UI 新增和修改弹窗 -->
     <el-dialog :title="!dataForm.id ? '新增-ADD' : '修改-EDITE'" :close-on-click-modal="false" :visible.sync="visible">
         <!-- 新增和创建表单表单 -->
-        <el-form :model="dataForm" ref="dataForm" @keyup.enter.native="dataSubmit()" label-width="160px">
+        <el-form :model="dataForm" :rules="rules" ref="dataForm" @keyup.enter.native="dataSubmit()" label-width="160px">
             <el-form-item label="区域" prop="sitecode">
                 <el-input v-model="dataForm.areaName" style="width: 100%;" placeholder="区域">
                 </el-input>
@@ -67,7 +67,24 @@ export default {
                 factoryProductCode:'',
                 factoryProductName:'',
                 sheets:''
-            }
+            },
+            rules: {
+                wlSiteCode: [
+                    { required: true, message: '请选择站点code', trigger: 'change' }
+                ],
+                factoryProductName: [
+                    { required: true, message: '请输入产品名称', trigger: 'blur' }
+                ],
+                factoryProductCode: [
+                    { required: true, message: '请输入产品编号', trigger: 'blur' }
+                ],
+                days: [
+                    { required: true, message: '请输入第几天到货', trigger: 'blur' }
+                ],
+                sheets: [
+                    { required: true, message: '请输入第几个表', trigger: 'blur' }
+                ]
+            },
         }
     },
     computed: {},
@@ -111,6 +128,11 @@ export default {
         // 表单数据提交
         dataSubmit() {
             this.$refs['dataForm'].validate((valid) => {
+                if (!valid) {
+                    // 验证不通过时直接返回
+                    console.log('表单验证失败');
+                    return;
+                }
                 if (!this.dataForm.id) {
                     api.wlFacteproaddApi(this.dataForm).then(res => {
                         // TODO 保存数据
