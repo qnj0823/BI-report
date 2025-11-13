@@ -87,6 +87,12 @@
           <el-option label="其它" value="其它"></el-option>
         </el-select>
       </el-form-item>
+      <el-form-item label="密度系数" prop="fgsbscName">
+        <el-input v-model="dataForm3.bulkfactor" placeholder="密度系数"></el-input>
+      </el-form-item>
+      <el-form-item label="件换算值(KG)" prop="fgsbscName">
+        <el-input v-model="dataForm3.pieceConverValue" placeholder="件换算值(KG)"></el-input>
+      </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="Cancel()">取消</el-button>
