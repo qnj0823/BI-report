@@ -34,10 +34,10 @@ export function exportExceljs(tableList, date, fileName,gxtableList) {
   let ws = XLSX.utils.aoa_to_sheet(tableData)
 
   // 准备第二个工作表的数据  
-  const tableData1 = [
-    ['区域', '联系人', '电话', '大LOOK', '小LOOK', '健能', `LOOK优选`, '大白桃', `小白桃`, '大清新健爽（橙）', `小清新健爽（橙）`, `330椰子牛乳`, `310椰子牛乳`, `大0糖`,
-      `小0糖`, '200鲜酪乳', '450鲜酪乳', '180健爽', '180红盒', `合计`, '地址', '备注']
-  ];
+  const tableHeader2 = ['区域', '联系人', '电话', '大LOOK', '小LOOK', '健能', `LOOK优选`, '大白桃', `小白桃`, '大清新健爽（橙）', `小清新健爽（橙）`, `330椰子牛乳`, `310椰子牛乳`, `大0糖`,
+    `小0糖`, '200鲜酪乳', '450鲜酪乳', '180健爽', '180红盒', `合计`, '地址', '备注'];
+  const labelRow2 = Array(tableHeader2.length).fill(labelText);
+  const tableData1 = [labelRow2, tableHeader2];
   gxtableList.forEach(item => {
     tableData1.push([ item.wlSiteName || '', item.contacts || '', item.tel || '', item.box1520100001 || '', item.box1520100002 || '', item.box1520100004 || '', item
       .box1520100008 || '', item.box1520100010 || '', item.box1520100009 || '', item.box1520100014 || '', item.box1520100015 || '', item.box1520130001 || '', item.box1520130003 || '',
@@ -47,6 +47,8 @@ export function exportExceljs(tableList, date, fileName,gxtableList) {
 
   //创建第二个工作表  
   const ws2 = XLSX.utils.aoa_to_sheet(tableData1);
+  // 让第二张表第一行与第一张表第一行一致：合并重复标签
+  mergeDuplicateInFirstTwoRows1(ws2);
   setExcelStyletwo(ws2);
   styleRowsWithSubtotaltwo(ws2); // 设置样式  
   styleFirstTwoRowsTWO(ws2)
@@ -264,14 +266,14 @@ function styleFirstTwoRowsTWO(ws) {
   };
 
   // 确保工作表的行数足够  
-  const rowIndex = 0; // 仅处理第二行（0-based索引）
+  const rowIndex = 1; // 表头在第二行（0-based索引）
   const colCount = XLSX.utils.decode_range(ws['!ref']).e.c; // 获取列的总数  
 
   // 处理第一行（行索引为0）  
   for (let col = 0; col <= colCount; col++) {
     const cellAddress = XLSX.utils.encode_cell({
       c: col,
-      r: 0  // 第一行  
+      r: 0  // 第一行（标签行）  
     });
     const cell = ws[cellAddress];
 
