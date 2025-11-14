@@ -31,6 +31,7 @@
                 <el-button class="filter-item" size="mini" type="success" @click="uploug('福建')">福建</el-button>
                 <el-button class="filter-item" size="mini" type="success" @click="uploug('江苏')">江苏</el-button>
                 <el-button class="filter-item" size="mini" type="success" @click="uploug('浙江')">浙江</el-button>
+                <el-button class="filter-item" size="mini" type="success" @click="uploug('广西')">广西</el-button>
             </el-form-item>
             <!-- <el-button class="filter-item" size="mini" type="success" @click="uploug('广东')">广东</el-button> -->
             <el-form-item>

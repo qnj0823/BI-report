@@ -253,6 +253,9 @@ export default {
                 }, {
                     oldsite: ['桂百色田东冠程', '桂南宁良庆福润'],
                     newsite: '桂百色平果牛牛顺'
+                }, {
+                    oldsite: ['桂柳州融水苏心怡'],
+                    newsite: '桂柳州米德'
                 }
             ],
             GXDataList1: [
@@ -2624,6 +2627,7 @@ export default {
                     this.dataList = this.processDataall(this.dataList)
                     // this.dataList = this.processDataall1(this.dataList)
                     this.dataList = this.processData2_1(this.dataList)
+                    this.dataList = this.processData2_2(this.dataList)
                     this.dataList = this.processData1_1(this.dataList)
                     this.dataList = this.processData1_2(this.dataList)
                     this.dataList = this.processData1_3(this.dataList)
@@ -4031,6 +4035,57 @@ export default {
             const result = data.filter(item => {
                 if (siteNames.includes(item.wlSiteName)) {
                     if (item.sum > 0) {
+                        // 获取所有字段名
+                        const allFields = Object.keys(item);
+                        const fieldsToRemove = ["wlSiteName", "wlSiteCode", "tel", "productName", "contacts", "areaName", "address"];
+
+                        // 遍历所有字段，把非 fieldsToRemove 的字段转为数字后相加到 targetSite
+                        allFields.forEach(field => {
+                            if (!fieldsToRemove.includes(field)) {
+                                // 尝试将值转为数字
+                                const numValue = parseFloat(item[field]);
+                                if (!isNaN(numValue)) { // 如果是有效数字
+                                    // 如果 targetSite 没有该字段，初始化为 0
+                                    if (targetSite[field] === undefined) {
+                                        targetSite[field] = 0;
+                                    }
+                                    // 确保 targetSite[field] 是数字（如果不是，尝试转换）
+                                    const targetNum = parseFloat(targetSite[field]);
+                                    if (!isNaN(targetNum)) {
+                                        targetSite[field] = targetNum + numValue;
+                                    }
+                                }
+                            }
+                        });
+
+                        // 过滤掉这个对象（sum < 50 的站点）
+                        return false;
+                    }
+                }
+                // 保留其他对象（sum >= 50 或非目标站点）
+                return true;
+            });
+
+            return result;
+        },
+        processData2_2(data) {
+            // 1. 找到目标对象（wlSiteName === "桂柳州米德"）
+            const targetSite = data.find(item => item.wlSiteName === "桂柳州米德");
+
+            if (!targetSite) {
+                console.log("未找到 wlSiteName 为 '桂柳州米德' 的对象");
+                return data;
+            }
+
+            // 2. 需要匹配的站点名称（不包括 "桂柳州融水苏心怡"）
+            const siteNames = [
+                "桂柳州融水苏心怡"
+            ];
+
+            // 3. 遍历数据，处理符合条件的对象
+            const result = data.filter(item => {
+                if (siteNames.includes(item.wlSiteName)) {
+                    if (item.sum < 50) {
                         // 获取所有字段名
                         const allFields = Object.keys(item);
                         const fieldsToRemove = ["wlSiteName", "wlSiteCode", "tel", "productName", "contacts", "areaName", "address"];
