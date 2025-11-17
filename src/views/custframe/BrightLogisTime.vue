@@ -150,16 +150,25 @@ export default {
 
         HandleuploadFile() {
             this.uploadFileTest()
-            if (this.testList) {
-                const h = this.$createElement;
-                this.$notify({
-                    title: '提示报错',
-                    message: h('i', { style: 'color: teal' }, '导入表格有重复项')
-                });
-                console.log('导入表格有重复项')
-            } else {
-                this.HandleuploadFiletest()
-            }
+            setTimeout(() => {
+                const rowNumbers = Object.values(this.testList).map(item => item[0].rowNumber);
+                console.log(rowNumbers.length)
+                if (rowNumbers.length !=0) {
+                    console.log(this.testList)
+                    const h = this.$createElement;
+                    this.$notify({
+                        title: '提示报错',
+                        message: h('div', null, [
+                            h('i', { style: 'color: teal' }, '导入表格有重复项'),
+                            h('p', null, `重复行号：${rowNumbers.join(', ')}`) // 显示行号数组
+                        ])
+                    });
+                    console.log('导入表格有重复项')
+                } else {
+                    this.HandleuploadFiletest()
+                }
+            }, 1000);
+
 
         },
         HandleuploadFiletest() {
@@ -203,8 +212,9 @@ export default {
                 formData.append("file", this.files);
 
                 api.importTestAPi(formData).then(res => {
-                    console.log(res, 'res')
+
                     this.testList = res
+
                     this.dataListLoading = false
                 })
                     .catch(error => {
