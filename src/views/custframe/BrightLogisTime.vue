@@ -115,7 +115,8 @@ export default {
             currentPage: 1,
             pageSize: 20,
             totalItems: 0,
-            types: ''
+            types: '',
+            testList: []
         };
     },
     mounted() {
@@ -148,6 +149,20 @@ export default {
         },
 
         HandleuploadFile() {
+            this.uploadFileTest()
+            if (this.testList) {
+                const h = this.$createElement;
+                this.$notify({
+                    title: '提示报错',
+                    message: h('i', { style: 'color: teal' }, '导入表格有重复项')
+                });
+                console.log('导入表格有重复项')
+            } else {
+                this.HandleuploadFiletest()
+            }
+
+        },
+        HandleuploadFiletest() {
             if (this.types == '小月') {
                 this.uploadFile('importproCycleAPi')
             } else if (this.types == '大月') {
@@ -170,6 +185,27 @@ export default {
                     this.$message.success('导入成功')
                     this.dataListLoading = false
                     this.getDataList()
+                })
+                    .catch(error => {
+                        this.dataListLoading = false
+                        this.$message.error("导入失败");
+                    });
+            } else {
+                this.$message.error("请先选择文件");
+            }
+        },
+        //导入测试表
+        uploadFileTest() {
+            this.dataListLoading = true
+            if (this.dataForm2.file) {
+                let formData = new FormData();
+                console.log(this.files)
+                formData.append("file", this.files);
+
+                api.importTestAPi(formData).then(res => {
+                    console.log(res, 'res')
+                    this.testList = res
+                    this.dataListLoading = false
                 })
                     .catch(error => {
                         this.dataListLoading = false

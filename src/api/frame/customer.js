@@ -1858,3 +1858,13 @@ export function APIdaily_report(params) {
     method: 'get'
   })
 }
+
+//导入Excel重复数据提醒
+export function importTestAPi(formData) {
+  return request({
+    url: 'api/basicDqAndCompany/importorderdatatest',
+    method: 'POST',
+    data: formData,
+   
+  })
+}
