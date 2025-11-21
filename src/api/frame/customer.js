@@ -1034,6 +1034,62 @@ export function wlFacteprodelApi(ids) {
   })
 }
 
+//查询物流站点与光明产品到货周期对应表(广东)
+export function wlFacteprocheckDGApi(params) {
+  return request({
+    url: 'api/wlWlsiteOrFactoryproductDeliveryCycleSetGuangdong',
+    params,
+    method: 'get'
+  })
+}
+
+//新增物流站点与光明产品到货周期对应表(广东)
+export function wlFacteproaddDGApi(data) {
+  return request({
+    url: 'api/wlWlsiteOrFactoryproductDeliveryCycleSetGuangdong',
+    method: 'post',
+    data
+  })
+}
+//修改物流站点与光明产品到货周期对应表(广东)
+export function wlFacteproupdateDGApi(data) {
+  return request({
+    url: 'api/wlWlsiteOrFactoryproductDeliveryCycleSetGuangdong',
+    method: 'put',
+    data
+  })
+}
+//删除物流站点与光明产品到货周期对应表(广东)
+export function wlFacteprodelDGApi(ids) {
+  return request({
+    url: 'api/wlWlsiteOrFactoryproductDeliveryCycleSetGuangdong',
+    method: 'delete',
+    data: ids
+  })
+}
+
+//物流--物流站点与光明产品到货周期对应表(导入复盖)(广东)
+export function importproCycleGDAPi(formData) {
+  return request({
+    url: 'api/wlWlsiteOrFactoryproductDeliveryCycleSet/importorderdatamax',
+    method: 'POST',
+    data: formData,
+    // headers: { 'Content-Type': 'multipart/form-data' }
+  })
+}
+
+
+
+//物流--物流站点与光明产品到货周期对应表(导入追加)(广东)
+export function importproCycleaddGDAPi(formData) {
+  return request({
+    url: 'api/wlWlsiteOrFactoryproductDeliveryCycleSetGuangdong/importorderdataguangdong',
+    method: 'POST',
+    data: formData,
+    
+  })
+}
+
 
 
 
@@ -1224,6 +1280,15 @@ export function wlsitepersonApi(params) {
 export function wlnewhenanApi(params) {
   return request({
     url: 'api/report/get_pro_wl_product_or_factory_excel_new_henan',
+    params,
+    method: 'get'
+  })
+}
+
+//物流及开单表(广东)
+export function wlguangdongApi(params) {
+  return request({
+    url: 'api/wlWlsiteOrFactoryproductOrderDeliveryCycleGuangdong',
     params,
     method: 'get'
   })
