@@ -15,21 +15,25 @@
                 <el-button class="filter-item" size="mini" type="success" @click="addOrUpdateHandle()">新增</el-button>
             </el-form-item>
         </el-form>
-        <el-table ref="table" v-loading="dataListLoading" :data="dataList" style="width: 100%;">
-            <el-table-column :show-overflow-tooltip="true" prop="areaName" align="center" label="区域"/>
-            <el-table-column :show-overflow-tooltip="true" prop="productCode" align="center" label="集团产品编码"/>
-            <el-table-column :show-overflow-tooltip="true" prop="factoryProductCode" align="center" label="工厂产品编码"/>
-            <el-table-column :show-overflow-tooltip="true" prop="factoryProductName" align="center" label="产品"/>
-            <el-table-column :show-overflow-tooltip="true" prop="wlSiteCode" align="center" label="光明物流编码"/>
-            <el-table-column :show-overflow-tooltip="true" prop="wlSiteName" align="center" label="光明物流站点"/>
-            <el-table-column :show-overflow-tooltip="true" prop="piece" align="center" label="数量(盒)"/>
-            <el-table-column :show-overflow-tooltip="true" prop="vouchdate" align="center" label="日期"/>
-            <el-table-column :show-overflow-tooltip="true" prop="days" align="center" label="T加几"/>
-            <el-table-column :show-overflow-tooltip="true" prop="deliverydate" align="center" label="到货日期"/>
-            <el-table-column :show-overflow-tooltip="true" prop="createdate" align="center" label="创建日期"/>
+        <el-table ref="table" v-loading="dataListLoading" :data="currentData" style="width: 100%;">
+            <el-table-column :show-overflow-tooltip="true" prop="areaName" align="center" label="区域" />
+            <el-table-column :show-overflow-tooltip="true" prop="productCode" align="center" label="集团产品编码" />
+            <el-table-column :show-overflow-tooltip="true" prop="factoryProductCode" align="center" label="工厂产品编码" />
+            <el-table-column :show-overflow-tooltip="true" prop="factoryProductName" align="center" label="产品" />
+            <el-table-column :show-overflow-tooltip="true" prop="wlSiteCode" align="center" label="光明物流编码" />
+            <el-table-column :show-overflow-tooltip="true" prop="wlSiteName" align="center" label="光明物流站点" />
+            <el-table-column :show-overflow-tooltip="true" prop="piece" align="center" label="数量(盒)" />
+            <el-table-column :show-overflow-tooltip="true" prop="vouchdate" align="center" label="日期" />
+            <el-table-column :show-overflow-tooltip="true" prop="days" align="center" label="T加几" />
+            <el-table-column :show-overflow-tooltip="true" prop="deliverydate" align="center" label="到货日期" />
+            <el-table-column :show-overflow-tooltip="true" prop="createdate" align="center" label="创建日期" />
         </el-table>
-        <add-or-update v-if="addOrUpdateVisible" :date="this.dataForm.p_vouchdateend"  ref="addOrUpdate" @close="addOrUpdateVisible = false"
-            @refreshDataList="getDataList"></add-or-update>
+        <el-pagination style="width: 90%; margin: 0 auto; " @size-change="sizeChangeHandle" ref="pagination"
+            @current-change="handleCurrentChange" :current-page="currentPage" :page-sizes="[20, 40, 60, 80, 100, 1000]"
+            :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="dataList.length">
+        </el-pagination>
+        <add-or-update v-if="addOrUpdateVisible" :date="this.dataForm.p_vouchdateend" ref="addOrUpdate"
+            @close="addOrUpdateVisible = false" @refreshDataList="getDataList"></add-or-update>
     </div>
 </template>
 
@@ -46,11 +50,14 @@ export default {
             msg: 'NomalData-page',
             addOrUpdateVisible: false,
             dataList: [],
-            dataListLoading:false,
-            bullay:'',
+            dataListLoading: false,
+            bullay: '',
             dataForm: {
                 p_vouchdateend: ''
-            }
+            },
+            currentData: [],
+            currentPage: 1,
+            pageSize: 20,
         };
     },
     created() {
@@ -63,15 +70,23 @@ export default {
         getDataList() {
             api.NormalListAPI().then(res => {
                 this.dataList = res
+                this.dataList = this.dataList.sort((a, b) => {
+                    return new Date(b.vouchdate) - new Date(a.vouchdate);
+                });
                 this.dataList = this.dataList.filter(item =>
                     (item.areaName && item.areaName.includes(this.bullay)) ||
-                    (item.productCode && item.productCode.includes(this.bullay))  ||
-                    (item.factoryProductCode && item.factoryProductCode.includes(this.bullay))  ||
+                    (item.productCode && item.productCode.includes(this.bullay)) ||
+                    (item.factoryProductCode && item.factoryProductCode.includes(this.bullay)) ||
                     (item.factoryProductName && item.factoryProductName.includes(this.bullay)) ||
-                    (item.wlSiteCode && item.wlSiteCode.includes(this.bullay))  ||
+                    (item.wlSiteCode && item.wlSiteCode.includes(this.bullay)) ||
                     (item.wlSiteName && item.wlSiteName.includes(this.bullay)) ||
-                    (item.vouchdate && item.vouchdate.includes(this.bullay)) 
+                    (item.vouchdate && item.vouchdate.includes(this.bullay))
                 );
+                this.currentData = {
+                    ...this.dataList
+                };
+                this.sizeChangeHandle(this.pageSize);
+                this.dataListLoading = false
             })
         },
         // 新增 / 修改
@@ -100,6 +115,19 @@ export default {
             this.month = String(date.getMonth() + 1).padStart(2, '0'); // 月份从0开始，所以加1 
             this.day = String(date.getDate()).padStart(2, '0');
             return `${this.year}-${this.month}-${this.day}`;
+        },
+        // 每页数
+        sizeChangeHandle(val) {
+            this.pageSize = val;
+            this.currentPage = 1;
+            this.currentData = this.dataList.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this
+                .pageSize);
+        },
+        // 当前页
+        handleCurrentChange(val) {
+            console.log(val)
+            this.currentPage = val;
+            this.currentData = this.dataList.slice((val - 1) * this.pageSize, val * this.pageSize);
         },
     }
 };
