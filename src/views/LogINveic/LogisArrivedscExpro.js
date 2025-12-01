@@ -621,7 +621,7 @@ function setExcelStyle(data) {
 
   // 2. 初始化列宽设置
   data['!cols'] = [
-    { wpx: 150 }, { wpx: 150 }, { wpx: 100 }, { wpx: 80 },
+    calculateColumnWidth(data,'A'), { wpx: 150 }, { wpx: 100 }, { wpx: 80 },
     { wpx: 80 }, { wpx: 80 }, { wpx: 80 }, { wpx: 80 },
     { wpx: 80 }, { wpx: 80 }, { wpx: 80 }, { wpx: 80 }, { wpx: 80 }, { wpx: 80 }, { wpx: 80 }, { wpx: 80 }, { wpx: 100 }, { wpx: 100 }, { wpx: 150 } // 最后一列宽度为0（隐藏列）
   ];
@@ -681,6 +681,44 @@ function setExcelStyle(data) {
   }
 }
 
+// 计算宽度
+function calculateColumnWidth(data,columnLetter) {
+  let maxChars = 0;
+  
+  // 遍历指定列的所有单元格
+  const columnRegex = new RegExp(`^${columnLetter}\\d+$`, 'i');
+  Object.keys(data).forEach(key => {
+    if (columnRegex.test(key)) {
+      const cellValue = data[key].v;
+      if (cellValue !== null && cellValue !== undefined) {
+        const strValue = cellValue.toString();
+        const charCount = getEffectiveLength(strValue);
+        if (charCount > maxChars) {
+          maxChars = charCount;
+        }
+      }
+    }
+  });
+  
+  // 计算宽度：每个字符10像素
+  let width = maxChars * 8;
+  return { wpx: width };
+}
+
+// 计算有效长度（中文算2个字符，英文算1个）
+function getEffectiveLength(str) {
+  let length = 0;
+  for (let i = 0; i < str.length; i++) {
+    const charCode = str.charCodeAt(i);
+    // 中文字符范围判断
+    if (charCode >= 0x4E00 && charCode <= 0x9FA5) {
+      length += 2;
+    } else {
+      length += 1;
+    }
+  }
+  return length;
+}
 
 function s2ab(s) {
   var buf = new ArrayBuffer(s.length)
