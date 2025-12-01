@@ -278,7 +278,10 @@ export default {
                 {
                     oldsite: ['桂柳州柳北李建重', '桂柳州城中严明高'],
                     newsite: '桂柳州米德'
-                }, {
+                }
+            ],
+            GXDataList4: [
+                {
                     oldsite: ['桂南宁宾阳汇成', '桂南宁上林海硕'],
                     newsite: '桂南宁横县湘旺'
                 }
@@ -1060,6 +1063,30 @@ export default {
                             oldsite: oldsite,
                             newsite: zjItem.newsite
                         });
+                    }
+                }
+            }
+
+            return result;
+        },
+        filterSites2(zjDataList, dataList) {
+            const result = [];
+
+            // 遍历ZJDataList中的每个对象
+            for (const zjItem of zjDataList) {
+                // 遍历每个对象的oldsite数组
+                for (const oldsite of zjItem.oldsite) {
+                    // 在dataList中查找匹配的站点
+                    const matchedItem = dataList.find(item => item.wlSiteName == oldsite);
+                    console.log(matchedItem, 'matchedItem')
+                    // 如果sum达到50
+                    if (matchedItem) {
+                        if (matchedItem.sum >= 50) {
+                            result.push({
+                                oldsite: oldsite,
+                                newsite: zjItem.newsite
+                            });
+                        }
                     }
                 }
             }
@@ -2760,7 +2787,17 @@ export default {
                     const gudingGXfinalResult = this.calculateGroupTotals(gudinguniqueArray);
                     console.log(gudingList, 'gudingList')
 
-
+                    const gudingList1 = this.filterSites2(this.GXDataList4, this.dataList)
+                    const gudingResult1 = this.filterByNewsiteMatch(gudingList1, this.dataList);
+                    const gudingonderList1 = this.matchSitesToOnderList(gudingResult1, this.dataList);
+                    const gudingformedArray1 = this.transformFilteredResult(gudingResult1);
+                    const gudingculatedList1 = this.sortAndCalculateOnderList(gudingonderList1, gudingformedArray1);
+                    const gudinguniqueArray1 = Array.from(
+                        new Map(
+                            gudingculatedList1.map(item => [item.wlSiteName, item])
+                        ).values()
+                    );
+                    const gudingGXfinalResult1 = this.calculateGroupTotals(gudinguniqueArray1);
 
                     // 如果 GXfinalResult 可能为 undefined，先初始化
                     this.GXfinalResult = this.GXfinalResult || [];
@@ -2769,6 +2806,7 @@ export default {
                     // this.GXfinalResult.push(...matresult);
                     this.GXfinalResult.push(...treematresult);
                     this.GXfinalResult.push(...gudingGXfinalResult);
+                    this.GXfinalResult.push(...gudingGXfinalResult1);
 
 
 
@@ -2779,7 +2817,7 @@ export default {
                     this.dataList = this.processData1(this.dataList)
                     this.dataList = this.processData2(this.dataList)
                     this.dataList = this.processData3(this.dataList)
-                    this.dataList = this.processDataall(this.dataList)
+                    // this.dataList = this.processDataall(this.dataList)
                     // this.dataList = this.processDataall1(this.dataList)
                     this.dataList = this.processData2_1(this.dataList)
                     this.dataList = this.processData2_2(this.dataList)
@@ -4189,7 +4227,7 @@ export default {
             // 3. 遍历数据，处理符合条件的对象
             const result = data.filter(item => {
                 if (siteNames.includes(item.wlSiteName)) {
-                    if (item.sum > 0) {
+                    if (item.sum >= 50) {
                         // 获取所有字段名
                         const allFields = Object.keys(item);
                         const fieldsToRemove = ["wlSiteName", "wlSiteCode", "tel", "productName", "contacts", "areaName", "address"];

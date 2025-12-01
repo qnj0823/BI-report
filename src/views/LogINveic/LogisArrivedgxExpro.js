@@ -979,7 +979,7 @@ function calculateColumnWidth(data,columnLetter) {
   });
   
   // 计算宽度：每个字符10像素
-  let width = maxChars * 8;
+  let width = maxChars * 10;
   return { wpx: width };
 }
 
