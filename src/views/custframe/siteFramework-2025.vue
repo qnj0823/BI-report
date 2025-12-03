@@ -76,7 +76,7 @@ export default {
                     ...obj,
                     year: 2024
                 }));
-                this.dataList = [...this.dataList, ...this.dataListHis]
+                // this.dataList = [...this.dataList, ...this.dataListHis]
                 this.dataList = this.dataList.filter(item => item.cname !== "杭州聚积宝网络科技有限公司");
                 this.dataList = this.groupByCompanyName(this.dataList);
 
