@@ -13,10 +13,10 @@
             </el-form-item>
         </el-form>
         <el-table ref="table" v-loading="dataListLoading" :data="currentData" style="width: 100%;">
-            <el-table-column :show-overflow-tooltip="true" align="center" prop="dqname" label="一级分类" />
-            <el-table-column :show-overflow-tooltip="true" align="center" prop="sqname" label="二级分类" />
-            <el-table-column :show-overflow-tooltip="true" align="center" prop="companyname" label="三级分类" />
-            <el-table-column :show-overflow-tooltip="true" prop="ccitename" align="center" label="客户站点" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="dqname" label="战区" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="sqname" label="一级分类" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="companyname" label="二级分类" />
+            <el-table-column :show-overflow-tooltip="true" prop="ccitename" align="center" label="三级分类" />
             <!-- <el-table-column :show-overflow-tooltip="true" align="center" prop="cname" label="客户名称" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="year" label="年份" /> -->
         </el-table>
@@ -31,7 +31,7 @@
 import * as api from '@/api/frame/customer.js'
 import {
     exportExcel
-} from './siteFrameworkExpro.js'
+} from './siteFramework-2025Expro.js'
 export default {
     name: 'ceshi-page',
     data() {
