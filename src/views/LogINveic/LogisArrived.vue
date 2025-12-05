@@ -45,6 +45,7 @@
             <!-- <el-table-column v-if="['四川'].includes(areas)" :show-overflow-tooltip="true" align="center" prop="linename"
                 label="客户分类" /> -->
             <el-table-column :show-overflow-tooltip="true" align="center" width="150" prop="wlSiteName" label="区域" />
+            <!-- <el-table-column :show-overflow-tooltip="true" align="center" width="150" prop="linename" label="线路" /> -->
             <el-table-column :show-overflow-tooltip="true" align="center" prop="box1520100001" label="大LOOK" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="box1520100002" label="小LOOK" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="box1520100004" label="健能" />
@@ -1911,7 +1912,8 @@ export default {
                         tel: '江苏总计',
                         days: 0,
                         wlSiteCode: "TOTAL",
-                        wlSiteName: "江苏总计"
+                        wlSiteName: "江苏总计",
+                        linename: "江苏总计",
                     };
 
                     // 遍历数组中的每个对象
@@ -1959,7 +1961,8 @@ export default {
                                 ...dataItem, // 保留原有属性
                                 address: matchedItem.address, // 添加address
                                 contacts: matchedItem.contacts, // 添加contacts
-                                tel: matchedItem.tel // 添加tel
+                                tel: matchedItem.tel,// 添加tel
+                                linename: matchedItem.linename
                             };
                         }
 
@@ -2011,6 +2014,7 @@ export default {
                         item.wlSiteName.includes(this.bullay)
                     );
                     console.log(this.dataList)
+                    console.log(this.JSfinalResult)
                     this.dataListLoading = false
                     this.showExportButton = true
                 })

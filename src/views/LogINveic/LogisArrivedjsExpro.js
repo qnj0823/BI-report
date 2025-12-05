@@ -7,7 +7,7 @@ import XLSXS from 'xlsx-style'
  * @param {Element} dom
  * @param {String} fileName
  */
-export function exportExceljs(tableList, date, fileName,gxtableList) {
+export function exportExceljs(tableList, date, fileName, gxtableList) {
 
   const selectedDate = new Date(date);
   const month = selectedDate.getMonth() + 1; // 获取月份（0-11，需要加 1）
@@ -17,16 +17,16 @@ export function exportExceljs(tableList, date, fileName,gxtableList) {
   console.log(month, year)
 
   let tableData = [
-    [`${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`,
+    [`${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`,
     `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`
     ]
   ]
-  const tableTitle = ['订单日期', '区域', '联系人', '电话', '大LOOK', '小LOOK', '健能', `LOOK优选`, '大白桃', `小白桃`, '大清新健爽（橙）', `小清新健爽（橙）`, `330椰子牛乳`, `310椰子牛乳`, `大0糖`,
+  const tableTitle = ['订单日期', '区域', '线路', '联系人', '电话', '大LOOK', '小LOOK', '健能', `LOOK优选`, '大白桃', `小白桃`, '大清新健爽（橙）', `小清新健爽（橙）`, `330椰子牛乳`, `310椰子牛乳`, `大0糖`,
     `小0糖`, '200鲜酪乳', '450鲜酪乳', '180健爽', '180红盒', `合计`, '地址', '备注']
 
   tableData.push(tableTitle)
   tableList.forEach(item => {
-    tableData.push([item.startDate || '', item.wlSiteName || '', item.contacts || '', item.tel || '', item.box1520100001 || '', item.box1520100002 || '', item.box1520100004 || '', item
+    tableData.push([item.startDate || '', item.wlSiteName || '', item.linename || '', item.contacts || '', item.tel || '', item.box1520100001 || '', item.box1520100002 || '', item.box1520100004 || '', item
       .box1520100008 || '', item.box1520100010 || '', item.box1520100009 || '', item.box1520100014 || '', item.box1520100015 || '', item.box1520130001 || '', item.box1520130003 || '',
     item.box1520100017 || '', item.box1520100016 || '', item.box1520100052 || '', item.box1520100053 || '', item.box1520100051 || '', item.box1520100026 || '', item.sum || '', item.address || '', item.vnote || ''
     ])
@@ -34,12 +34,12 @@ export function exportExceljs(tableList, date, fileName,gxtableList) {
   let ws = XLSX.utils.aoa_to_sheet(tableData)
 
   // 准备第二个工作表的数据  
-  const tableHeader2 = ['区域', '联系人', '电话', '大LOOK', '小LOOK', '健能', `LOOK优选`, '大白桃', `小白桃`, '大清新健爽（橙）', `小清新健爽（橙）`, `330椰子牛乳`, `310椰子牛乳`, `大0糖`,
+  const tableHeader2 = ['区域', '线路', '联系人', '电话', '大LOOK', '小LOOK', '健能', `LOOK优选`, '大白桃', `小白桃`, '大清新健爽（橙）', `小清新健爽（橙）`, `330椰子牛乳`, `310椰子牛乳`, `大0糖`,
     `小0糖`, '200鲜酪乳', '450鲜酪乳', '180健爽', '180红盒', `合计`, '地址', '备注'];
   const labelRow2 = Array(tableHeader2.length).fill(labelText);
   const tableData1 = [labelRow2, tableHeader2];
   gxtableList.forEach(item => {
-    tableData1.push([ item.wlSiteName || '', item.contacts || '', item.tel || '', item.box1520100001 || '', item.box1520100002 || '', item.box1520100004 || '', item
+    tableData1.push([item.wlSiteName || '', item.linename || '', item.contacts || '', item.tel || '', item.box1520100001 || '', item.box1520100002 || '', item.box1520100004 || '', item
       .box1520100008 || '', item.box1520100010 || '', item.box1520100009 || '', item.box1520100014 || '', item.box1520100015 || '', item.box1520130001 || '', item.box1520130003 || '',
     item.box1520100017 || '', item.box1520100016 || '', item.box1520100052 || '', item.box1520100053 || '', item.box1520100051 || '', item.box1520100026 || '', item.sum || '', item.address || '', item.vnote || ''
     ])
@@ -96,9 +96,9 @@ function setExcelStyletwo(data) {
 
   // 2. 初始化列宽设置
   data['!cols'] = [
-    calculateColumnWidth(data,'A'), { wpx: 120 }, { wpx: 100 }, { wpx: 90 },
+    calculateColumnWidth(data, 'A'), { wpx: 100 }, { wpx: 120 }, { wpx: 100 }, { wpx: 90 },
     { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 },
-    { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, calculateColumnWidth(data,'U'), { wpx: 100 } // 最后一列宽度为0（隐藏列）
+    { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, calculateColumnWidth(data, 'V'), { wpx: 100 } // 最后一列宽度为0（隐藏列）
   ];
 
   // 3. 设置行高（两种单位任选其一）
@@ -182,8 +182,8 @@ function styleRowsWithSubtotaltwo(ws) {
   const range = XLSX.utils.decode_range(ws['!ref']);
 
   for (let row = range.s.r; row <= range.e.r; row++) {
-    // 检查B列（索引1）
-    const cellAddress = XLSX.utils.encode_cell({ c: 1, r: row });
+    // 检查c列（索引2）
+    const cellAddress = XLSX.utils.encode_cell({ c: 2, r: row });
     const cell = ws[cellAddress];
 
     // 检查是否为总计行
@@ -358,7 +358,7 @@ function mergeDuplicateInFirstTwoRows(ws) {
   // 遍历需要处理的行
   for (const row of rowsToProcess) {
     // 只处理前三列（0-2列）
-    for (let col = 0; col < 4; col++) {  // 修改这里，只循环到第2列
+    for (let col = 0; col < 5; col++) {  // 修改这里，只循环到第2列
       const cellAddress = XLSX.utils.encode_cell({ c: col, r: row });
       const cell = ws[cellAddress];
 
@@ -367,7 +367,7 @@ function mergeDuplicateInFirstTwoRows(ws) {
         let startCol = col;
 
         // 检查后续单元格是否与当前单元格相同（不超过第2列）
-        while (col + 1 < 4) {  // 修改这里，限制不超过第2列
+        while (col + 1 < 5) {  // 修改这里，限制不超过第2列
           const nextCellAddress = XLSX.utils.encode_cell({ c: col + 1, r: row });
           const nextCell = ws[nextCellAddress];
           if (nextCell && nextCell.v === cellValue) {
@@ -666,7 +666,7 @@ function styleRowsWithSubtotal1(ws) {
 
     // 2. 从第三行开始检查P列（索引15）的值
     if (row >= 2) {  // 从第三行开始（索引2）
-      const pColCell = ws[XLSX.utils.encode_cell({ c: 20, r: row })];  // P列是第16列，索引15
+      const pColCell = ws[XLSX.utils.encode_cell({ c: 21, r: row })];  // P列是第16列，索引15
 
       if (pColCell) {
         // 尝试获取数值
@@ -899,9 +899,9 @@ function setExcelStyle(data) {
 
   // 2. 初始化列宽设置
   data['!cols'] = [
-    { wpx: 100 }, calculateColumnWidth(data,'B'), { wpx: 100 }, { wpx: 160 },
+    { wpx: 100 }, calculateColumnWidth(data, 'B'), { wpx: 100 }, { wpx: 100 }, { wpx: 160 },
     { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 54 },
-    { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, calculateColumnWidth(data,'V') // 最后一列宽度为0（隐藏列）
+    { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, { wpx: 54 }, calculateColumnWidth(data, 'W') // 最后一列宽度为0（隐藏列）
   ];
 
   // 3. 设置行高（两种单位任选其一）
@@ -960,9 +960,9 @@ function setExcelStyle(data) {
 }
 
 // 计算宽度
-function calculateColumnWidth(data,columnLetter) {
+function calculateColumnWidth(data, columnLetter) {
   let maxChars = 0;
-  
+
   // 遍历指定列的所有单元格
   const columnRegex = new RegExp(`^${columnLetter}\\d+$`, 'i');
   Object.keys(data).forEach(key => {
@@ -977,7 +977,7 @@ function calculateColumnWidth(data,columnLetter) {
       }
     }
   });
-  
+
   // 计算宽度：每个字符10像素
   let width = maxChars * 8;
   return { wpx: width };

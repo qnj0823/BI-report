@@ -62,21 +62,15 @@ export default {
             this.dataListLoading = true
 
             try {
-                const [ywkjres, ljtqjr] = await Promise.all([
+                const [ywkjres] = await Promise.all([
                     api.CustomerSite(),//2025
-                    api.SiteallhistoryCustomer(),//2024
                 ]);
                 this.dataList = ywkjres
                 this.dataList = this.dataList.map(obj => ({
                     ...obj,
                     year: 2025
                 }));
-                this.dataListHis = ljtqjr
-                this.dataListHis = this.dataListHis.map(obj => ({
-                    ...obj,
-                    year: 2024
-                }));
-                // this.dataList = [...this.dataList, ...this.dataListHis]
+
                 this.dataList = this.dataList.filter(item => item.cname !== "杭州聚积宝网络科技有限公司");
                 this.dataList = this.groupByCompanyName(this.dataList);
 
