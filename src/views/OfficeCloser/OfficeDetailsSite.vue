@@ -15,6 +15,10 @@
                         :value="item.name" />
                 </el-select>
             </el-form-item>
+               <el-form-item>
+                  <el-input v-model="bullay" placeholder="省区" clearable @keyup.enter.native="searchEnterFun()"
+                    ref="searchInput"></el-input>
+            </el-form-item>
             <el-form-item>
                 <el-button class="filter-item" size="mini" type="success" icon="el-icon-search"
                     @click="getdataList">查询</el-button>
