@@ -263,7 +263,10 @@ export default {
                 }, {
                     oldsite: ['桂柳州融水苏心怡'],
                     newsite: '桂柳州米德'
-                }
+                }, {
+                    oldsite: ['桂北流楚鑫晟'],
+                    newsite: '桂玉林北流乐雯'
+                },
             ],
             GXDataList1: [
                 {
@@ -279,10 +282,6 @@ export default {
                 {
                     oldsite: ['桂柳州柳北李建重', '桂柳州城中严明高'],
                     newsite: '桂柳州米德'
-                },
-                {
-                    oldsite: ['桂北流楚鑫晟'],
-                    newsite: '桂玉林北流乐雯'
                 },
             ],
             GXDataList4: [
@@ -344,7 +343,7 @@ export default {
                     newsite: '苏苏州吴中邱裕铭'
                 },
                 {
-                    oldsite: ['苏苏州直营部','苏苏州常熟荣泽酒业'],
+                    oldsite: ['苏苏州直营部', '苏苏州常熟荣泽酒业'],
                     newsite: '苏苏州相城田君'
                 },
                 {
@@ -4387,7 +4386,7 @@ export default {
             // 3. 遍历数据，处理符合条件的对象
             const result = data.filter(item => {
                 if (siteNames.includes(item.wlSiteName)) {
-                    if (item.sum > 0) {
+                    if (item.sum < 50) {
                         // 获取所有字段名
                         const allFields = Object.keys(item);
                         const fieldsToRemove = ["wlSiteName", "wlSiteCode", "tel", "productName", "contacts", "areaName", "address"];
