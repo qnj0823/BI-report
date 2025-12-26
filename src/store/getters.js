@@ -29,6 +29,8 @@ const getters = {
   // 获取dataList
   getDataList: state => state.dataList,
   // 可选：获取dataList长度
-  getDataListLength: state => state.dataList.length
+  getDataListLength: state => state.dataList.length,
+
+  getSiteDataList: state => state.officeSite.siteDataList,      
 }
 export default getters

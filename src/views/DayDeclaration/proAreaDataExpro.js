@@ -13,7 +13,7 @@ export async function exportExcel(tableList, fileName) {
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Sheet1');
 
-  const labelText = '屋顶盒&海南工厂每日计划'
+  const labelText = 'LOOK每日报单计划（盒/瓶）'
   const hnFruit = ['海南果汁饮料']
   const hnNormal = ['海南常温']
   const hnCoconut = ['海南椰子汁']

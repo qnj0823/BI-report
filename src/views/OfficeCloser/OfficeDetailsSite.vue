@@ -16,10 +16,16 @@
                 </el-select>
             </el-form-item>
             <el-form-item>
+                <el-input v-model="bullay" placeholder="省区" clearable @keyup.enter.native="searchEnterFun()"
+                    ref="searchInput"></el-input>
+            </el-form-item>
+            <el-form-item>
                 <el-button class="filter-item" size="mini" type="success" icon="el-icon-search"
                     @click="getdataList">查询</el-button>
                 <el-button size="mini" class="filter-item" type="warning" icon="el-icon-download" v-if="showbutton"
                     @click="exportData">导出</el-button>
+                <el-button class="filter-item" size="mini" type="success" icon="el-icon-search"
+                    @click="getdataListLS">查询历史</el-button>
             </el-form-item>
             <div class="test">{{ this.labelText }}</div>
         </el-form>
@@ -113,9 +119,27 @@ export default {
         // this.calculateLastYearDates()
     },
     mounted() {
-        this.getdataList()
+        // this.getdataList()
     },
     methods: {
+
+        getdataListLS() {
+            this.showbutton = false
+            this.dataListLoading = true,
+                this.dataList = this.$store.getters.getSiteDataList
+            console.log(this.dataList, '111');
+            this.dataList = this.dataList.filter(item =>
+                (item.iParentName && item.iParentName.includes(this.bullay))
+            );
+            this.currentData = [...this.dataList]
+
+            this.dataListLoading = false,
+                setTimeout(() => {
+                    this.showbutton = true
+                }, 2000)
+            console.log(this.currentData);
+        },
+
         async getdataList() {
             this.dataListLoading = true;
             this.showbutton = false;
@@ -264,16 +288,17 @@ export default {
                 this.dataList = this.dataList.filter(obj => {
                     return obj.leijiend; //会过滤掉所有假值
                 });
-                console.log(this.dataList,'this.dataList112255')
+                console.log(this.dataList, 'this.dataList112255')
                 this.dataList = this.dataList.map(item => ({
                     ...item,           // 保留其他属性
                     goalnumtotal: '',  // 覆盖这两个字段
                     lejibox: '',
-                    leijidiff:''
+                    leijidiff: ''
                 }));
                 this.currentData = {
                     ...this.dataList
                 };
+                this.$store.commit('officeSite/SET_DATA_LIST', this.dataList)
                 this.sizeChangeHandle(this.pageSize);
                 this.showbutton = true;
                 console.log(this.dataList, ' this.dataList')
@@ -453,33 +478,6 @@ export default {
             return result;
         },
 
-        //按站点时间段计算ordersnumStage截至当日单数
-        mergezdByname(arr) {
-            const result = {};
-
-            arr.forEach(obj => {
-                const key = obj.sitename;
-                const currentValue = parseFloat(obj.goalnum) || 0; // 安全转换为数字
-
-                if (!result[key]) {
-                    // 第一次遇到这个站点，创建新对象
-                    result[key] = {
-                        ...obj, // 保留所有原始字段
-                        ordersnumStage: currentValue // 初始化累计值
-                    };
-                } else {
-                    // 已存在该站点，累加ordersnum值
-                    result[key].ordersnumStage += currentValue;
-
-                    // 可选：保留其他需要的信息，如最新日期的数据
-                    // if (new Date(obj.date) > new Date(result[key].date)) {
-                    //     result[key].date = obj.date;
-                    // }
-                }
-            });
-
-            return Object.values(result); // 转换为数组
-        },
         // 每页数
         sizeChangeHandle(val) {
             this.pageSize = val;

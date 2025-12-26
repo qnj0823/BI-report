@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import getters from './getters'
-
+import createPersistedState from 'vuex-persistedstate'
 Vue.use(Vuex)
 
 // https://webpack.js.org/guides/dependency-management/#requirecontext
@@ -19,7 +19,14 @@ const modules = modulesFiles.keys().reduce((modules, modulePath) => {
 
 const store = new Vuex.Store({
   modules,
-  getters
+  getters,
+ plugins: [
+    createPersistedState({
+      key: 'vuex',
+      storage: window.localStorage,
+      paths: ['officeSite'],
+    })
+  ]
 })
 
 export default store
