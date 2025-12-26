@@ -44,7 +44,7 @@
 
         <el-form :inline="true" style="width: 100%; margin: 0 auto;">
             <el-form-item>
-                <el-button type="primary" @click="addOrUpdateHandle()">手动</el-button>
+                <el-button type="primary"  :disabled="isBtnDisabled" @click="addOrUpdateHandle()">手动</el-button>
             </el-form-item>
             <el-form-item>
                 <el-button type="success" @click="CalibrateHandle('1')">校准</el-button>
@@ -134,6 +134,8 @@ export default {
     name: 'Wlin-page',
     data() {
         return {
+            isBtnDisabled: false,
+            timer: null,
             msg: 'Wlin-page',
             dataListLoading: false,
             showModal: false,
