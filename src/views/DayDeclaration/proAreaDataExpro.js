@@ -39,7 +39,7 @@ export async function exportExcel(tableList, fileName) {
   };
 
   // 添加表头和数据
-  const subHeaders = ['省区', '销售总计划','供应链', '鲜露乳', '健爽', '330/310'];
+  const subHeaders = ['省区', '销售总计划','供应链', '鲜露乳', '健爽', '330/310','200清新活力','450清新活力'];
 
   worksheet.addRow(subHeaders);
 
