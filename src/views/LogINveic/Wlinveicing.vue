@@ -29,7 +29,7 @@
                 </el-button>
 
                 <el-button v-if="showhubei" size="mini" class="filter-item" type="primary"
-                    @click="getDataList('湖北', '海南雨帆之家餐饮供应链管理有限公司')">
+                    @click="getDataList('湖北', '雨帆食品集团股份有限公司')">
                     湖北
                 </el-button>
                 <!-- 2. 渲染其他地区按钮（排除西南包含的地区） -->
