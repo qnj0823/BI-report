@@ -167,7 +167,9 @@ export default {
             const fieldMapping = {
                 "鲜露乳": "xnl",
                 "健爽": "js",
-                "330/310": "yznr"
+                "330/310": "yznr",
+                "清新活力200":"qxhl200",
+                "清新活力450":"qxhl450"
             };
 
             // 为广东对象添加各个字段
