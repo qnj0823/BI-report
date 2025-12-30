@@ -384,12 +384,12 @@ export default {
             this.buttonText = '导出中百罗森计划表'
         } else if (data == '四川') {
             this.butnshow = true
-            this.butnshow1 = true
+            this.butnshow1 = false
             this.butnshow3 = true
             this.butnshow2 = false
             this.butnshowSD = false
             this.butnshowSDNO = false
-            this.buttonText = '导出新鲜活力开单表'
+            // this.buttonText = '导出新鲜活力开单表'
         } else if (data == '安徽') {
             this.butnshow = false
             this.butnshow1 = false
