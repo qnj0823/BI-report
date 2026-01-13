@@ -55,7 +55,9 @@ export default {
                 { index: 8, name: '二号机计划开单-山东' },
                 { index: 9, name: '三号机计划开单-陕西' },
                 { index: 10, name: '三号机计划开单-西南' },
-                { index: 11, name: '三号机计划开单-湖南' }
+                { index: 11, name: '三号机计划开单-湖南' },
+                { index: 12, name: '一号机计划开单-北京' },
+                { index: 13, name: '三号机计划开单-安徽' }
             ],
             selectedPROValue: '',
             selectedPROLable: '',

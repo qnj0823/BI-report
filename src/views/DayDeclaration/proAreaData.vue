@@ -30,6 +30,8 @@
             <el-table-column :show-overflow-tooltip="true" align="center" prop="xnl" label="鲜露乳" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="js" label="健爽" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="yznr" label="330/310" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="qxhl200" label="200清新活力" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="qxhl450" label="450清新活力" />
         </el-table>
     </div>
 </template>
@@ -165,7 +167,9 @@ export default {
             const fieldMapping = {
                 "鲜露乳": "xnl",
                 "健爽": "js",
-                "330/310": "yznr"
+                "330/310": "yznr",
+                "清新活力200":"qxhl200",
+                "清新活力450":"qxhl450"
             };
 
             // 为广东对象添加各个字段

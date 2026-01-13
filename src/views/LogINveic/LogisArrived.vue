@@ -343,7 +343,7 @@ export default {
                     newsite: '苏苏州吴中邱裕铭'
                 },
                 {
-                    oldsite: ['苏苏州直营部', '苏苏州常熟荣泽酒业'],
+                    oldsite: ['苏苏州直营部','苏苏州常熟荣泽酒业'],
                     newsite: '苏苏州相城田君'
                 },
                 {

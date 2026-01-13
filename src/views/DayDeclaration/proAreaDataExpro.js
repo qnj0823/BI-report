@@ -13,7 +13,7 @@ export async function exportExcel(tableList, fileName) {
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Sheet1');
 
-  const labelText = 'LOOK每日报单计划（盒/瓶）'
+  const labelText = 'LOOK每日报单计划(盒/瓶)'
   const hnFruit = ['海南果汁饮料']
   const hnNormal = ['海南常温']
   const hnCoconut = ['海南椰子汁']
@@ -27,7 +27,7 @@ export async function exportExcel(tableList, fileName) {
   ];
 
   // 添加标题行（合并单元格）
-  worksheet.mergeCells('A1:F1');//合并单元格
+  worksheet.mergeCells('A1:H1');//合并单元格
   const titleRow = worksheet.getRow(1);
   titleRow.getCell(1).value = labelText;
   titleRow.height = 40; // 行高
@@ -39,7 +39,7 @@ export async function exportExcel(tableList, fileName) {
   };
 
   // 添加表头和数据
-  const subHeaders = ['省区', '销售总计划','供应链', '鲜露乳', '健爽', '330/310'];
+  const subHeaders = ['省区', '销售总计划','供应链', '鲜露乳', '健爽', '330/310','200清新活力','450清新活力'];
 
   worksheet.addRow(subHeaders);
 
@@ -52,6 +52,8 @@ export async function exportExcel(tableList, fileName) {
       item.xnl || '',
       item.js || '',
       item.yznr || '',
+      item.qxhl200 || '',
+      item.qxhl450 || ''
     ]);
   });
 
