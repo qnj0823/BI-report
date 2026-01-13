@@ -193,7 +193,7 @@ export default {
                 "福建省", "江西省", "湖北省", "河南省", "山西省",
                 "陕西省", "安徽省", "天津市", "北京市", "山西省",
                 "江苏省", "山东省", "海南省", "海南look常温",
-                "海南look椰汁", "海南look果汁","其它"
+                "海南look椰汁", "海南look果汁", "其它"
             ];
 
             // 深拷贝数组
@@ -332,12 +332,23 @@ export default {
                 }
             });
 
-            // 将总计行添加到数据列表末尾
-            result.push(guangmingTotal);
+            // 查找"海南look常温"行的索引
+            const hainanLookIndex = result.findIndex(item => item.areaname === '海南look常温');
+
+            if (hainanLookIndex !== -1) {
+                // 在"海南look常温"行前面插入"光明工厂总计"
+                result.splice(hainanLookIndex, 0, guangmingTotal);
+            } else {
+                // 如果找不到"海南look常温"，则将"光明工厂总计"添加到末尾
+                result.push(guangmingTotal);
+            }
+
+            // "海南工厂总计"始终放在最后
             result.push(hainanTotal);
 
             return result;
         },
+
         tableRowClassName({ row, rowIndex }) {
             // 为总计行添加特殊样式类名
             if (row.isTotal) {

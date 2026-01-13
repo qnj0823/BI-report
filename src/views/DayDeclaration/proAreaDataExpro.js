@@ -55,22 +55,6 @@ export async function exportExcel(tableList, fileName) {
     ]);
   });
 
-  // worksheet.addRow(hnFruit);
-  // worksheet.addRow(hnNormal);
-  // worksheet.addRow(hnCoconut);
-
-  //   // 链式设置多行行高
-  // worksheet.getRow(2).height = 30; // 第2行
-  // worksheet.getRow(3).height = 25; // 第3行
-
-  // 合并相同内容的单元格（示例：合并第2行和第3行）
-  // worksheet.mergeCells('A2:A3');
-  // worksheet.mergeCells('B2:B3');
-  // worksheet.mergeCells('C2:C3');
-  // worksheet.mergeCells('D2:D3');
-  // // ...其他需要合并的列
-  // worksheet.mergeCells('E2:J2');
-
   // 动态查找 "分公司总计" 行并合并前三列
   worksheet.eachRow((row, rowNum) => {
     if (row.getCell(2).value === "分公司总计") {
@@ -84,7 +68,9 @@ export async function exportExcel(tableList, fileName) {
   // 设置样式（表头、数据行、小计行等）
   styleHeaderRows(worksheet);
   styleDataRows(worksheet);
-  mergeColumn(worksheet,3)
+  
+  // 修改合并逻辑："海南省"行不合并，其他行正常合并
+  mergeColumnWithHainanExclusion(worksheet, 3, 2);
   
   // 处理光明工厂总计和海南工厂总计行样式（必须在styleDataRows之后执行）
   worksheet.eachRow((row, rowNum) => {
@@ -103,6 +89,7 @@ export async function exportExcel(tableList, fileName) {
       });
     }
   });
+  
   // 隐藏指定列（例如隐藏第4列）
   worksheet.getColumn(4).hidden = false;
 
@@ -147,28 +134,46 @@ function styleHeaderRows(worksheet) {
   row2.eachCell(cell => {
     cell.style = headerStyle;
   });
-
-  // // 应用样式到第3行
-  // const row3 = worksheet.getRow(3);
-  // row3.height = 35;//设置行高
-  // row3.eachCell(cell => {
-  //   cell.style = headerStyle;
-  // });
 }
-function mergeColumn(worksheet, columnIndex, startRow = 2) {
+
+// 新的合并函数："海南省"行不合并，其他行正常合并
+function mergeColumnWithHainanExclusion(worksheet, columnIndex, startRow = 2) {
   const endRow = worksheet.rowCount;
   const columnLetter = worksheet.getColumn(columnIndex).letter;
+  const areaColumnLetter = worksheet.getColumn(1).letter; // 省区列是第1列
   
   let mergeStart = startRow;
   let currentValue = worksheet.getCell(`${columnLetter}${mergeStart}`).value;
   
   for (let i = startRow + 1; i <= endRow + 1; i++) {
     const cellValue = i <= endRow ? worksheet.getCell(`${columnLetter}${i}`).value : null;
+    const areaCellValue = i <= endRow ? worksheet.getCell(`${areaColumnLetter}${i}`).value : null;
+    const prevAreaCellValue = worksheet.getCell(`${areaColumnLetter}${i-1}`).value;
     
-    // 检查值是否发生变化、到达最后一行、或者遇到空值
-    if (cellValue !== currentValue || i > endRow || !currentValue || !cellValue) {
-      // 只有当起始值不为空时才进行合并
-      if (mergeStart < i - 1 && currentValue) {
+    // 检查是否需要中断合并的条件：
+    // 1. 供应链值发生变化
+    // 2. 到达最后一行
+    // 3. 遇到空值
+    // 4. 当前行或上一行是"海南省"（不参与合并）
+    const shouldBreakMerge = cellValue !== currentValue || 
+                            i > endRow || 
+                            !currentValue || 
+                            !cellValue ||
+                            areaCellValue === "海南省" || // 当前行是海南省
+                            prevAreaCellValue === "海南省"; // 上一行是海南省
+  
+    if (shouldBreakMerge) {
+      // 只有当起始值不为空、合并段长度大于1、且合并段中没有"海南省"时才进行合并
+      // 检查合并段中是否包含"海南省"
+      let hasHainanInRange = false;
+      for (let r = mergeStart; r < i; r++) {
+        if (worksheet.getCell(`${areaColumnLetter}${r}`).value === "海南省") {
+          hasHainanInRange = true;
+          break;
+        }
+      }
+      
+      if (mergeStart < i - 1 && currentValue && !hasHainanInRange) {
         const mergeRange = `${columnLetter}${mergeStart}:${columnLetter}${i - 1}`;
         worksheet.mergeCells(mergeRange);
         
@@ -183,7 +188,31 @@ function mergeColumn(worksheet, columnIndex, startRow = 2) {
       currentValue = cellValue;
     }
   }
+  
+  // 处理最后一段
+  if (mergeStart <= endRow && currentValue) {
+    // 检查最后一段中是否包含"海南省"
+    let hasHainanInLastRange = false;
+    for (let r = mergeStart; r <= endRow; r++) {
+      if (worksheet.getCell(`${areaColumnLetter}${r}`).value === "海南省") {
+        hasHainanInLastRange = true;
+        break;
+      }
+    }
+    
+    if (!hasHainanInLastRange) {
+      const mergeRange = `${columnLetter}${mergeStart}:${columnLetter}${endRow}`;
+      worksheet.mergeCells(mergeRange);
+      
+      const cell = worksheet.getCell(`${columnLetter}${mergeStart}`);
+      cell.alignment = {
+        vertical: 'middle',
+        horizontal: 'center'
+      };
+    }
+  }
 }
+
 //设置表体样式从第四行开始
 function styleDataRows(worksheet) {
   // 通用数据行样式
@@ -215,6 +244,3 @@ function styleDataRows(worksheet) {
     row.height = 25; // 设置行高
   }
 }
-
-
-
