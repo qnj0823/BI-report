@@ -67,6 +67,7 @@
             <el-table-column :show-overflow-tooltip="true" align="center" prop="box1520100052" label="200鲜酪乳" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="box1520100053" label="450鲜酪乳" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="box1520100051" label="180健爽" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="box1520100054" label="455健爽" />
             <el-table-column v-if="!['四川', '重庆', '云南', '贵州'].includes(areas)" :show-overflow-tooltip="true"
                 align="center" prop="box1520100020" label="小原味戴永红" />
             <el-table-column v-if="!['四川', '重庆', '云南', '贵州'].includes(areas)" :show-overflow-tooltip="true"

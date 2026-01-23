@@ -18,11 +18,11 @@ export function exportscExcel(tableList, date, fileName, area) {
 
   let tableData = [
     [`${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`,
-    `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`
+    `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`,`${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`
     ]
   ]
   const tableTitle = ['区域', '大LOOK', '小LOOK', '健能', 'LOOK优选', '大白桃', '小白桃', '大清新', '小清新',
-    '大清新健爽（橙）', '小清新健爽（橙）', '大0糖0脂', '小0糖0脂', '180噜渴(红)', '合计', '备注']
+    '大清新健爽（橙）', '小清新健爽（橙）', '大0糖0脂', '小0糖0脂','200鲜酪乳', '450鲜酪乳', '180健爽','455健爽','180噜渴(红)', '合计', '备注']
 
   tableData.push(tableTitle)
   tableList.forEach(item => {
@@ -40,6 +40,10 @@ export function exportscExcel(tableList, date, fileName, area) {
       item.box1520100015 || '',
       item.box1520100017 || '',
       item.box1520100016 || '',
+      item.box1520100052 || '', 
+      item.box1520100053 || '', 
+      item.box1520100051 || '',
+      item.box1520100054 || '',
       item.box1520100026 || '',
       item.sum || '',
       item.vnote || ''
@@ -623,7 +627,7 @@ function setExcelStyle(data) {
   data['!cols'] = [
     calculateColumnWidth(data,'A'), { wpx: 150 }, { wpx: 100 }, { wpx: 80 },
     { wpx: 80 }, { wpx: 80 }, { wpx: 80 }, { wpx: 80 },
-    { wpx: 80 }, { wpx: 80 }, { wpx: 80 }, { wpx: 80 }, { wpx: 80 }, { wpx: 80 }, { wpx: 80 }, { wpx: 80 }, { wpx: 100 }, { wpx: 100 }, { wpx: 150 } // 最后一列宽度为0（隐藏列）
+    { wpx: 80 }, { wpx: 80 }, { wpx: 80 }, { wpx: 80 }, { wpx: 80 }, { wpx: 80 }, { wpx: 80 }, { wpx: 80 },{ wpx: 80 }, { wpx: 80 }, { wpx: 80 }, { wpx: 100 }, { wpx: 100 }, { wpx: 150 } // 最后一列宽度为0（隐藏列）
   ];
 
   // 3. 设置行高（两种单位任选其一）

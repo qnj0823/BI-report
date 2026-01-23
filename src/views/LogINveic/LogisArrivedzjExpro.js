@@ -18,17 +18,17 @@ export function exportExcelzj(tableList, date, fileName, gxtableList) {
 
   let tableData = [
     [`${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`,
-    `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`
+    `${labelText}`, `${labelText}`, `${labelText}`,`${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`
     ]
   ]
   const tableTitle = ['订单日期', '区域', '联系人', '电话', '大LOOK', '小LOOK', '健能', '大白桃', `小白桃`, `LOOK优选`, '大清新健爽（橙）', `小清新健爽（橙）`, `330椰子牛乳`, `310椰子牛乳`, `大0糖`,
-    `小0糖`, '200鲜酪乳', '450鲜酪乳', '180健爽', '180红盒', `合计`, '地址', '备注']
+    `小0糖`, '200鲜酪乳', '450鲜酪乳', '180健爽','455健爽', '180红盒', `合计`, '地址', '备注']
 
   tableData.push(tableTitle)
   tableList.forEach(item => {
     tableData.push([item.startDate || '', item.wlSiteName || '', item.contacts || '', item.tel || '', item.box1520100001 || '', item.box1520100002 || '', item.box1520100004 || '', item.box1520100010 || '', item.box1520100009 || '', item
       .box1520100008 || '', item.box1520100014 || '', item.box1520100015 || '', item.box1520130001 || '', item.box1520130003 || '',
-    item.box1520100017 || '', item.box1520100016 || '', item.box1520100052 || '', item.box1520100053 || '', item.box1520100051 || '', item.box1520100026 || '', item.sum || '', item.address || '', item.vnote || ''
+    item.box1520100017 || '', item.box1520100016 || '', item.box1520100052 || '', item.box1520100053 || '', item.box1520100051 || '', item.box1520100054 || '', item.box1520100026 || '', item.sum || '', item.address || '', item.vnote || ''
     ])
   })
   let ws = XLSX.utils.aoa_to_sheet(tableData)
@@ -36,12 +36,12 @@ export function exportExcelzj(tableList, date, fileName, gxtableList) {
   // 准备第二个工作表的数据  
   const tableData1 = [
     ['区域', '联系人', '电话', '大LOOK', '小LOOK', '健能', '大白桃', `小白桃`, `LOOK优选`, '大清新健爽（橙）', `小清新健爽（橙）`, `330椰子牛乳`, `310椰子牛乳`, `大0糖`,
-      `小0糖`, '200鲜酪乳', '450鲜酪乳', '180健爽', '180红盒', `合计`, '地址', '备注']
+      `小0糖`, '200鲜酪乳', '450鲜酪乳', '180健爽','455健爽', '180红盒', `合计`, '地址', '备注']
   ];
   gxtableList.forEach(item => {
     tableData1.push([item.wlSiteName || '', item.contacts || '', item.tel || '', item.box1520100001 || '', item.box1520100002 || '', item.box1520100004 || '', item.box1520100010 || '', item.box1520100009 || '', item
       .box1520100008 || '', item.box1520100014 || '', item.box1520100015 || '', item.box1520130001 || '', item.box1520130003 || '',
-    item.box1520100017 || '', item.box1520100016 || '', item.box1520100052 || '', item.box1520100053 || '', item.box1520100051 || '', item.box1520100026 || '', item.sum || '', item.address || '', item.vnote || ''
+    item.box1520100017 || '', item.box1520100016 || '', item.box1520100052 || '', item.box1520100053 || '', item.box1520100051 || '',item.box1520100054 || '', item.box1520100026 || '', item.sum || '', item.address || '', item.vnote || ''
     ])
   })
 
@@ -957,7 +957,7 @@ function setExcelStyletwo(data) {
   data['!cols'] = [
     calculateColumnWidth(data,'A'), { wpx: 120 }, { wpx: 100 }, { wpx: 90 },
     { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 },
-    { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, calculateColumnWidth(data,'U'), { wpx: 100 } // 最后一列宽度为0（隐藏列）
+    { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 },{ wpx: 50.28 }, calculateColumnWidth(data,'v'), { wpx: 100 } // 最后一列宽度为0（隐藏列）
   ];
 
   // 3. 设置行高（两种单位任选其一）
@@ -1029,7 +1029,7 @@ function setExcelStyle(data) {
   data['!cols'] = [
     { wpx: 90 }, calculateColumnWidth(data,'B'), { wpx: 90 }, calculateColumnWidth(data,'D'),
     { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 },
-    { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, calculateColumnWidth(data,'V') // 最后一列宽度为0（隐藏列）
+    { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 }, { wpx: 50.28 },calculateColumnWidth(data,'w') // 最后一列宽度为0（隐藏列）
   ];
 
   // 3. 设置行高（两种单位任选其一）
