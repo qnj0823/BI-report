@@ -52,8 +52,8 @@ export default {
             dataListLoading: false,
             addOrUpdateVisible: false,
             dataList: [],
+            monthSumList: [],
             editList: [],
-
             factoryList: [
                 { province: "广东省", factory: "广州工厂" },
                 { province: "广西壮族自治区", factory: "广州工厂" },
@@ -90,7 +90,9 @@ export default {
             editForm: {
                 page: 0,
                 size: 500,
-            }
+            },
+            startOfMonth: '',
+            endOfToday: '',
         };
     },
     created() {
@@ -135,30 +137,87 @@ export default {
                 this.$refs.addOrUpdate.init(id, data)
             })
         },
-        getDataList() {
+        async getDataList() {
             this.dataListLoading = true
             this.dataForm.p_vouchdateend = this.dataForm.p_vouchdatestart
-            api.GetareaDataAPi(this.dataForm).then(res => {
-                this.dataList = res
-                this.dataList = this.addMultipleFieldsAndRemoveSource(this.dataList)
-                this.factoryList = this.updateFactoryByCycle(this.factoryList)
-                console.log(this.factoryList, ' this.factoryList')
-                this.dataList = this.mergeFactoryData(this.dataList, this.factoryList)
-                // this.dataList = this.dataList.filter(item => item.areaname);
-                this.dataList = this.dataList.map(item => {
-                    // 如果没有areaname字段，或者areaname为空值
-                    if (!item.hasOwnProperty('areaname') || !item.areaname) {
-                        return { ...item, areaname: "其它" };
-                    }
-                    return item;
-                });
-                this.dataList = this.sortByCustomOrder(this.dataList)
-                // 添加工厂总计行
-                this.dataList = this.addFactoryTotals(this.dataList);
 
-                this.dataListLoading = false
-                console.log(this.dataList)
+            // api.GetareaDataAPi(this.dataForm).then(res => {
+            //     this.dataList = res
+            //     this.dataList = this.addMultipleFieldsAndRemoveSource(this.dataList)
+            //     this.factoryList = this.updateFactoryByCycle(this.factoryList)
+            //     console.log(this.factoryList, ' this.factoryList')
+            //     this.dataList = this.mergeFactoryData(this.dataList, this.factoryList)
+            //     // this.dataList = this.dataList.filter(item => item.areaname);
+            //     this.dataList = this.dataList.map(item => {
+            //         // 如果没有areaname字段，或者areaname为空值
+            //         if (!item.hasOwnProperty('areaname') || !item.areaname) {
+            //             return { ...item, areaname: "其它" };
+            //         }
+            //         return item;
+            //     });
+            //     this.dataList = this.sortByCustomOrder(this.dataList)
+            //     // 添加工厂总计行
+            //     this.dataList = this.addFactoryTotals(this.dataList);
+            //     this.dataList = this.addFactoryMonthTotals(this.dataList);
+            //     this.dataListLoading = false
+            //     console.log(this.dataList)
+            // })
+
+
+            this.dataListLoading = true
+
+            // 1. 同步等待API数据
+            const res = await api.GetareaDataAPi(this.dataForm)
+            const res1 = await api.GetareaDataAPi({
+                p_vouchdatestart: this.startOfMonth,
+                p_vouchdateend: this.endOfToday
             })
+            // 2. 同步处理数据
+            this.dataList = res
+            this.dataList = this.addMultipleFieldsAndRemoveSource(this.dataList)
+
+            this.monthSumList = res1
+            this.monthSumList = this.addMultipleFieldsAndRemoveSource(this.monthSumList)
+
+
+            // 3. 同步更新工厂列表
+            this.factoryList = this.updateFactoryByCycle(this.factoryList)
+            console.log(this.factoryList, ' this.factoryList')
+
+            // 4. 合并数据
+            this.dataList = this.mergeFactoryData(this.dataList, this.factoryList)
+
+            this.monthSumList = this.mergeFactoryData(this.monthSumList, this.factoryList)
+
+            // 5. 处理空值
+            this.dataList = this.dataList.map(item => {
+                if (!item.hasOwnProperty('areaname') || !item.areaname) {
+                    return { ...item, areaname: "其它" }
+                }
+                return item
+            })
+
+            this.monthSumList = this.monthSumList.map(item => {
+                if (!item.hasOwnProperty('areaname') || !item.areaname) {
+                    return { ...item, areaname: "其它" }
+                }
+                return item
+            })
+
+            // 6. 排序
+            this.dataList = this.sortByCustomOrder(this.dataList)
+            this.monthSumList = this.sortByCustomOrder(this.monthSumList)
+
+
+            // 7. 添加总计
+            this.dataList = this.addFactoryTotals(this.dataList)
+            this.monthSumList = this.addFactoryMonthTotals(this.monthSumList)
+            this.dataList = this.insertBothMonthlyTotals(this.monthSumList, this.dataList)
+            console.log(this.dataList, this.monthSumList);
+
+            this.dataListLoading = false
+            console.log(this.dataList)
+
         },
         addMultipleFieldsAndRemoveSource(dataArray) {
             const result = JSON.parse(JSON.stringify(dataArray));
@@ -168,8 +227,8 @@ export default {
                 "鲜露乳": "xnl",
                 "健爽": "js",
                 "330/310": "yznr",
-                "清新活力200":"qxhl200",
-                "清新活力450":"qxhl450"
+                "清新活力200": "qxhl200",
+                "清新活力450": "qxhl450"
             };
 
             // 为广东对象添加各个字段
@@ -294,7 +353,7 @@ export default {
 
             // 计算光明工厂总计（除了海南工厂的所有数据）
             let guangmingTotal = {
-                areaname: '光明工厂总计',
+                areaname: '光明工厂每日总计',
                 factory: '',
                 piece: 0,
                 xnl: 0,
@@ -305,7 +364,7 @@ export default {
 
             // 计算海南工厂总计
             let hainanTotal = {
-                areaname: '海南工厂总计',
+                areaname: '海南工厂每日总计',
                 factory: '',
                 piece: 0,
                 xnl: 0,
@@ -349,6 +408,130 @@ export default {
 
             // "海南工厂总计"始终放在最后
             result.push(hainanTotal);
+
+            return result;
+        },
+        addFactoryMonthTotals(dataList) {
+            // 深拷贝数组，避免修改原数组
+            const result = JSON.parse(JSON.stringify(dataList));
+
+            // 计算光明工厂总计（除了海南工厂的所有数据）
+            let guangmingTotal = {
+                areaname: '光明工厂月度总计',
+                factory: '',
+                piece: 0,
+                xnl: 0,
+                js: 0,
+                yznr: 0,
+                isTotal: true // 标记为总计行
+            };
+
+            // 计算海南工厂总计
+            let hainanTotal = {
+                areaname: '海南工厂月度总计',
+                factory: '',
+                piece: 0,
+                xnl: 0,
+                js: 0,
+                yznr: 0,
+                isTotal: true // 标记为总计行
+            };
+
+            // 遍历数据进行分类汇总
+            result.forEach(item => {
+                const piece = Number(item.piece) || 0;
+                const xnl = Number(item.xnl) || 0;
+                const js = Number(item.js) || 0;
+                const yznr = Number(item.yznr) || 0;
+
+                if (item.factory === '海南工厂') {
+                    // 海南工厂的数据
+                    hainanTotal.piece += piece;
+                    hainanTotal.xnl += xnl;
+                    hainanTotal.js += js;
+                    hainanTotal.yznr += yznr;
+                } else if (item.factory != '海南工厂' && item.areaname != '光明工厂总计' && item.areaname != '海南工厂总计') {
+                    // 其他工厂的数据归入光明工厂总计
+                    guangmingTotal.piece += piece;
+                    guangmingTotal.xnl += xnl;
+                    guangmingTotal.js += js;
+                    guangmingTotal.yznr += yznr;
+                }
+            });
+
+            // 查找"海南look常温"行的索引
+            const hainanLookIndex = result.findIndex(item => item.areaname === '海南look常温');
+
+            if (hainanLookIndex !== -1) {
+                // 在"海南look常温"行前面插入"光明工厂月度总计"
+                result.splice(hainanLookIndex, 0, guangmingTotal);
+            } else {
+                // 如果找不到"海南look常温"，则将"光明工厂总计"添加到末尾
+                result.push(guangmingTotal);
+            }
+
+            // "海南工厂总计"始终放在最后
+            result.push(hainanTotal);
+
+            return result;
+        },
+
+        insertBothMonthlyTotals(source, target) {
+            // 创建目标数组的深拷贝
+            let result = JSON.parse(JSON.stringify(target));
+
+            // 1. 从源数组中提取两个月度总计
+            const brightMonthly = source.find(item =>
+                item.areaname === "光明工厂月度总计"
+            );
+
+            const hainanMonthly = source.find(item =>
+                item.areaname === "海南工厂月度总计"
+            );
+
+            if (!brightMonthly) {
+                console.warn("未找到'光明工厂月度总计'");
+            }
+
+            if (!hainanMonthly) {
+                console.warn("未找到'海南工厂月度总计'");
+            }
+
+            // 2. 先插入光明工厂月度总计
+            if (brightMonthly) {
+                const brightTotalIndex = result.findIndex(item =>
+                    item.areaname === "光明工厂每日总计"
+                );
+
+                if (brightTotalIndex !== -1) {
+                    // 在光明工厂总计后面插入光明工厂月度总计
+                    result.splice(brightTotalIndex + 1, 0, { ...brightMonthly });
+                    console.log("已插入'光明工厂月度总计'");
+                } else {
+                    console.warn("未找到'光明工厂每日总计'，无法插入月度总计");
+                }
+            }
+
+            // 3. 再插入海南工厂月度总计
+            if (hainanMonthly) {
+                const hainanTotalIndex = result.findIndex(item =>
+                    item.areaname === "海南工厂每日总计"
+                );
+
+                if (hainanTotalIndex !== -1) {
+                    // 在海南工厂总计后面插入海南工厂月度总计
+                    // 注意：因为上面可能已经插入了一个元素，所以索引可能变化
+                    const currentHainanIndex = result.findIndex(item =>
+                        item.areaname === "海南工厂每日总计"
+                    );
+                    if (currentHainanIndex !== -1) {
+                        result.splice(currentHainanIndex + 1, 0, { ...hainanMonthly });
+                        console.log("已插入'海南工厂月度总计'");
+                    }
+                } else {
+                    console.warn("未找到'海南工厂每日总计'，无法插入月度总计");
+                }
+            }
 
             return result;
         },

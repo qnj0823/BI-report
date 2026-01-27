@@ -79,7 +79,7 @@ export async function exportExcel(tableList, fileName) {
     const areaName = row.getCell(1).value;
     
     // 处理光明工厂总计和海南工厂总计行
-    if (areaName === "光明工厂总计" || areaName === "海南工厂总计") {
+    if (areaName === "光明工厂每日总计" || areaName === "海南工厂每日总计" ||areaName === "光明工厂月度总计" || areaName === "海南工厂月度总计") {
       row.eachCell(cell => {
         cell.style = {
           ...cell.style,
