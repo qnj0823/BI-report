@@ -666,7 +666,7 @@ function styleRowsWithSubtotal1(ws) {
 
     // 2. 从第三行开始检查P列（索引15）的值
     if (row >= 2) {  // 从第三行开始（索引2）
-      const pColCell = ws[XLSX.utils.encode_cell({ c: 21, r: row })];  // P列是第16列，索引15
+      const pColCell = ws[XLSX.utils.encode_cell({ c: 22, r: row })];  // P列是第16列，索引15
 
       if (pColCell) {
         // 尝试获取数值
