@@ -49,10 +49,10 @@
                         v-if="!(scope.row.orderoutNumber == '合计') && !(scope.row.orderoutNumber == '小计')" size="small"
                         v-show="scope.row.issend != 1"
                         @click="addOrUpdateHandle(scope.row.orderoutMainNumber, scope.row)">确认发货</el-button>
-                    <el-button type="text"
+                    <!-- <el-button type="text"
                         v-if="!(scope.row.orderoutNumber == '合计') && !(scope.row.orderoutNumber == '小计')" size="small"
                         v-show="scope.row.issend != 1"
-                        @click="deleteHandle(scope.row.orderoutMainNumber, scope.row)">删除</el-button>
+                        @click="deleteHandle(scope.row.orderoutMainNumber, scope.row)">删除</el-button> -->
                 </template>
             </el-table-column>
         </el-table>
