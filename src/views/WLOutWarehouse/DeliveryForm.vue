@@ -107,9 +107,20 @@ export default {
     methods: {
         addOrUpdateHandle(odd, data) {
             this.ptsForm.mainorderno = odd
+            this.dataListLoading = true
             api.APIorderissend(this.ptsForm).then(res => {
                 this.getDataList()
-                this.$message.success('已成功发货')
+                const resObj = JSON.parse(res);
+                if (resObj.success == false) {
+                    console.log(resObj, 'resObj')
+                    const materialErrorList = this.parseMaterialError(resObj.errorStack)
+                    console.log(materialErrorList, 'materialErrorList')
+                    this.dataListLoading = false
+
+                    this.$message.error(materialErrorList)
+                }
+
+
 
             })
         },
@@ -125,6 +136,23 @@ export default {
                 })
             })
 
+        },
+        parseMaterialError(errorStack) {
+            const reg = /物料编码\[([^\]]+)\]仓库\[([^\]]+)\]现存缺口\[([^\]]+)\]现存业务单位缺口\[([^\]]+)\]\s+存在行：([^ ]+)\s+物料\[([^\]]+)\]/g
+            const result = []
+            let match
+            // 循环匹配所有物料行（全局匹配g需用while循环）
+            while ((match = reg.exec(errorStack)) !== null) {
+                result.push({
+                    materialCode: match[1], // 物料编码
+                    warehouse: match[2],    // 仓库
+                    stockGap: match[3],     // 现存缺口
+                    bizUnitGap: match[4],   // 现存业务单位缺口
+                    rows: match[5],         // 存在行
+                    materialName: match[6]  // 物料名称
+                })
+            }
+            return result
         },
         /**
      * 选择变化时的处理（选中一个主单号时，自动选中该主单号的所有行）
@@ -386,7 +414,7 @@ export default {
                         item.tong = (Math.round(midCount * pieceConverValue) / 1000).toString(); // 四舍五入保留两位
                         item.midCount = ((Number(item.midCount) || 0).toFixed(0)).toString();
                     });
-                    
+
                     // 按 orderoutMainNumber 排序
                     this.dataList = [...this.dataList].sort((a, b) =>
                         a.orderoutMainNumber.localeCompare(b.orderoutMainNumber)
@@ -397,7 +425,7 @@ export default {
                         (item.pname && item.pname.includes(this.bullay)) ||
                         (item.cuName && item.cuName.includes(this.bullay)) ||
                         (item.orderoutMainNumber && item.orderoutMainNumber.includes(this.bullay)) ||
-                        (item.csitename && item.csitename.includes(this.bullay))||
+                        (item.csitename && item.csitename.includes(this.bullay)) ||
                         (item.pNo && item.pNo.includes(this.bullay))
                     );
                     this.dataList.forEach((item, index) => {
@@ -445,7 +473,7 @@ export default {
                         (item.pname && item.pname.includes(this.bullay)) ||
                         (item.cuName && item.cuName.includes(this.bullay)) ||
                         (item.orderoutMainNumber && item.orderoutMainNumber.includes(this.bullay)) ||
-                        (item.csitename && item.csitename.includes(this.bullay))||
+                        (item.csitename && item.csitename.includes(this.bullay)) ||
                         (item.pNo && item.pNo.includes(this.bullay))
                     );
                     this.dataList.forEach((item, index) => {
