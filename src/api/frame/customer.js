@@ -571,6 +571,7 @@ export function sitenccApi(params) {
   })
 }
 
+
 //项目组销量进度目标模版导入*
 export function importMonthGoalAPi(data) {
   return request({
@@ -755,6 +756,14 @@ export function wlProductexcelnewhnApi(params) {
 export function wlProductexcelhbjhApi(params) {
   return request({
     url: 'api/report/get_pro_wl_product_or_factory_excel_new_plan_hubei',
+    params,
+    method: 'get'
+  })
+}
+//返回全部(物流及开单表(广东计划)--导出EXCEL)
+export function wlProductexcelGDKDApi(params) {
+  return request({
+    url: 'api/reportExt/get_pro_kd_product_or_factory_excel_new_guangdong',
     params,
     method: 'get'
   })
@@ -1288,7 +1297,7 @@ export function wlnewhenanApi(params) {
 //物流及开单表(广东)
 export function wlguangdongApi(params) {
   return request({
-    url: 'api/wlWlsiteOrFactoryproductOrderDeliveryCycleGuangdong',
+    url: 'api/reportExt/get_pro_wl_product_or_factory_excel_new_guangdong',
     params,
     method: 'get'
   })

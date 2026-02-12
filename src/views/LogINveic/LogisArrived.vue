@@ -111,6 +111,10 @@ import {
     exportscTwoExcel
 } from './LogisArrivedscTwoExpro.js'
 
+import {
+    exportgdExcel
+} from './LogisArrivedgdExpro.js'
+
 import * as api from '@/api/frame/customer.js'
 
 export default {
@@ -233,7 +237,9 @@ export default {
             wlDataList: [],
             wlDataList1: [],
             sichuanList: [],
+            siteListGD:[],
             gxNoSpecialList: [],
+
 
             dateLable: '',
             dataListLoading: false,
@@ -344,7 +350,7 @@ export default {
                     newsite: '苏苏州吴中邱裕铭'
                 },
                 {
-                    oldsite: ['苏苏州直营部','苏苏州常熟荣泽酒业'],
+                    oldsite: ['苏苏州直营部', '苏苏州常熟荣泽酒业'],
                     newsite: '苏苏州相城田君'
                 },
                 {
@@ -2099,10 +2105,17 @@ export default {
                 this.showExportButton = true
             })
         },
+        wlpersongdList() {
+            api.WLContactsAPI().then(res => {
+                this.siteListGD = res
+               
+            })
+        },
 
         getguangdong() {
             this.areas = '广东'
             this.wlForm.blurry = this.areas
+            this.wlpersongdList()
             this.dataListLoading = true
             this.showExportButton = false
             const [year, month, day] = this.dataForm.p_vouchdateend.split('-').map(Number);
@@ -2115,14 +2128,16 @@ export default {
             date.setDate(date.getDate() - 2);
 
             api.wlguangdongApi(this.guangdongForm).then(res => {
-                console.log(res.content)
-                this.dataList = res.content
+
+                this.dataList = res
+
                 this.dataList = this.mergeBoxFields(this.dataList)
                 this.dataList = this.mergeObjectsByCodes(this.dataList);
                 this.dataList = this.dataList.map(item => ({
                     ...item, // 展开原对象的所有属性
                     ["box" + item.productCode]: item.box // 新增动态属性
                 }));
+                console.log(this.dataList, 'this.dataList')
                 this.dataList = Object.values(
                     this.dataList.reduce((acc, item) => {
                         const key = item.wlSiteCode; // 使用 wlSiteCode 作为分组依据
@@ -2236,7 +2251,27 @@ export default {
                 this.dataList = this.dataList.filter(item =>
                     item.wlSiteName.includes(this.bullay)
                 );
-                console.log(this.dataList)
+                this.siteListGD = this.siteListGD.filter(item =>
+                    item.areaName =='广东'
+                    
+                );
+                const siteMap = {};
+                this.siteListGD.forEach(site => {
+                    // 以站点名称（sitename）作为 key，值为整个站点对象
+                    // 注意：这里的 key 要和 dataItem.wlSiteName 完全匹配（大小写、空格都要一致）
+                    siteMap[site.wlSiteName] = site;
+                });
+
+                // 第二步：遍历 dataList，合并站点信息（就是你提供的代码）
+                this.dataList = this.dataList.map((dataItem) => {
+                    const matchedSite = siteMap[dataItem.wlSiteName] || {};
+                    return {
+                        ...dataItem,
+                        ...matchedSite
+                    };
+                });
+
+                console.log(this.dataList, '123')
                 this.dataListLoading = false
                 this.showExportButton = true
             })
@@ -5809,6 +5844,8 @@ export default {
                     exportExcelfj(this.dataList, this.dataForm.p_vouchdateend, '福建区域物流报表.xlsx', this.FJfinalResult)
                 } else if (this.areas == '江苏') {
                     exportExceljs(this.dataList, this.dataForm.p_vouchdateend, '江苏区域物流报表.xlsx', this.JSfinalResult)
+                } else if (this.areas == '广东') {
+                    exportgdExcel(this.dataList, this.dataForm.p_vouchdateend, '广东区域物流报表.xlsx', this.siteListGD, this.areas)
                 } else if (this.areas == '山东') {
                     window.open('http://bi.yufanjtbip.com:8069/file/%E6%96%87%E6%A1%A3/newfilepdatashandongout.xlsx')
                 } else {

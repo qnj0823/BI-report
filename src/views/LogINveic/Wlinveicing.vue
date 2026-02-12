@@ -669,7 +669,7 @@ export default {
 
             })
         } else if (this.dictForm.p_areaname == '广东') {
-            api.wlnewguangdongApi(this.dictForm).then(res => {
+            api.wlProductexcelGDKDApi(this.dictForm).then(res => {
                 window.open('http://bi.yufanjtbip.com:8069/file/%E6%96%87%E6%A1%A3/newfileguangdongout.xlsx')
                 this.dataListLoading = false
 
