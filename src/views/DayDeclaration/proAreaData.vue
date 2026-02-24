@@ -27,7 +27,7 @@
             <el-table-column :show-overflow-tooltip="true" align="center" prop="areaname" label="省区" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="piece" label="销售总计划" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="factory" label="供应链" />
-            <el-table-column :show-overflow-tooltip="true" align="center" prop="xnl" label="鲜露乳" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="xnl" label="鲜酪乳" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="js" label="健爽" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="yznr" label="330/310" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="qxhl200" label="200清新活力" />

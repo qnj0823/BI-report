@@ -36,6 +36,10 @@ export function exportgdExcel(tableList, date, fileName, tableList1, area) {
       item.box1520100054 || '',
       item.box1520100052 || '',
       item.box1520100053 || '',
+      item.sum || '',
+      item.contacts|| '',
+      item.tel|| '',
+      item.address|| '',
       
     ])
   })

@@ -2195,8 +2195,8 @@ export default {
                 // 初始化总计对象
                 const totalObj = {
                     areaName: "广东总计",
-                    contacts: '广东总计',
-                    tel: '广东总计',
+                    contacts: '',
+                    tel: '',
                     days: 0,
                     wlSiteCode: "TOTAL",
                     wlSiteName: "广东总计"
