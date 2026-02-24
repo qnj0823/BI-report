@@ -234,6 +234,7 @@ export default {
     },
     mounted() {
         this.getfast()
+        // this.getdataList()
 
     },
     methods: {
