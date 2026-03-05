@@ -763,7 +763,7 @@ export function wlProductexcelhbjhApi(params) {
 //返回全部(物流及开单表(广东计划)--导出EXCEL)
 export function wlProductexcelGDKDApi(params) {
   return request({
-    url: 'api/reportExt/get_pro_kd_product_or_factory_excel_new_guangdong',
+    url: 'api/reportExt/get_pro_kd2_product_or_factory_excel_new_guangdong',
     params,
     method: 'get'
   })

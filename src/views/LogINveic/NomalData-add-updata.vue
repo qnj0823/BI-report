@@ -6,7 +6,7 @@
             <el-table :data="dataList">
                 <el-table-column :show-overflow-tooltip="true" align="center" prop="productCode" label="集团产品编码" />
                 <el-table-column :show-overflow-tooltip="true" align="center" prop="factoryProductCode" label="工厂产品编码" />
-                <el-table-column :show-overflow-tooltip="true" prop="factoryProductName" width="250" align="center" label="产品" />
+                <el-table-column :show-overflow-tooltip="true" prop="factoryProductName" width="350" align="center" label="产品" />
                 <el-table-column :show-overflow-tooltip="true" prop="wlSiteCode" align="center" label="光明物流站点编码" />
                 <el-table-column :show-overflow-tooltip="true" prop="wlSiteName" align="center" label="光明物流站点" />
                 <el-table-column :show-overflow-tooltip="true" prop="piece" align="center" label="数量(盒)">
@@ -125,6 +125,30 @@ export default {
                 factoryProductCode: '10500082',
                 factoryProductName: '光明噜渴原味酸奶饮品(常温)300ml-1*12纸箱(藏文版)',
                 productCode: '1520100062',
+                piece: '',
+                wlSiteName: 'LOOK雨帆自提',
+                wlSiteCode: '12117991',
+                days: '8',
+                createdate: ''
+            }, {
+                areaName: '四川',
+                deliverydate: '',//到货周期
+                vouchdate: '',//下单日期
+                factoryProductCode: '10500095',
+                factoryProductName: '光明噜渴原味酸奶饮品(常温-宴席版)300g-1*12纸箱(成都)',
+                productCode: '1520100064',
+                piece: '',
+                wlSiteName: 'LOOK雨帆自提',
+                wlSiteCode: '12117991',
+                days: '8',
+                createdate: ''
+            }, {
+                areaName: '四川',
+                deliverydate: '',//到货周期
+                vouchdate: '',//下单日期
+                factoryProductCode: '10500096',
+                factoryProductName: '光明噜渴原味酸奶饮品(常温-常规版)300g-1*12纸箱(成都)',
+                productCode: '1520100065',
                 piece: '',
                 wlSiteName: 'LOOK雨帆自提',
                 wlSiteCode: '12117991',

@@ -56,6 +56,13 @@
                 </template>
             </el-table-column>
         </el-table>
+        <el-dialog title="提示" :visible.sync="dialogVisible" width="50%" :before-close="handleClose">
+            <span>{{ errotTest }}</span>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="dialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
 
@@ -76,6 +83,8 @@ export default {
             month: '',
             day: '',
             bullay: '',
+            dialogVisible: false,
+            errotTest: '',
             dataListLoading: false,
             dataForm: {
                 p_vouchdatestart: '',
@@ -113,16 +122,30 @@ export default {
                 const resObj = JSON.parse(res);
                 if (resObj.success == false) {
                     console.log(resObj, 'resObj')
-                    const materialErrorList = this.parseMaterialError(resObj.errorStack)
-                    console.log(materialErrorList, 'materialErrorList')
+                    // const materialErrorList = this.parseMaterialError(resObj.errorStack)
+                    // console.log(materialErrorList, 'materialErrorList')
+                    this.errotTest = resObj.errorStack
                     this.dataListLoading = false
+                    this.dialogVisible = true
 
-                    this.$message.error(materialErrorList)
+                    // this.$message.error(resObj.errorStack)
+                    // this.$notify({
+                    //     title: '提示',
+                    //     message: resObj.errorStack,
+                    //     duration: 0
+                    // });
                 }
 
 
 
             })
+        },
+        handleClose(done) {
+            this.$confirm('确认关闭？')
+                .then(_ => {
+                    done();
+                })
+                .catch(_ => { });
         },
         deleteHandle(odd, data) {
             this.dataListLoading = true

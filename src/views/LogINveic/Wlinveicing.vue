@@ -18,7 +18,7 @@
                     @click="getdataList()">查询</el-button>
             </el-form-item>
             <el-form-item>
-                <!-- 1. 先渲染西南按钮（如果存在西南地区） -->
+                <!-- 1. 先渲染西南按钮(如果存在西南地区) -->
                 <el-button v-if="showSouthwest" size="mini" class="filter-item" type="primary"
                     @click="getDataList('四川', '雨帆食品集团股份有限公司')">
                     西南
@@ -32,17 +32,22 @@
                     @click="getDataList('湖北', '雨帆食品集团股份有限公司')">
                     湖北
                 </el-button>
+                <el-button   size="mini" class="filter-item" type="primary"
+                    @click="getDataListGD('广东', '雨帆食品集团股份有限公司')">
+                    广东
+                </el-button>
                 <!-- <el-button  size="mini" class="filter-item" type="primary"
                     @click="getDataList('湖北', '雨帆食品集团股份有限公司')">
                     湖北
                 </el-button> -->
-                <!-- 2. 渲染其他地区按钮（排除西南包含的地区） -->
+                <!-- 2. 渲染其他地区按钮(排除西南包含的地区) -->
                 <el-button v-for="item in nonSouthwestAreas" :key="item.pK_AREACL_NAME" size="mini" class="filter-item"
                     type="primary" @click="getDataList(item.pK_AREACL_NAME, item.salesOrgName)">
                     {{ item.pK_AREACL_NAME }}
                 </el-button>
                 <!-- 导出按钮 -->
                 <el-button type="warning" icon="el-icon-download" @click="handleClick">导出</el-button>
+                <el-button type="warning"  v-if="showExportButton" icon="el-icon-download" @click="handleClickGD">广东导出</el-button>
             </el-form-item>
         </el-form>
 
@@ -138,6 +143,7 @@ export default {
     name: 'Wlin-page',
     data() {
         return {
+            showExportButton: false,
             isBtnDisabled: false,
             timer: null,
             msg: 'Wlin-page',
@@ -188,6 +194,7 @@ export default {
             areas: '',
             organaze: '',
             showhubei: '',
+            guangdong:'',
             addOrUpdateVisible: false,
         };
     },
@@ -200,6 +207,11 @@ export default {
         beijingTianjin() {
             return ['北京', '天津'];
         },
+        // 广东地区
+        GUANGDONG() {
+            return ['广东'];
+        },
+
 
         // 是否需要显示西南按钮
         showSouthwest() {
@@ -213,12 +225,19 @@ export default {
                 this.beijingTianjin.includes(item.pK_AREACL_NAME)
             );
         },
+        // 是否需要显示 广东按钮
+        showSouthgd() {
+            return this.newArray.some(item =>
+                this.GUANGDONG.includes(item.pK_AREACL_NAME)
+            );
+        },
 
         // 非西南地区与北京天津的列表
         nonSouthwestAreas() {
             return this.newArray.filter(item =>
                 !this.southwestProvinces.includes(item.pK_AREACL_NAME) &&
-                !this.beijingTianjin.includes(item.pK_AREACL_NAME)
+                !this.beijingTianjin.includes(item.pK_AREACL_NAME)&&
+                !this.GUANGDONG.includes(item.pK_AREACL_NAME)
             );
         },
         // nonSouthwestAreas() {
@@ -250,6 +269,30 @@ export default {
             this.addOrCalibrVisible = true
             this.$nextTick(() => {
                 this.$refs.addOrCalibr.init(id)
+            })
+        },
+        getDataListGD(data, salse){
+            this.areas = data
+            this.organaze = salse
+            this.dictForm.p_orgname = salse
+            this.dictForm.p_areaname = data
+            this.butnshow = true
+            this.butnshow1 = false
+            this.butnshow2 = false
+            this.butnshow3 = false
+            this.butnshowSD = false
+            this.butnshowSDNO = false
+            this.showExportButton = false
+            api.wlProductexcelGDKDApi(this.dictForm).then(res => {
+                this.showExportButton = true
+            })
+        },
+        handleClickGD(){
+            api.wlProductexcelGDKDApi(this.dictForm).then(res => {
+                window.open('http://bi.yufanjtbip.com:8069/file/%E6%96%87%E6%A1%A3/newfileguangdongout.xlsx')
+                this.dataListLoading = false
+                this.GDshow = true
+
             })
         },
         async getfast() {
