@@ -26,9 +26,10 @@ export async function exportExcel(tableList, date, fileName, tableList1) {
   const ws = workbook.addWorksheet('总单');
 
   // 添加数据到第一个工作表
-  ws.addRow([`${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`]);
-  ws.addRow([`${timedate}`, `${timedate}`, `发货单号`, `发货单号`, `${dislble}`, `${dislble}`]);
-  ws.addRow(['序号', '名称', '规格', '数量', `吨位`, `备注`]);
+  ws.addRow([`${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`, `${labelText}`]);
+  ws.addRow([`${timedate}`, `${timedate}`,`车牌号`,``, ``,  `发货单号`, `发货单号`, `${dislble}`, `${dislble}`]);
+  ws.addRow([`发货日期:`, `发货日期:`,`承运商`,`承运商`, ``, ``,  `客户名称`, ``, ``]);
+  ws.addRow(['序号', '名称', '规格', '数量', `吨位`,`整板`,`尾数`,`批号`, `备注`]);
 
   tableList.forEach(item => {
     ws.addRow([
@@ -37,7 +38,10 @@ export async function exportExcel(tableList, date, fileName, tableList1) {
       item.midUnit || '',
       item.midCount || '',
       item.tong || '',
-      item.box1520100010 || ''
+      item.box1520100010 || '',
+      '',
+      '',
+      ''
     ]);
   });
 
@@ -119,20 +123,21 @@ function saveAs(blob, filename) {
 function applyFirstSheetStyles(ws) {
   // 设置列宽
   ws.columns = [
-    { width: 4.92 }, { width: 53 }, { width: 7 },
+    { width: 4.92 }, { width: 22 }, { width: 7 },
     { width: 7 }, { width: 7 }, { width: 14.7 }
   ];
 
+  ws.getColumn('H').width = 10; 
   // 设置行高
-  ws.getRow(1).height = 45;
-  ws.getRow(2).height = 32;
-  ws.getRow(3).height = 28;
+  ws.getRow(1).height = 18;
+  ws.getRow(2).height = 22;
+  ws.getRow(3).height = 22;
 
   // ws.getRow(8).hidden = true
 
   // 设置第4行及以后的行高为25
   for (let i = 4; i <= ws.rowCount; i++) {
-    ws.getRow(i).height = 25;
+    ws.getRow(i).height = 20;
   }
 
   // 设置所有行的默认样式
@@ -159,18 +164,33 @@ function applyFirstSheetStyles(ws) {
   });
 
   // 合并第一行单元格
-  ws.mergeCells(`A1:F1`);
+  ws.mergeCells(`A1:I1`);
 
   // 合并第二行相关单元格
   ws.mergeCells(`A2:B2`);
+  ws.mergeCells(`A3:B3`);
   ws.mergeCells(`C2:D2`);
+  ws.mergeCells(`H2:I2`);
+  ws.mergeCells(`H3:I3`);
+  ws.mergeCells(`C3:D3`);
   ws.mergeCells(`E2:F2`);
+  ws.mergeCells(`E3:F3`);
+
+  // 获取合并后的单元格（以左上角单元格为基准）
+  const mergedCell = ws.getCell('A3');
+  // 设置水平左对齐、垂直居中（垂直对齐可根据需求调整）
+  mergedCell.alignment = {
+    horizontal: 'left',  // 水平左对齐（核心设置）
+    vertical: 'middle',  // 垂直居中（可选，推荐）
+    // wrapText: false      // 是否自动换行（可选）
+};
 
   // 合并最后两行的相关单元格
   const lastRow = ws.rowCount;
   // ws.mergeCells(`A${lastRow - 2}:F${lastRow - 2}`);
-  ws.mergeCells(`A${lastRow - 1}:F${lastRow - 1}`);
-  ws.mergeCells(`A${lastRow}:F${lastRow}`);
+  ws.mergeCells(`A${lastRow - 2}:C${lastRow - 2}`);
+  ws.mergeCells(`A${lastRow - 1}:I${lastRow - 1}`);
+  ws.mergeCells(`A${lastRow}:I${lastRow}`);
 
   // 第一行特殊样式
   ws.getRow(1).eachCell(cell => {
@@ -182,7 +202,7 @@ function applyFirstSheetStyles(ws) {
     cell.alignment = {
       vertical: 'middle',
       horizontal: 'center',
-      wrapText: true,
+      // wrapText: true,
       shrinkToFit: true
     };
   });

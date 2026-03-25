@@ -37,10 +37,10 @@ export function exportgdExcel(tableList, date, fileName, tableList1, area) {
       item.box1520100052 || '',
       item.box1520100053 || '',
       item.sum || '',
-      item.contacts|| '',
-      item.tel|| '',
-      item.address|| '',
-      
+      item.contacts || '',
+      item.tel || '',
+      item.address || '',
+
     ])
   })
   let ws = XLSX.utils.aoa_to_sheet(tableData)
@@ -48,18 +48,31 @@ export function exportgdExcel(tableList, date, fileName, tableList1, area) {
   // 准备第二个工作表的数据  
   const tableData1 = [
     [
-      '物流站点','区域', '联系人', '电话', '地址'
+      '物流站点', '区域', '联系人', '电话', '地址'
     ]
   ];
   tableList1.forEach(item => {
-    tableData1.push([item.wlSiteName || '',item.areaGd || '',  item.contacts || '', item.tel || '', item.address || ''
+    tableData1.push([item.wlSiteName || '', item.areaGd || '', item.contacts || '', item.tel || '', item.address || ''
     ])
   })
 
   // 创建第二个工作表  
   const ws2 = XLSX.utils.aoa_to_sheet(tableData1);
+
+  
+  //准备第三个工作表
+  const tableData2 = [
+    ['到货日期', '站点', '区域', '330椰子', '310椰子', '180ml健爽', '455ml健爽', '200ml鲜酪乳',
+      '450ml鲜酪乳', '合计', '联系人', '电话', '地址']
+  ];
+
+  // 创建第三个工作表  
+  const ws3 = XLSX.utils.aoa_to_sheet(tableData2);
+
+
   setExcelStyle(ws2);
   styleFirstRows(ws2); // 设置样式  
+  
 
   mergeColumnCells(ws, 0);
   mergeSecondAndThirdRows(ws); // 合并
@@ -67,15 +80,15 @@ export function exportgdExcel(tableList, date, fileName, tableList1, area) {
   mergeDuplicateInFirstTwoRows1(ws)
   setExcelStyle(ws) // 设置样式
   styleFirstTwoRows(ws)
-  styleLastRow(ws)
   styleRowsWithSubtotal(ws)//小计
-  // styleRowsWithSubtotal1(ws)
-  // styleFirstTwoRows1(ws2)
+  setExcelStyle(ws3)
+  styleFirstRows(ws3)
 
   let wb = XLSX.utils.book_new()
   // 将工作表添加到工作簿中  
   XLSX.utils.book_append_sheet(wb, ws2, '物流站点相关信息');
   XLSX.utils.book_append_sheet(wb, ws, '物流配送表');
+  XLSX.utils.book_append_sheet(wb, ws3, '物流配送表1');
 
   let wbout = XLSXS.write(wb, {
     bookType: 'xlsx',

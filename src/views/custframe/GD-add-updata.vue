@@ -3,31 +3,59 @@
     <el-dialog :title="!dataForm.id ? '新增-ADD' : '修改-EDITE'" :close-on-click-modal="false" :visible.sync="visible" :before-close="Cancel">
         <!-- 新增和创建表单表单 -->
         <el-form :model="dataForm" :rules="rules" ref="dataForm" @keyup.enter.native="dataSubmit()" label-width="160px">
-            <el-form-item label="区域" prop="sitecode">
+            <!-- <el-form-item label="区域" prop="sitecode">
                 <el-input v-model="dataForm.areaName" style="width: 100%;" placeholder="区域">
                 </el-input>
-            </el-form-item>
+            </el-form-item> -->
             <el-form-item label="光明站点">
                 <el-select style="width: 25rem;" v-model="selectedPROValue" filterable placeholder="请选择"
                     @change="handlebigChange1">
                     <el-option v-for="item in exportList" :key="item.id" :label="item.sitename" :value="item.id" />
                 </el-select>
             </el-form-item>
-            <el-form-item label="光明站点code" prop="wlSiteCode">
-                <el-input v-model="dataForm.wlSiteCode" style="width: 100%;" placeholder="光明站点code">
-                </el-input>
-            </el-form-item>
-            <el-form-item label="光明产品名称" prop="factoryProductName">
-                <el-input v-model="dataForm.factoryProductName" style="width: 100%;" placeholder="光明产品名称">
-                </el-input>
-            </el-form-item>
-            <el-form-item label="光明产品编号" prop="factoryProductCode">
-                <el-input v-model="dataForm.factoryProductCode" style="width: 100%;" placeholder="光明产品编号">
+            <el-form-item label="到货初始值" prop="initialDate">
+                <el-input v-model="dataForm.initialDate" style="width: 100%;" placeholder="到货初始值">
                 </el-input>
             </el-form-item>
             <el-form-item label="第几天到货" prop="days">
                 <el-input v-model="dataForm.days" style="width: 100%;" placeholder="第几天到货">
                 </el-input>
+            </el-form-item>
+            <el-form-item label="报单日期" prop="orderDate">
+                <el-input v-model="dataForm.orderDate" style="width: 100%;" placeholder="报单日期">
+                </el-input>
+            </el-form-item>
+            <el-form-item label="到货日期" prop="arrivalDate">
+                <el-input v-model="dataForm.arrivalDate" style="width: 100%;" placeholder="到货日期">
+                </el-input>
+            </el-form-item>
+            <el-form-item label="报单日期1" prop="orderDate1">
+                <el-input v-model="dataForm.orderDate1" style="width: 100%;" placeholder="报单日期1">
+                </el-input>
+            </el-form-item>
+            <el-form-item label="到货日期1" prop="arrivalDate1">
+                <el-input v-model="dataForm.arrivalDate1" style="width: 100%;" placeholder="到货日期1">
+                </el-input>
+            </el-form-item>
+            <el-form-item label="报单日期2" prop="orderDate2">
+                <el-input v-model="dataForm.orderDate2" style="width: 100%;" placeholder="报单日期2">
+                </el-input>
+            </el-form-item>
+            <el-form-item label="到货日期2" prop="arrivalDate2">
+                <el-input v-model="dataForm.arrivalDate2" style="width: 100%;" placeholder="到货日期2">
+                </el-input>
+            </el-form-item>
+            <el-form-item label="产品" prop="factoryProductName">
+                <el-input v-model="dataForm.factoryProductName" style="width: 100%;" placeholder="产品">
+                </el-input>
+            </el-form-item>
+            <el-form-item label="规则类型" prop="ruleType">
+                <!-- <el-input v-model="dataForm.ruleType" style="width: 100%;" placeholder="规则类型">
+                </el-input> -->
+                <el-select style="width: 25rem;" v-model="selectedPROValueRule" filterable placeholder="请选择"
+                    @change="handlebigChangeRule">
+                    <el-option v-for="item in ruleTypeList" :key="item.id" :label="item.name" :value="item.id" />
+                </el-select>
             </el-form-item>
             <!-- <el-form-item label="编号" prop="sheets">
                 <el-input v-model="dataForm.sheets" style="width: 100%;" placeholder="sheet编号">
@@ -58,33 +86,57 @@ export default {
             },
             selectedPROValue: '',
             selectedPROLable: '',
+            selectedPROValueRule:'',
+            selectedPROLableRule:'',
             dataForm: {
                 id: 0,
-                areaName:'',
+                wlSiteName:'',
+                initialDate: '',
                 days: '',
-                wlSiteCode: '',
-                wlSiteName: '',
-                factoryProductCode:'',
+                orderDate: '',
+                arrivalDate:'',
+                orderDate1:'',
+                arrivalDate1:'',
+                orderDate2:'',
+                arrivalDate2:'',
                 factoryProductName:'',
-                sheets:''
+                ruleType:''
             },
             rules: {
-                wlSiteCode: [
-                    { required: true, message: '请选择站点code', trigger: 'change' }
+                ruleType: [
+                    { required: true, message: '请选择规则类型', trigger: 'blur' }
                 ],
-                factoryProductName: [
-                    { required: true, message: '请输入产品名称', trigger: 'blur' }
+                wlSiteName: [
+                    { required: true, message: '请输入站点名称', trigger: 'change' }
                 ],
-                factoryProductCode: [
-                    { required: true, message: '请输入产品编号', trigger: 'blur' }
-                ],
-                days: [
-                    { required: true, message: '请输入第几天到货', trigger: 'blur' }
-                ],
-                sheets: [
-                    { required: true, message: '请输入第几个表', trigger: 'blur' }
-                ]
             },
+            ruleTypeList:[
+                {
+                    id:'1',
+                    name:'到货初始值',
+                    lable:'init_date_compute'
+                },
+                {
+                    id:'2',
+                    name:'原味到货',
+                    lable:'fix_product_1'
+                },
+                {
+                    id:'3',
+                    name:'新品(含330)到货',
+                    lable:'fix_product_2'
+                },
+                {
+                    id:'4',
+                    name:'每日到货',
+                    lable:'1_everyday'
+                },
+                {
+                    id:'5',
+                    name:'固定到货',
+                    lable:'2_fix'
+                }
+            ]
         }
     },
     computed: {},
@@ -106,6 +158,12 @@ export default {
             this.dataForm.wlSiteName = selectedProItem.sitename
             this.dataForm.wlSiteCode = selectedProItem.sitecode
         },
+        handlebigChangeRule(value){
+            const selectedProItem = this.ruleTypeList.find(item => item.id === value);
+            this.selectedPROLableRule = selectedProItem.name
+            this.dataForm.ruleType = selectedProItem.lable
+            console.log(this.dataForm.ruleType,666622)
+        },
         //取消
         Cancel() {
             this.visible = false
@@ -120,8 +178,8 @@ export default {
             this.$nextTick(() => {
                 if (this.dataForm.id) {
                     this.selectedPROValue = data.wlSiteName
-                    this.dataForm.wlSiteName = data.wlSiteName
-                    this.dataForm.wlSiteCode = data.wlSiteCode
+                    const datalable = this.ruleTypeList.find(item => item.lable == data.ruleType);
+                    this.selectedPROValueRule = datalable.name
                     this.dataForm = data
                 }
             })

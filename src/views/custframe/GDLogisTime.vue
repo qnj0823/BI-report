@@ -16,25 +16,28 @@
                     @click="addOrUpdateHandle()">新增</el-button>
             </el-form-item>
         </el-form>
-        <el-form :inline="true">
-            <el-form-item>
-                <el-input v-model="dataForm2.file" placeholder="选择文件" readonly></el-input>
-                <input type="file" ref="fileInput" style="display: none" @change="handleFileUpload">
-            </el-form-item>
-            <el-form-item>
-                <el-button type="primary" @click="openFileInput">选择文件</el-button>
-                <el-button type="success" :disabled="disablede" @click="uploug('广东')">导入</el-button>
-            </el-form-item>
-        </el-form>
         <!-- 站点排序 -->
         <el-table ref="table" v-loading="dataListLoading" :data="currentData" style="width: 100%;">
-            <el-table-column :show-overflow-tooltip="true" align="center" prop="areaName" label="区域" />
-            <el-table-column :show-overflow-tooltip="true" align="center" prop="wlSiteCode" label="光明站点code" />
-            <el-table-column :show-overflow-tooltip="true" align="center" prop="wlSiteName" width="180" label="光明站点" />
-            <el-table-column :show-overflow-tooltip="true" align="center" prop="factoryProductCode" label="光明产品编号" />
-            <el-table-column :show-overflow-tooltip="true" align="center" prop="factoryProductName" width="300"
-                label="光明产品名称" />
+            <!-- <el-table-column :show-overflow-tooltip="true" align="center" prop="areaName" label="区域" /> -->
+            <!-- <el-table-column :show-overflow-tooltip="true" align="center" prop="wlSiteCode" label="光明站点code" /> -->
+            <!-- <el-table-column :show-overflow-tooltip="true" align="center" prop="factoryProductCode" label="光明产品编号" /> -->
+            <!-- <el-table-column :show-overflow-tooltip="true" align="center" prop="factoryProductName" width="300"label="光明产品名称" /> -->
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="wlSiteName" width="200" label="光明站点" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="initialDate" label="到货初始值" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="days" label="第几天到货" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="orderDate" label="报单日期" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="arrivalDate" label="到货日期" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="orderDate1" label="报单日期1" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="arrivalDate1" label="到货日期1" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="orderDate2" label="报单日期2" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="arrivalDate2" label="到货日期2" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="factoryProductName" label="产品" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="ruleType" label="规则类型">
+                <template slot-scope="scope">
+                    <!-- 从数组映射表中查找对应的中文名称 -->
+                    {{ getRuleTypeName(scope.row.ruleType) }}
+                </template>
+            </el-table-column>
             <el-table-column header-align="center" align="center" width="150" label="操作">
                 <template slot-scope="scope">
                     <el-button type="text" size="small"
@@ -50,15 +53,12 @@
         <!-- 表单弹窗, 新增数据和修改数据 -->
         <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @close="addOrUpdateVisible = false"
             @refreshDataList="getDataList"></add-or-update>
-        <!-- 选出导出类型弹窗 -->
-        <importGD v-if="addUpdateVisible" ref="addUpdate" @close="addUpdateVisible = false"
-            @select-type="handleReceiveType">
-        </importGD>
     </div>
 </template>
 
 <script>
 import * as api from '@/api/frame/customer.js'
+
 import AddOrUpdate from './GD-add-updata'
 import importGD from './GD-import'
 import {
@@ -78,7 +78,8 @@ export default {
                 file: '',
             },
             dataForm: {
-
+                page: '0',
+                size: '500'
             },
 
             upList: {
@@ -97,13 +98,51 @@ export default {
             pageSize: 20,
             totalItems: 0,
             types: '',
-            testList: []
+            testList: [],
+            ruleTypeList: [
+                {
+                    id: '1',
+                    name: '到货初始值',
+                    lable: 'init_date_compute'
+                },
+                {
+                    id: '2',
+                    name: '原味到货',
+                    lable: 'fix_product_1'
+                },
+                {
+                    id: '3',
+                    name: '新品(含330)到货',
+                    lable: 'fix_product_2'
+                },
+                {
+                    id: '4',
+                    name: '每日到货',
+                    lable: '1_everyday'
+                },
+                {
+                    id: '5',
+                    name: '固定到货',
+                    lable: '2_fix'
+                }
+            ]
         };
     },
     mounted() {
         this.getDataList()
+
     },
     methods: {
+        getRuleTypeName(ruleType) {
+            // 边界处理：如果ruleType为空，直接返回未知类型
+            if (!ruleType) return '未知类型';
+
+            // 从数组中查找匹配lable的项
+            const matchItem = this.ruleTypeList.find(item => item.lable == ruleType);
+
+            // 找到则返回name，否则返回未知类型
+            return matchItem ? matchItem.name : '未知类型';
+        },
         handleReceiveType(type) {
             if (type) {
                 this.types = type
@@ -112,6 +151,7 @@ export default {
 
         },
         uploug(area) {
+
             this.area_name = area
             this.addUpdateVisible = true
             this.$nextTick(() => {
@@ -190,7 +230,7 @@ export default {
                 this.$message.error("请先选择文件");
             }
         },
-     
+
         exportData() {
             this.$confirm('是否导出表格数据到Excel?', '提示', {
                 confirmButtonText: '确定',
@@ -210,6 +250,8 @@ export default {
             })
         },
         getDataList() {
+
+
             this.dataListLoading = true
             api.wlFacteprocheckDGApi(this.dataForm).then(res => {
                 this.dataList = res.content

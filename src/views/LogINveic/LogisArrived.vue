@@ -2137,7 +2137,8 @@ export default {
                     ...item, // 展开原对象的所有属性
                     ["box" + item.productCode]: item.box // 新增动态属性
                 }));
-                console.log(this.dataList, 'this.dataList')
+                console.log(this.dataList, 'this.dataList广东')
+                
                 this.dataList = Object.values(
                     this.dataList.reduce((acc, item) => {
                         const key = item.wlSiteCode; // 使用 wlSiteCode 作为分组依据
@@ -2271,7 +2272,7 @@ export default {
                     };
                 });
 
-                console.log(this.dataList, '123')
+                console.log(this.dataList, '123广东')
                 this.dataListLoading = false
                 this.showExportButton = true
             })
