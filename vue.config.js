@@ -35,7 +35,7 @@ module.exports = {
           '^/api': 'api'
         }
       },
-      //测试完成
+      //测试111
       // '/uapws': {
       //   target: 'http://172.16.100.166:9090',
       //   changeOrigin: true,
