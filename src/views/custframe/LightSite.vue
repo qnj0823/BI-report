@@ -34,6 +34,8 @@
                 <el-button type="primary" @click="getDataList('浙江')">福建</el-button> -->
                 <el-button size="mini" class="filter-item" type="warning" icon="el-icon-download"
                     @click="exportData">导出</el-button>
+                <el-button size="mini" class="filter-item" type="warning" icon="el-icon-download"
+                    @click="exportDataALL">导出全部</el-button>
             </el-form-item>
         </el-form>
         <!-- 站点排序 -->
@@ -82,9 +84,14 @@ export default {
             selectedButton: 'site',
             dataForm: {
                 page: 0,
-                size: 5000
+                size: 8000
+            },
+            dataForm1: {
+                page: 1,
+                size: 8000
             },
             dataList: [],
+            dataList1:[],
             childMessage: '',
             test: '',
             dataListLoading: false,
@@ -96,9 +103,21 @@ export default {
     },
     mounted() {
         this.getDataList()
+        this.getDataListALL()
     },
     methods: {
         exportData() {
+            this.$confirm('是否导出表格数据到Excel?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+
+                exportExcel(this.dataList, '光明站点排序.xlsx')
+
+            })
+        },
+        exportDataALL() {
             this.$confirm('是否导出表格数据到Excel?', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
@@ -131,6 +150,45 @@ export default {
         sortProduct() {
             this.show = false
         },
+        getDataListALL() {
+
+            this.test = this.seek
+            if (this.show == false) {
+                this.$nextTick(() => {
+                    this.$refs.product.getDataList()
+                })
+            }
+            this.dataListLoading = true
+            api.BDSiteFactorycheckApi(this.dataForm).then(res => {
+                this.dataListALL = res.content
+                // this.dataList = this.dataList.filter(item =>
+                //     item.areaname.toLowerCase().includes(this.bullay)
+                // );
+                // this.dataList = this.dataList.filter(item =>
+                //     item.sitename.includes(this.seek)
+                // );
+                this.dataListALL = this.dataList.filter(item => {
+                    // 1. 先判断 areaname 是否存在且为字符串
+                    if (typeof item.areaname !== 'string') {
+                        return false; // 非字符串类型直接过滤（或根据需求处理）
+                    }
+                    // 2. 确保 this.bullay 是字符串（避免 includes 传入非字符串导致的问题）
+                    const bullayStr = typeof this.bullay === 'string' ? this.bullay : '';
+                    // 3. 安全调用 toLowerCase() 和 includes()
+                    return item.areaname.toLowerCase().includes(bullayStr);
+                });
+                this.dataListALL = this.dataListALL.filter(item => {
+                    // 确保 sitename 存在且是字符串，再调用 includes()
+                    return typeof item.sitename === 'string' && item.sitename.includes(this.seek);
+                });
+                this.dataListALL = this.dataListALL.sort((a, b) => {
+                    return a.orderid - b.orderid; // 升序排序  
+                    // 如果需要降序排序，可以使用: return b.orderId - a.orderId;  
+                });
+                console.log(this.dataListALL)
+                this.dataListLoading = false
+            })
+        },
         getDataList(bully) {
             this.childMessage = bully || '湖北'
             this.test = this.seek
@@ -142,35 +200,43 @@ export default {
             this.bullay = bully || '湖北'
             this.dataListLoading = true
             api.BDSiteFactorycheckApi(this.dataForm).then(res => {
-                this.dataList = res.content
-                // this.dataList = this.dataList.filter(item =>
-                //     item.areaname.toLowerCase().includes(this.bullay)
-                // );
-                // this.dataList = this.dataList.filter(item =>
-                //     item.sitename.includes(this.seek)
-                // );
-                this.dataList = this.dataList.filter(item => {
-                    // 1. 先判断 areaname 是否存在且为字符串
-                    if (typeof item.areaname !== 'string') {
-                        return false; // 非字符串类型直接过滤（或根据需求处理）
-                    }
-                    // 2. 确保 this.bullay 是字符串（避免 includes 传入非字符串导致的问题）
-                    const bullayStr = typeof this.bullay === 'string' ? this.bullay : '';
-                    // 3. 安全调用 toLowerCase() 和 includes()
-                    return item.areaname.toLowerCase().includes(bullayStr);
-                });
-                this.dataList = this.dataList.filter(item => {
-                    // 确保 sitename 存在且是字符串，再调用 includes()
-                    return typeof item.sitename === 'string' && item.sitename.includes(this.seek);
-                });
-                this.dataList = this.dataList.sort((a, b) => {
-                    return a.orderid - b.orderid; // 升序排序  
-                    // 如果需要降序排序，可以使用: return b.orderId - a.orderId;  
-                });
-                console.log(this.dataList)
-                this.dataListLoading = false
+                    this.dataList1 = res.content
+                api.BDSiteFactorycheckApi(this.dataForm1).then(res1 => {
+                    this.dataList = res1.content
+                    this.dataList = [...this.dataList, ...this.dataList1]
+                    console.log(this.dataList,'this.dataList')
+                    // this.dataList = this.dataList.filter(item =>
+                    //     item.areaname.toLowerCase().includes(this.bullay)
+                    // );
+                    // this.dataList = this.dataList.filter(item =>
+                    //     item.sitename.includes(this.seek)
+                    // );
+                    this.dataList = this.dataList.filter(item => {
+                        // 1. 先判断 areaname 是否存在且为字符串
+                        if (typeof item.areaname !== 'string') {
+                            return false; // 非字符串类型直接过滤（或根据需求处理）
+                        }
+                        // 2. 确保 this.bullay 是字符串（避免 includes 传入非字符串导致的问题）
+                        const bullayStr = typeof this.bullay === 'string' ? this.bullay : '';
+                        // 3. 安全调用 toLowerCase() 和 includes()
+                        return item.areaname.toLowerCase().includes(bullayStr);
+                    });
+                    this.dataList = this.dataList.filter(item => {
+                        // 确保 sitename 存在且是字符串，再调用 includes()
+                        return typeof item.sitename === 'string' && item.sitename.includes(this.seek);
+                    });
+                    this.dataList = this.dataList.sort((a, b) => {
+                        return a.orderid - b.orderid; // 升序排序  
+                        // 如果需要降序排序，可以使用: return b.orderId - a.orderId;  
+                    });
+                    console.log(this.dataList)
+                    this.dataListLoading = false
+
+                })
             })
         },
+
+
         //删除
         deleteHandle(id) {
             var ids = id ? [id] : this.dataListSelections.map(item => {
@@ -197,6 +263,4 @@ export default {
 };
 </script>
 
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>

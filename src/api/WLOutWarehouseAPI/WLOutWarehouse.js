@@ -100,6 +100,15 @@ export function APIptsinoutdetails(params) {
 }
 
 //返回全部(入库统计明细表)
+export function APIptsinoutdetailstotal(params) {
+  return request({
+    url: 'api/reportRpa/get_pro_product_pts_order_sale_inout_total',
+    params,
+    method: 'get'
+  })
+}
+
+//返回全部(入库统计明细表)
 export function APIorderissend(params) {
   return request({
     url: 'api/ptsNccOrder/get_pts_ncc_order_issend',
@@ -107,5 +116,21 @@ export function APIorderissend(params) {
     method: 'get'
   })
 }
+//新增常温提货进度车-吨
+export function APIptsNccOrderCarADD(data) {
+  return request({
+    url: 'api/ptsNccOrderCar',
+    data,
+    method: 'post'
+  })
+}
 
+//查询订单吨数汇总（按一级、二级组织，左关联两个数据源）
+export function APIptsNccOrderCarsummar(params) {
+  return request({
+    url: 'api/ptsNccOrderCar/queryordersummary',
+    params,
+    method: 'get'
+  })
+}
 

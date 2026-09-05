@@ -7,7 +7,7 @@ import XLSXS from 'xlsx-style'
  * @param {Element} dom
  * @param {String} fileName
  */
-export function exportgdExcel(tableList, date, fileName, tableList1, area) {
+export function exportgdExcel(tableList, date, fileName, tableList1, area,dataListgdhz,dataListgdex,dataListgdhnhz) {
 
   const selectedDate = new Date(date);
   const month = selectedDate.getMonth() + 1; // 获取月份（0-11，需要加 1）
@@ -65,9 +65,84 @@ export function exportgdExcel(tableList, date, fileName, tableList1, area) {
     ['到货日期', '站点', '区域', '330椰子', '310椰子', '180ml健爽', '455ml健爽', '200ml鲜酪乳',
       '450ml鲜酪乳', '合计', '联系人', '电话', '地址']
   ];
+  dataListgdhz.forEach(item => {
+    tableData2.push([
+      item.startDate || '',
+      item.wlSiteName || '',
+      item.areaGd || '',
+      item.box1520130001 || '',
+      item.box1520130003 || '',
+      item.box1520100051 || '',
+      item.box1520100054 || '',
+      item.box1520100052 || '',
+      item.box1520100053 || '',
+      item.sum || '',
+      item.contacts || '',
+      item.tel || '',
+      item.address || '',
+
+    ])
+  })
 
   // 创建第三个工作表  
   const ws3 = XLSX.utils.aoa_to_sheet(tableData2);
+
+   //准备第四个工作表
+   const tableData3 = [
+    ['到货日期', '站点', '区域', '330椰子', '310椰子', '180ml健爽', '455ml健爽', '200ml鲜酪乳',
+      '450ml鲜酪乳', '合计', '联系人', '电话', '地址']
+  ];
+  dataListgdex.forEach(item => {
+    tableData3.push([
+      item.startDate || '',
+      item.wlSiteName || '',
+      item.areaGd || '',
+      item.box1520130001 || '',
+      item.box1520130003 || '',
+      item.box1520100051 || '',
+      item.box1520100054 || '',
+      item.box1520100052 || '',
+      item.box1520100053 || '',
+      item.sum || '',
+      item.contacts || '',
+      item.tel || '',
+      item.address || '',
+
+    ])
+  })
+
+  // 创建第四个工作表  
+  const ws4 = XLSX.utils.aoa_to_sheet(tableData3);
+
+    //准备第伍个工作表
+    const tableData4 = [
+      ['到货日期', '站点', '区域', '330椰子', '310椰子', '180ml健爽', '455ml健爽', '200ml鲜酪乳',
+        '450ml鲜酪乳', '合计', '联系人', '电话', '地址']
+    ];
+    dataListgdhnhz.forEach(item => {
+      tableData4.push([
+        item.startDate || '',
+        item.wlSiteName || '',
+        item.areaGd || '',
+        item.box1520130001 || '',
+        item.box1520130003 || '',
+        item.box1520100051 || '',
+        item.box1520100054 || '',
+        item.box1520100052 || '',
+        item.box1520100053 || '',
+        item.sum || '',
+        item.contacts || '',
+        item.tel || '',
+        item.address || '',
+  
+      ])
+    })
+  
+    // 创建第四个工作表  
+    const ws5 = XLSX.utils.aoa_to_sheet(tableData4);
+
+
+
 
 
   setExcelStyle(ws2);
@@ -83,12 +158,18 @@ export function exportgdExcel(tableList, date, fileName, tableList1, area) {
   styleRowsWithSubtotal(ws)//小计
   setExcelStyle(ws3)
   styleFirstRows(ws3)
+  setExcelStyle(ws4)
+  styleFirstRows(ws4)
+  setExcelStyle(ws5)
+  styleFirstRows(ws5)
 
   let wb = XLSX.utils.book_new()
   // 将工作表添加到工作簿中  
   XLSX.utils.book_append_sheet(wb, ws2, '物流站点相关信息');
   XLSX.utils.book_append_sheet(wb, ws, '物流配送表');
-  XLSX.utils.book_append_sheet(wb, ws3, '物流配送表1');
+  XLSX.utils.book_append_sheet(wb, ws3, '广东合资');
+  XLSX.utils.book_append_sheet(wb, ws4, '粤西');
+  XLSX.utils.book_append_sheet(wb, ws5, '湖南合资');
 
   let wbout = XLSXS.write(wb, {
     bookType: 'xlsx',
@@ -291,7 +372,7 @@ function styleFirstTwoRows(ws) {
     }
   };
 
-  // 确保工作表的行数足够  
+  // 确保工作表的行数足够                                                  
   const rowIndex = 1; // 仅处理第二行（0-based索引）
   const colCount = XLSX.utils.decode_range(ws['!ref']).e.c; // 获取列的总数  
 

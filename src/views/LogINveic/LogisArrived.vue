@@ -124,6 +124,9 @@ export default {
             msg: 'wlreport-page',
             showExportButton: false,
             bullay: '',
+            dataListgdhz: [],
+            dataListgdex: [],
+            dataListgdhnhz: [],
             dataForm: {
                 p_vouchdateend: '',
                 p_areaname: '',
@@ -221,6 +224,76 @@ export default {
                 p_areaname: '广东',
                 p_orgname: '雨帆食品集团股份有限公司'
             },
+            lswlzd: [
+                { wlarea: '福建', wlsitecode: '', wlsitename: '零食很忙福州仓' },
+                { wlarea: '福建', wlsitecode: '', wlsitename: '零食很忙龙岩仓' },
+                { wlarea: '福建', wlsitecode: '', wlsitename: '零食很忙泉州仓' },
+                { wlarea: '福建', wlsitecode: '', wlsitename: '零食很忙三明仓' },
+                { wlarea: '福建', wlsitecode: '', wlsitename: '零食很忙漳州仓' },
+                { wlarea: '广东', wlsitecode: '12241160', wlsitename: '赵一鸣广佛仓' },
+                { wlarea: '广东', wlsitecode: '12241139', wlsitename: '零食很忙东莞2仓' },
+                { wlarea: '广东', wlsitecode: '12241256', wlsitename: '零食很忙东莞仓' },
+                { wlarea: '广东', wlsitecode: '12241199', wlsitename: '零食很忙深圳仓' },
+                { wlarea: '广西', wlsitecode: '12241210', wlsitename: '零食很忙钦州仓' },
+                { wlarea: '广西', wlsitecode: '12241209', wlsitename: '零食很忙梧州仓' },
+                { wlarea: '广西', wlsitecode: '12241188', wlsitename: '零食很忙南宁仓' },
+                { wlarea: '广西', wlsitecode: '12241178', wlsitename: '零食很忙玉林仓' },
+                { wlarea: '广西', wlsitecode: '12241227', wlsitename: '零食很忙百色仓' },
+                { wlarea: '广西', wlsitecode: '12241191', wlsitename: '零食很忙柳州仓' },
+                { wlarea: '广西', wlsitecode: '12241194', wlsitename: '零食很忙桂林仓' },
+                { wlarea: '海南', wlsitecode: '12241150', wlsitename: '赵一鸣三亚仓' },
+                { wlarea: '海南', wlsitecode: '12241200', wlsitename: '赵一鸣海口仓' },
+                { wlarea: '湖北', wlsitecode: '12241189', wlsitename: '零食很忙宜昌仓' },
+                { wlarea: '湖北', wlsitecode: '12241163', wlsitename: '零食很忙十堰仓' },
+                { wlarea: '湖北', wlsitecode: '12241176', wlsitename: '零食很忙黄冈仓' },
+                { wlarea: '湖北', wlsitecode: '12241153', wlsitename: '零食很忙武汉仓' },
+                { wlarea: '湖北', wlsitecode: '12241157', wlsitename: '零食很忙咸宁仓' },
+                { wlarea: '湖北', wlsitecode: '12241198', wlsitename: '零食很忙荆州仓' },
+                { wlarea: '湖北', wlsitecode: '12241162', wlsitename: '零食很忙恩施仓' },
+                { wlarea: '湖北', wlsitecode: '12241169', wlsitename: '零食很忙孝感仓' },
+                { wlarea: '湖北', wlsitecode: '12241254', wlsitename: '零食很忙仙桃仓' },
+                { wlarea: '湖北', wlsitecode: '12241171', wlsitename: '零食很忙襄阳仓' },
+                { wlarea: '湖北', wlsitecode: '12241143', wlsitename: '零食很忙襄阳2仓' },
+                { wlarea: '湖南', wlsitecode: '12241193', wlsitename: '零食很忙长沙仓' },
+                { wlarea: '湖南', wlsitecode: '12241156', wlsitename: '零食很忙郴州仓' },
+                { wlarea: '湖南', wlsitecode: '12241151', wlsitename: '零食很忙常德仓' },
+                { wlarea: '湖南', wlsitecode: '12241144', wlsitename: '零食很忙怀化仓' },
+                { wlarea: '湖南', wlsitecode: '12241230', wlsitename: '零食很忙张家界仓' },
+                { wlarea: '湖南', wlsitecode: '12241251', wlsitename: '零食很忙永州仓' },
+                { wlarea: '湖南', wlsitecode: '12241240', wlsitename: '零食很忙吉首仓' },
+                { wlarea: '湖南', wlsitecode: '12241242', wlsitename: '零食很忙岳阳仓' },
+                { wlarea: '湖南', wlsitecode: '12241206', wlsitename: '零食很忙邵阳仓' },
+                { wlarea: '湖南', wlsitecode: '12241235', wlsitename: '零食很忙衡阳仓' },
+                { wlarea: '湖南', wlsitecode: '12241216', wlsitename: '零食很忙益阳仓' },
+                { wlarea: '湖南', wlsitecode: '12241186', wlsitename: '零食很忙娄底仓' },
+                { wlarea: '江西', wlsitecode: '12241195', wlsitename: '零食很忙南昌仓（中心仓）' },
+                { wlarea: '江西', wlsitecode: '12241197', wlsitename: '零食很忙宜春仓' },
+                { wlarea: '江西', wlsitecode: '12241125', wlsitename: '零食很忙九江仓' },
+                { wlarea: '江西', wlsitecode: '12241149', wlsitename: '零食很忙赣州仓' },
+                { wlarea: '江西', wlsitecode: '12241248', wlsitename: '零食很忙吉安仓' },
+                { wlarea: '江西', wlsitecode: '12241203', wlsitename: '零食很忙上饶仓' },
+                { wlarea: '四川', wlsitecode: '12241218', wlsitename: '零食很忙成都站' },
+                { wlarea: '四川', wlsitecode: '12241215', wlsitename: '零食很忙自贡站' },
+                { wlarea: '四川', wlsitecode: '12241170', wlsitename: '零食很忙南充站' },
+                { wlarea: '四川', wlsitecode: '12241164', wlsitename: '零食很忙绵阳站' },
+                { wlarea: '云南', wlsitecode: '12241239', wlsitename: '零食很忙保山站' },
+                { wlarea: '云南', wlsitecode: '12241229', wlsitename: '零食很忙大理站' },
+                { wlarea: '云南', wlsitecode: '12241161', wlsitename: '零食很忙昆明站' },
+                { wlarea: '云南', wlsitecode: '12241145', wlsitename: '零食很忙丽江站' },
+                { wlarea: '云南', wlsitecode: '12241211', wlsitename: '零食很忙临沧站' },
+                { wlarea: '云南', wlsitecode: '12241231', wlsitename: '零食很忙蒙自站' },
+                { wlarea: '云南', wlsitecode: '12241228', wlsitename: '零食很忙普洱站' },
+                { wlarea: '云南', wlsitecode: '12241167', wlsitename: '零食很忙昭通站' },
+                { wlarea: '重庆', wlsitecode: '12241220', wlsitename: '零食很忙江北站' },
+                { wlarea: '重庆', wlsitecode: '12241179', wlsitename: '零食很忙万州站' },
+                { wlarea: '重庆', wlsitecode: '12241142', wlsitename: '零食很忙沙坪坝站' },
+                { wlarea: '贵州', wlsitecode: '12241224', wlsitename: '赵一鸣毕节站' },
+                { wlarea: '贵州', wlsitecode: '12241247', wlsitename: '零食很忙贵阳站' },
+                { wlarea: '贵州', wlsitecode: '12241212', wlsitename: '零食很忙凯里站' },
+                { wlarea: '贵州', wlsitecode: '12241214', wlsitename: '零食很忙盘州站' },
+                { wlarea: '贵州', wlsitecode: '12241175', wlsitename: '零食很忙遵义站' },
+                { wlarea: '贵州', wlsitecode: '12241255', wlsitename: '零食很忙铜仁站' }
+            ],
 
             siteForm: {
                 p_areaname: ''
@@ -237,7 +310,7 @@ export default {
             wlDataList: [],
             wlDataList1: [],
             sichuanList: [],
-            siteListGD:[],
+            siteListGD: [],
             gxNoSpecialList: [],
 
 
@@ -287,7 +360,7 @@ export default {
             ],
             GXDataList3: [
                 {
-                    oldsite: ['桂柳州柳北李建重', '桂柳州城中严明高'],
+                    oldsite: ['桂柳州柳北李建重', '桂柳州城中严明高', '桂柳州融水苏心怡'],
                     newsite: '桂柳州米德'
                 },
             ],
@@ -449,6 +522,16 @@ export default {
 
                 ///数据合并（根据wlSiteCode分组）
                 this.dataList = this.mergeDataList(this.dataList);
+                // 1. 先取出 lswlzd 中 wlarea 为广西的所有站点编码
+                const guangxiCodes = this.lswlzd
+                        .filter(item => item.wlarea == '四川')
+                        .map(item => item.wlsitecode);
+
+                    // 2. 从 this.dataList 中剔除 wlSiteCode 在 guangxiCodes 中的项
+                    this.dataList = this.dataList.filter(item => {
+                        return !guangxiCodes.includes(item.wlSiteCode);
+                    });
+                    console.log(this.dataList, '四川')
                 //计算小计
                 this.dataList = this.dataList.map(item => {
                     let sum = 0;
@@ -523,6 +606,7 @@ export default {
                         },
                         addToOriginal: true
                     })
+                    console.log()
                     this.dataListLoading = false
                     this.showExportButton = true
                 })
@@ -698,6 +782,16 @@ export default {
                 }));
                 ///数据合并（根据wlSiteCode分组）
                 this.dataList = this.mergeDataList(this.dataList);
+                // 1. 先取出 lswlzd 中 wlarea 为广西的所有站点编码
+                const guangxiCodes = this.lswlzd
+                        .filter(item => item.wlarea == '重庆')
+                        .map(item => item.wlsitecode);
+
+                    // 2. 从 this.dataList 中剔除 wlSiteCode 在 guangxiCodes 中的项
+                    this.dataList = this.dataList.filter(item => {
+                        return !guangxiCodes.includes(item.wlSiteCode);
+                    });
+                    console.log(this.dataList, '重庆')
                 //计算小计
                 this.dataList = this.dataList.map(item => {
                     let sum = 0;
@@ -744,6 +838,16 @@ export default {
                 }));
                 ///数据合并（根据wlSiteCode分组）
                 this.dataList = this.mergeDataList(this.dataList);
+                // 1. 先取出 lswlzd 中 wlarea 为广西的所有站点编码
+                const guangxiCodes = this.lswlzd
+                        .filter(item => item.wlarea == '云南')
+                        .map(item => item.wlsitecode);
+
+                    // 2. 从 this.dataList 中剔除 wlSiteCode 在 guangxiCodes 中的项
+                    this.dataList = this.dataList.filter(item => {
+                        return !guangxiCodes.includes(item.wlSiteCode);
+                    });
+                    console.log(this.dataList, '云南')
                 //计算小计
                 this.dataList = this.dataList.map(item => {
                     let sum = 0;
@@ -790,6 +894,16 @@ export default {
                 }));
                 ///数据合并（根据wlSiteCode分组）
                 this.dataList = this.mergeDataList(this.dataList);
+                // 1. 先取出 lswlzd 中 wlarea 为广西的所有站点编码
+                const guangxiCodes = this.lswlzd
+                        .filter(item => item.wlarea == '贵州')
+                        .map(item => item.wlsitecode);
+
+                    // 2. 从 this.dataList 中剔除 wlSiteCode 在 guangxiCodes 中的项
+                    this.dataList = this.dataList.filter(item => {
+                        return !guangxiCodes.includes(item.wlSiteCode);
+                    });
+                    console.log(this.dataList, '贵州')
                 //计算小计
                 this.dataList = this.dataList.map(item => {
                     let sum = 0;
@@ -2108,16 +2222,326 @@ export default {
         wlpersongdList() {
             api.WLContactsAPI().then(res => {
                 this.siteListGD = res
-               
+
             })
         },
 
         getguangdong() {
+            this.areas = '广东';
+            this.wlForm.blurry = this.areas;
+            this.wlpersongdList();
+            this.dataListLoading = true;
+            this.showExportButton = false;
+
+            // 日期处理
+            const [year, month, day] = this.dataForm.p_vouchdateend.split('-').map(Number);
+            this.labelText = `${this.areas}区域到货明细表--截止${year}年${month}月${day}日`;
+            this.dateLable = `${month}月${day}日`;
+            this.guangdongForm.p_vouchdateend = this.dataForm.p_vouchdateend;
+
+            const date = new Date(this.dataForm.p_vouchdateend);
+            date.setDate(date.getDate() - 2);
+
+            // 调用接口
+            api.wlguangdongApi(this.guangdongForm).then(res => {
+                // ====================== 核心拆分 ======================
+                const allData = res; // 总数据
+
+                // 拆分成 4 张表
+                const dataList = allData; // 广东合资总表
+                const dataListgdhz = allData.filter(item => item.areaCategory === '广东合资');
+                const dataListgdex = allData.filter(item => item.areaCategory === '粤西');
+                const dataListgdhnhz = allData.filter(item => item.areaCategory === '湖南合资');
+
+                // 4 张表统一处理
+                this.dataList = this.processTableData(dataList);
+                this.dataListgdhz = this.processTableData(dataListgdhz);
+                this.dataListgdex = this.processTableData(dataListgdex);
+                this.dataListgdhnhz = this.processTableData(dataListgdhnhz);
+
+                console.log('✅ 四张表处理完成');
+                console.log('总表：', this.dataList);
+                console.log('广东合资：', this.dataListgdhz);
+                console.log('粤西：', this.dataListgdex);
+                console.log('湖南合资：', this.dataListgdhnhz);
+                this.dataListLoading = false
+                this.showExportButton = true
+
+            });
+        },
+
+        // ====================== 表格统一处理函数（复用） ======================
+        processTableData(data) {
+            if (!data || data.length === 0) return [];
+
+            // 1. 合并箱号字段
+            let result = this.mergeBoxFields(data);
+            // 2. 按编码合并对象
+            result = this.mergeObjectsByCodes(result);
+            // 3. 动态添加 box+编码 属性
+            result = result.map(item => ({
+                ...item,
+                ["box" + item.productCode]: item.box
+            }));
+            // 4. 按 wlSiteCode 分组合并
+            result = Object.values(
+                result.reduce((acc, item) => {
+                    const key = item.wlSiteCode;
+                    if (!acc[key]) {
+                        acc[key] = { ...item };
+                        const fieldsToRemove = [
+                            'box', 'deliverydate', 'factoryProductCode',
+                            'factoryProductName', 'piece', 'productCode', 'vouchdate', 'tel'
+                        ];
+                        fieldsToRemove.forEach(field => delete acc[key][field]);
+                    } else {
+                        Object.keys(item).forEach(field => {
+                            if (![
+                                'wlSiteCode', 'box', 'deliverydate', 'factoryProductCode',
+                                'factoryProductName', 'piece', 'productCode', 'vouchdate'
+                            ].includes(field)) {
+                                acc[key][field] = item[field];
+                            }
+                        });
+                    }
+                    return acc;
+                }, {})
+            );
+            // 5. 第一次 sum 计算
+            result = result.map(item => {
+                let sum = 0;
+                for (const key in item) {
+                    if (['areaName', 'days', 'wlSiteCode', 'wlSiteName', 'tel', 'address', 'contacts'].includes(key)) continue;
+                    sum += Number(item[key]) || 0;
+                }
+                return { ...item, sum };
+            });
+            // 6. 添加总计行
+            const totalObj = {
+                areaName: "广东总计",
+                contacts: '',
+                tel: '',
+                days: 0,
+                wlSiteCode: "TOTAL",
+                wlSiteName: "广东总计"
+            };
+            result.forEach(item => {
+                Object.keys(item).forEach(key => {
+                    if (['areaName', 'days', 'wlSiteCode', 'wlSiteName', 'tel', 'contacts', 'vnote'].includes(key)) return;
+                    if (!totalObj.hasOwnProperty(key)) totalObj[key] = 0;
+                    const value = Number(item[key]) || 0;
+                    totalObj[key] += value;
+                });
+                totalObj.days += Number(item.days) || 0;
+            });
+            result.push(totalObj);
+            // 7. 添加 startDate
+            result.forEach((item, index) => {
+                if (index < result.length - 1) {
+                    item.startDate = this.dateLable;
+                }
+            });
+            // 8. 重新计算 rowSum（只累加 box* 列）
+            result = result.map(item => {
+                let rowSum = 0;
+                Object.keys(item).forEach(key => {
+                    if (!key.startsWith('box')) return;
+                    const val = Number(item[key]);
+                    if (Number.isFinite(val)) rowSum += val;
+                });
+                return { ...item, sum: rowSum };
+            });
+            // 9. 过滤 bullay
+            result = result.filter(item =>
+                item.wlSiteName.includes(this.bullay)
+            );
+            // 10. 匹配站点信息
+            const siteMap = {};
+            this.siteListGD.filter(s => s.areaName === '广东').forEach(site => {
+                siteMap[site.wlSiteName] = site;
+            });
+            result = result.map(dataItem => {
+                const matchedSite = siteMap[dataItem.wlSiteName] || {};
+                return { ...dataItem, ...matchedSite };
+            });
+
+            return result;
+        },
+
+        // getguangdong() {
+        //     this.areas = '广东'
+        //     this.wlForm.blurry = this.areas
+        //     this.wlpersongdList()
+        //     this.dataListLoading = true
+        //     this.showExportButton = false
+        //     const [year, month, day] = this.dataForm.p_vouchdateend.split('-').map(Number);
+        //     this.labelText = `${this.areas}区域到货明细表--截止${year}年${month}月${day}日`; // 如果没有选择日期，显示默认文本
+        //     this.dateLable = `${month}月${day}日`
+        //     console.log(this.dateLable)
+        //     this.guangdongForm.p_vouchdateend = this.dataForm.p_vouchdateend
+        //     //转时间
+        //     const date = new Date(this.dataForm.p_vouchdateend);
+        //     date.setDate(date.getDate() - 2);
+
+        //     api.wlguangdongApi(this.guangdongForm).then(res => {
+
+        //         this.dataList = res
+
+        //         this.dataList = this.mergeBoxFields(this.dataList)
+        //         this.dataList = this.mergeObjectsByCodes(this.dataList);
+        //         this.dataList = this.dataList.map(item => ({
+        //             ...item, // 展开原对象的所有属性
+        //             ["box" + item.productCode]: item.box // 新增动态属性
+        //         }));
+        //         console.log(this.dataList, 'this.dataList广东')
+
+        //         this.dataList = Object.values(
+        //             this.dataList.reduce((acc, item) => {
+        //                 const key = item.wlSiteCode; // 使用 wlSiteCode 作为分组依据
+
+        //                 if (!acc[key]) {
+        //                     // 初始化新对象，并删除不合并的字段
+        //                     acc[key] = { ...item }; // 先复制所有字段
+
+        //                     // 删除不合并的字段
+        //                     const fieldsToRemove = [
+        //                         'box',
+        //                         'deliverydate',
+        //                         'factoryProductCode',
+        //                         'factoryProductName',
+        //                         'piece',
+        //                         'productCode',
+        //                         'vouchdate',
+        //                         'tel'
+        //                     ];
+        //                     fieldsToRemove.forEach(field => delete acc[key][field]);
+        //                 } else {
+        //                     // 合并其他字段(如 jtProductCode）
+        //                     Object.keys(item).forEach(field => {
+        //                         // 如果字段不在排除列表，则合并
+        //                         if (![
+        //                             'wlSiteCode',
+        //                             'box',
+        //                             'deliverydate',
+        //                             'factoryProductCode',
+        //                             'factoryProductName',
+        //                             'piece',
+        //                             'productCode',
+        //                             'vouchdate'
+        //                         ].includes(field)) {
+        //                             acc[key][field] = item[field]; // 后出现的值会覆盖前面的
+        //                         }
+        //                     });
+        //                 }
+
+        //                 return acc;
+        //             }, {})
+        //         );
+        //         this.dataList = this.dataList.map(item => {
+        //             let sum = 0;
+        //             for (const key in item) {
+        //                 // 跳过保留字段
+        //                 if (['areaName', 'days', 'wlSiteCode', 'wlSiteName', 'tel', 'address', 'contacts'].includes(key)) continue;
+        //                 // 其他字段转为数字并累加
+        //                 sum += Number(item[key]) || 0;
+        //             }
+        //             // 返回新对象(保留原字段 + 新增 sum）
+        //             return { ...item, sum };
+        //         });
+
+        //         // 初始化总计对象
+        //         const totalObj = {
+        //             areaName: "广东总计",
+        //             contacts: '',
+        //             tel: '',
+        //             days: 0,
+        //             wlSiteCode: "TOTAL",
+        //             wlSiteName: "广东总计"
+        //         };
+
+        //         // 遍历数组中的每个对象
+        //         this.dataList.forEach(item => {
+        //             // 遍历每个对象的属性
+        //             Object.keys(item).forEach(key => {
+        //                 // 跳过不需要求和的字段
+        //                 if (['areaName', 'days', 'wlSiteCode', 'wlSiteName', 'tel', 'contacts', 'vnote'].includes(key)) {
+        //                     return;
+        //                 }
+
+        //                 // 初始化总计对象中的字段(如果不存在)
+        //                 if (!totalObj.hasOwnProperty(key)) {
+        //                     totalObj[key] = 0;
+        //                 }
+
+        //                 // 将值转为数字并累加
+        //                 const value = Number(item[key]) || 0;
+        //                 totalObj[key] += value;
+        //             });
+
+        //             // 累加days字段(如果需要)
+        //             totalObj.days += Number(item.days) || 0;
+        //         });
+
+        //         // 将总计对象添加到原数组（如果需要)
+        //         this.dataList.push(totalObj);
+        //         // 直接修改原数组
+        //         this.dataList.forEach((item, index) => {
+        //             // 如果不是最后三个元素，则添加 startDate
+        //             if (index < this.dataList.length - 1) {
+        //                 item.startDate = this.dateLable;
+        //             }
+        //         });
+
+        //         // 为每一行追加合计（sum），仅累加 box* 动态列
+        //         this.dataList = this.dataList.map(item => {
+        //             let rowSum = 0;
+        //             Object.keys(item).forEach(key => {
+        //                 if (!key.startsWith('box')) return;
+        //                 const val = Number(item[key]);
+        //                 if (Number.isFinite(val)) {
+        //                     rowSum += val;
+        //                 }
+        //             });
+        //             return { ...item, sum: rowSum };
+        //         });
+
+        //         this.dataList = this.dataList.filter(item =>
+        //             item.wlSiteName.includes(this.bullay)
+        //         );
+        //         this.siteListGD = this.siteListGD.filter(item =>
+        //             item.areaName == '广东'
+
+        //         );
+        //         const siteMap = {};
+        //         this.siteListGD.forEach(site => {
+        //             // 以站点名称（sitename）作为 key，值为整个站点对象
+        //             // 注意：这里的 key 要和 dataItem.wlSiteName 完全匹配（大小写、空格都要一致）
+        //             siteMap[site.wlSiteName] = site;
+        //         });
+
+        //         // 第二步：遍历 dataList，合并站点信息（就是你提供的代码）
+        //         this.dataList = this.dataList.map((dataItem) => {
+        //             const matchedSite = siteMap[dataItem.wlSiteName] || {};
+        //             return {
+        //                 ...dataItem,
+        //                 ...matchedSite
+        //             };
+        //         });
+
+        //         console.log(this.dataList, '123广东')
+        //         this.getguangdongHZ()
+        //         // this.showExportButton = true
+        //     })
+
+
+
+        // },
+        //广东合资单表
+        getguangdongHZ() {
             this.areas = '广东'
             this.wlForm.blurry = this.areas
             this.wlpersongdList()
-            this.dataListLoading = true
-            this.showExportButton = false
+            // this.showExportButton = false
             const [year, month, day] = this.dataForm.p_vouchdateend.split('-').map(Number);
             this.labelText = `${this.areas}区域到货明细表--截止${year}年${month}月${day}日`; // 如果没有选择日期，显示默认文本
             this.dateLable = `${month}月${day}日`
@@ -2129,18 +2553,18 @@ export default {
 
             api.wlguangdongApi(this.guangdongForm).then(res => {
 
-                this.dataList = res
+                this.dataListgdhz = res.filter(item => item.areaCategory === '广东合资')
 
-                this.dataList = this.mergeBoxFields(this.dataList)
-                this.dataList = this.mergeObjectsByCodes(this.dataList);
-                this.dataList = this.dataList.map(item => ({
+                this.dataListgdhz = this.mergeBoxFields(this.dataListgdhz)
+                this.dataListgdhz = this.mergeObjectsByCodes(this.dataListgdhz);
+                this.dataListgdhz = this.dataListgdhz.map(item => ({
                     ...item, // 展开原对象的所有属性
                     ["box" + item.productCode]: item.box // 新增动态属性
                 }));
-                console.log(this.dataList, 'this.dataList广东')
-                
-                this.dataList = Object.values(
-                    this.dataList.reduce((acc, item) => {
+                console.log(this.dataListgdhz, 'this.dataListgdhz广东')
+
+                this.dataListgdhz = Object.values(
+                    this.dataListgdhz.reduce((acc, item) => {
                         const key = item.wlSiteCode; // 使用 wlSiteCode 作为分组依据
 
                         if (!acc[key]) {
@@ -2181,7 +2605,7 @@ export default {
                         return acc;
                     }, {})
                 );
-                this.dataList = this.dataList.map(item => {
+                this.dataListgdhz = this.dataListgdhz.map(item => {
                     let sum = 0;
                     for (const key in item) {
                         // 跳过保留字段
@@ -2204,7 +2628,7 @@ export default {
                 };
 
                 // 遍历数组中的每个对象
-                this.dataList.forEach(item => {
+                this.dataListgdhz.forEach(item => {
                     // 遍历每个对象的属性
                     Object.keys(item).forEach(key => {
                         // 跳过不需要求和的字段
@@ -2227,17 +2651,17 @@ export default {
                 });
 
                 // 将总计对象添加到原数组（如果需要)
-                this.dataList.push(totalObj);
+                this.dataListgdhz.push(totalObj);
                 // 直接修改原数组
-                this.dataList.forEach((item, index) => {
+                this.dataListgdhz.forEach((item, index) => {
                     // 如果不是最后三个元素，则添加 startDate
-                    if (index < this.dataList.length - 1) {
+                    if (index < this.dataListgdhz.length - 1) {
                         item.startDate = this.dateLable;
                     }
                 });
 
                 // 为每一行追加合计（sum），仅累加 box* 动态列
-                this.dataList = this.dataList.map(item => {
+                this.dataListgdhz = this.dataListgdhz.map(item => {
                     let rowSum = 0;
                     Object.keys(item).forEach(key => {
                         if (!key.startsWith('box')) return;
@@ -2249,12 +2673,12 @@ export default {
                     return { ...item, sum: rowSum };
                 });
 
-                this.dataList = this.dataList.filter(item =>
+                this.dataListgdhz = this.dataListgdhz.filter(item =>
                     item.wlSiteName.includes(this.bullay)
                 );
                 this.siteListGD = this.siteListGD.filter(item =>
-                    item.areaName =='广东'
-                    
+                    item.areaName == '广东'
+
                 );
                 const siteMap = {};
                 this.siteListGD.forEach(site => {
@@ -2263,8 +2687,340 @@ export default {
                     siteMap[site.wlSiteName] = site;
                 });
 
-                // 第二步：遍历 dataList，合并站点信息（就是你提供的代码）
-                this.dataList = this.dataList.map((dataItem) => {
+                // 第二步：遍历 dataListgdhz，合并站点信息（就是你提供的代码）
+                this.dataListgdhz = this.dataListgdhz.map((dataItem) => {
+                    const matchedSite = siteMap[dataItem.wlSiteName] || {};
+                    return {
+                        ...dataItem,
+                        ...matchedSite
+                    };
+                });
+                this.getguangdongexHZ()
+                // console.log(this.dataListgdhz, '123广东')
+                // this.dataListLoading = false
+                // this.showExportButton = true
+            })
+
+        },
+        //广东合资粤西
+        getguangdongexHZ() {
+            this.areas = '广东'
+            this.wlForm.blurry = this.areas
+            this.wlpersongdList()
+            // this.showExportButton = false
+            const [year, month, day] = this.dataForm.p_vouchdateend.split('-').map(Number);
+            this.labelText = `${this.areas}区域到货明细表--截止${year}年${month}月${day}日`; // 如果没有选择日期，显示默认文本
+            this.dateLable = `${month}月${day}日`
+            console.log(this.dateLable)
+            this.guangdongForm.p_vouchdateend = this.dataForm.p_vouchdateend
+            //转时间
+            const date = new Date(this.dataForm.p_vouchdateend);
+            date.setDate(date.getDate() - 2);
+
+            api.wlguangdongApi(this.guangdongForm).then(res => {
+
+                this.dataListgdex = res.filter(item => item.areaCategory === '粤西')
+
+                this.dataListgdex = this.mergeBoxFields(this.dataListgdex)
+                this.dataListgdex = this.mergeObjectsByCodes(this.dataListgdex);
+                this.dataListgdex = this.dataListgdex.map(item => ({
+                    ...item, // 展开原对象的所有属性
+                    ["box" + item.productCode]: item.box // 新增动态属性
+                }));
+                console.log(this.dataListgdex, 'this.dataListgdex广东')
+
+                this.dataListgdex = Object.values(
+                    this.dataListgdex.reduce((acc, item) => {
+                        const key = item.wlSiteCode; // 使用 wlSiteCode 作为分组依据
+
+                        if (!acc[key]) {
+                            // 初始化新对象，并删除不合并的字段
+                            acc[key] = { ...item }; // 先复制所有字段
+
+                            // 删除不合并的字段
+                            const fieldsToRemove = [
+                                'box',
+                                'deliverydate',
+                                'factoryProductCode',
+                                'factoryProductName',
+                                'piece',
+                                'productCode',
+                                'vouchdate',
+                                'tel'
+                            ];
+                            fieldsToRemove.forEach(field => delete acc[key][field]);
+                        } else {
+                            // 合并其他字段(如 jtProductCode）
+                            Object.keys(item).forEach(field => {
+                                // 如果字段不在排除列表，则合并
+                                if (![
+                                    'wlSiteCode',
+                                    'box',
+                                    'deliverydate',
+                                    'factoryProductCode',
+                                    'factoryProductName',
+                                    'piece',
+                                    'productCode',
+                                    'vouchdate'
+                                ].includes(field)) {
+                                    acc[key][field] = item[field]; // 后出现的值会覆盖前面的
+                                }
+                            });
+                        }
+
+                        return acc;
+                    }, {})
+                );
+                this.dataListgdex = this.dataListgdex.map(item => {
+                    let sum = 0;
+                    for (const key in item) {
+                        // 跳过保留字段
+                        if (['areaName', 'days', 'wlSiteCode', 'wlSiteName', 'tel', 'address', 'contacts'].includes(key)) continue;
+                        // 其他字段转为数字并累加
+                        sum += Number(item[key]) || 0;
+                    }
+                    // 返回新对象(保留原字段 + 新增 sum）
+                    return { ...item, sum };
+                });
+
+                // 初始化总计对象
+                const totalObj = {
+                    areaName: "广东总计",
+                    contacts: '',
+                    tel: '',
+                    days: 0,
+                    wlSiteCode: "TOTAL",
+                    wlSiteName: "广东总计"
+                };
+
+                // 遍历数组中的每个对象
+                this.dataListgdex.forEach(item => {
+                    // 遍历每个对象的属性
+                    Object.keys(item).forEach(key => {
+                        // 跳过不需要求和的字段
+                        if (['areaName', 'days', 'wlSiteCode', 'wlSiteName', 'tel', 'contacts', 'vnote'].includes(key)) {
+                            return;
+                        }
+
+                        // 初始化总计对象中的字段(如果不存在)
+                        if (!totalObj.hasOwnProperty(key)) {
+                            totalObj[key] = 0;
+                        }
+
+                        // 将值转为数字并累加
+                        const value = Number(item[key]) || 0;
+                        totalObj[key] += value;
+                    });
+
+                    // 累加days字段(如果需要)
+                    totalObj.days += Number(item.days) || 0;
+                });
+
+                // 将总计对象添加到原数组（如果需要)
+                this.dataListgdex.push(totalObj);
+                // 直接修改原数组
+                this.dataListgdex.forEach((item, index) => {
+                    // 如果不是最后三个元素，则添加 startDate
+                    if (index < this.dataListgdex.length - 1) {
+                        item.startDate = this.dateLable;
+                    }
+                });
+
+                // 为每一行追加合计（sum），仅累加 box* 动态列
+                this.dataListgdex = this.dataListgdex.map(item => {
+                    let rowSum = 0;
+                    Object.keys(item).forEach(key => {
+                        if (!key.startsWith('box')) return;
+                        const val = Number(item[key]);
+                        if (Number.isFinite(val)) {
+                            rowSum += val;
+                        }
+                    });
+                    return { ...item, sum: rowSum };
+                });
+
+                this.dataListgdex = this.dataListgdex.filter(item =>
+                    item.wlSiteName.includes(this.bullay)
+                );
+                this.siteListGD = this.siteListGD.filter(item =>
+                    item.areaName == '广东'
+
+                );
+                const siteMap = {};
+                this.siteListGD.forEach(site => {
+                    // 以站点名称（sitename）作为 key，值为整个站点对象
+                    // 注意：这里的 key 要和 dataItem.wlSiteName 完全匹配（大小写、空格都要一致）
+                    siteMap[site.wlSiteName] = site;
+                });
+
+                // 第二步：遍历 dataListgdex，合并站点信息（就是你提供的代码）
+                this.dataListgdex = this.dataListgdex.map((dataItem) => {
+                    const matchedSite = siteMap[dataItem.wlSiteName] || {};
+                    return {
+                        ...dataItem,
+                        ...matchedSite
+                    };
+                });
+                this.getguangdonghnhz()
+                console.log(this.dataListgdex, '123广东')
+                // this.dataListLoading = false
+                // this.showExportButton = true
+            })
+
+        },
+        //广东合资湖南合资
+        getguangdonghnhz() {
+            this.areas = '广东'
+            this.wlForm.blurry = this.areas
+            this.wlpersongdList()
+            // this.showExportButton = false
+            const [year, month, day] = this.dataForm.p_vouchdateend.split('-').map(Number);
+            this.labelText = `${this.areas}区域到货明细表--截止${year}年${month}月${day}日`; // 如果没有选择日期，显示默认文本
+            this.dateLable = `${month}月${day}日`
+            console.log(this.dateLable)
+            this.guangdongForm.p_vouchdateend = this.dataForm.p_vouchdateend
+            //转时间
+            const date = new Date(this.dataForm.p_vouchdateend);
+            date.setDate(date.getDate() - 2);
+
+            api.wlguangdongApi(this.guangdongForm).then(res => {
+
+                this.dataListgdhnhz = res.filter(item => item.areaCategory === '湖南合资')
+
+                this.dataListgdhnhz = this.mergeBoxFields(this.dataListgdhnhz)
+                this.dataListgdhnhz = this.mergeObjectsByCodes(this.dataListgdhnhz);
+                this.dataListgdhnhz = this.dataListgdhnhz.map(item => ({
+                    ...item, // 展开原对象的所有属性
+                    ["box" + item.productCode]: item.box // 新增动态属性
+                }));
+                console.log(this.dataListgdhnhz, 'this.dataListgdhnhz广东')
+
+                this.dataListgdhnhz = Object.values(
+                    this.dataListgdhnhz.reduce((acc, item) => {
+                        const key = item.wlSiteCode; // 使用 wlSiteCode 作为分组依据
+
+                        if (!acc[key]) {
+                            // 初始化新对象，并删除不合并的字段
+                            acc[key] = { ...item }; // 先复制所有字段
+
+                            // 删除不合并的字段
+                            const fieldsToRemove = [
+                                'box',
+                                'deliverydate',
+                                'factoryProductCode',
+                                'factoryProductName',
+                                'piece',
+                                'productCode',
+                                'vouchdate',
+                                'tel'
+                            ];
+                            fieldsToRemove.forEach(field => delete acc[key][field]);
+                        } else {
+                            // 合并其他字段(如 jtProductCode）
+                            Object.keys(item).forEach(field => {
+                                // 如果字段不在排除列表，则合并
+                                if (![
+                                    'wlSiteCode',
+                                    'box',
+                                    'deliverydate',
+                                    'factoryProductCode',
+                                    'factoryProductName',
+                                    'piece',
+                                    'productCode',
+                                    'vouchdate'
+                                ].includes(field)) {
+                                    acc[key][field] = item[field]; // 后出现的值会覆盖前面的
+                                }
+                            });
+                        }
+
+                        return acc;
+                    }, {})
+                );
+                this.dataListgdhnhz = this.dataListgdhnhz.map(item => {
+                    let sum = 0;
+                    for (const key in item) {
+                        // 跳过保留字段
+                        if (['areaName', 'days', 'wlSiteCode', 'wlSiteName', 'tel', 'address', 'contacts'].includes(key)) continue;
+                        // 其他字段转为数字并累加
+                        sum += Number(item[key]) || 0;
+                    }
+                    // 返回新对象(保留原字段 + 新增 sum）
+                    return { ...item, sum };
+                });
+
+                // 初始化总计对象
+                const totalObj = {
+                    areaName: "广东总计",
+                    contacts: '',
+                    tel: '',
+                    days: 0,
+                    wlSiteCode: "TOTAL",
+                    wlSiteName: "广东总计"
+                };
+
+                // 遍历数组中的每个对象
+                this.dataListgdhnhz.forEach(item => {
+                    // 遍历每个对象的属性
+                    Object.keys(item).forEach(key => {
+                        // 跳过不需要求和的字段
+                        if (['areaName', 'days', 'wlSiteCode', 'wlSiteName', 'tel', 'contacts', 'vnote'].includes(key)) {
+                            return;
+                        }
+
+                        // 初始化总计对象中的字段(如果不存在)
+                        if (!totalObj.hasOwnProperty(key)) {
+                            totalObj[key] = 0;
+                        }
+
+                        // 将值转为数字并累加
+                        const value = Number(item[key]) || 0;
+                        totalObj[key] += value;
+                    });
+
+                    // 累加days字段(如果需要)
+                    totalObj.days += Number(item.days) || 0;
+                });
+
+                // 将总计对象添加到原数组（如果需要)
+                this.dataListgdhnhz.push(totalObj);
+                // 直接修改原数组
+                this.dataListgdhnhz.forEach((item, index) => {
+                    // 如果不是最后三个元素，则添加 startDate
+                    if (index < this.dataListgdhnhz.length - 1) {
+                        item.startDate = this.dateLable;
+                    }
+                });
+
+                // 为每一行追加合计（sum），仅累加 box* 动态列
+                this.dataListgdhnhz = this.dataListgdhnhz.map(item => {
+                    let rowSum = 0;
+                    Object.keys(item).forEach(key => {
+                        if (!key.startsWith('box')) return;
+                        const val = Number(item[key]);
+                        if (Number.isFinite(val)) {
+                            rowSum += val;
+                        }
+                    });
+                    return { ...item, sum: rowSum };
+                });
+
+                this.dataListgdhnhz = this.dataListgdhnhz.filter(item =>
+                    item.wlSiteName.includes(this.bullay)
+                );
+                this.siteListGD = this.siteListGD.filter(item =>
+                    item.areaName == '广东'
+
+                );
+                const siteMap = {};
+                this.siteListGD.forEach(site => {
+                    // 以站点名称（sitename）作为 key，值为整个站点对象
+                    // 注意：这里的 key 要和 dataItem.wlSiteName 完全匹配（大小写、空格都要一致）
+                    siteMap[site.wlSiteName] = site;
+                });
+
+                // 第二步：遍历 dataListgdhnhz，合并站点信息（就是你提供的代码）
+                this.dataListgdhnhz = this.dataListgdhnhz.map((dataItem) => {
                     const matchedSite = siteMap[dataItem.wlSiteName] || {};
                     return {
                         ...dataItem,
@@ -2272,12 +3028,10 @@ export default {
                     };
                 });
 
-                console.log(this.dataList, '123广东')
+                console.log(this.dataListgdhnhz, '123广东')
                 this.dataListLoading = false
                 this.showExportButton = true
             })
-
-
 
         },
 
@@ -2678,6 +3432,17 @@ export default {
                         ...item, // 展开原对象的所有属性
                         ["box" + item.productCode]: item.box // 新增动态属性
                     }));
+
+                    // 1. 先取出 lswlzd 中 wlarea 为广西的所有站点编码
+                    const guangxiCodes = this.lswlzd
+                        .filter(item => item.wlarea == '广西')
+                        .map(item => item.wlsitecode);
+
+                    // 2. 从 this.dataList 中剔除 wlSiteCode 在 guangxiCodes 中的项
+                    this.dataList = this.dataList.filter(item => {
+                        return !guangxiCodes.includes(item.wlSiteCode);
+                    });
+                    console.log(this.dataList, '广西')
 
                     this.dataList = Object.values(
                         this.dataList.reduce((acc, item) => {
@@ -5846,7 +6611,7 @@ export default {
                 } else if (this.areas == '江苏') {
                     exportExceljs(this.dataList, this.dataForm.p_vouchdateend, '江苏区域物流报表.xlsx', this.JSfinalResult)
                 } else if (this.areas == '广东') {
-                    exportgdExcel(this.dataList, this.dataForm.p_vouchdateend, '广东区域物流报表.xlsx', this.siteListGD, this.areas)
+                    exportgdExcel(this.dataList, this.dataForm.p_vouchdateend, '广东区域物流报表.xlsx', this.siteListGD, this.areas, this.dataListgdhz, this.dataListgdex, this.dataListgdhnhz)
                 } else if (this.areas == '山东') {
                     window.open('http://bi.yufanjtbip.com:8069/file/%E6%96%87%E6%A1%A3/newfilepdatashandongout.xlsx')
                 } else {

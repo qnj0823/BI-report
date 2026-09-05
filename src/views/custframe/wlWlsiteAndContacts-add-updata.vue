@@ -7,6 +7,10 @@
                 <el-input v-model="dataForm.areaName" style="width: 25rem;" placeholder="区域">
                 </el-input>
             </el-form-item>
+            <el-form-item label="区域（广东）" prop="areaGd">
+                <el-input v-model="dataForm.areaGd" style="width: 25rem;" placeholder="区域（广东）">
+                </el-input>
+            </el-form-item>
             <el-form-item label="站点名称" prop="wlSiteName">
                 <el-input v-model="dataForm.wlSiteName" style="width: 25rem;" placeholder="站点名称">
                 </el-input>

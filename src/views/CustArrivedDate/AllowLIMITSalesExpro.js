@@ -9,10 +9,10 @@ import XLSXS from 'xlsx-style'
  */
 export function exportExcel(tableList, fileName) {
   let tableData = [
-    ['销售组织','销售组织编码', '客户','客户编码','产品','产品编码']
+    ['销售组织','客户', '客户编码','产品','产品编码','价格']
   ]
   tableList.forEach(item => {
-    tableData.push([item.orgname || '', item.orgcode || '', item.cname || '', item.ccode || '',item.pname || '',item.pcode || ''
+    tableData.push([item.orgname || '', item.cname || '', item.ccode || '', item.pname || '',item.pcode || '',item.price || ''
     ])
   })
   let ws = XLSX.utils.aoa_to_sheet(tableData)

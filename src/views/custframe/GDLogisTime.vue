@@ -32,6 +32,7 @@
             <el-table-column :show-overflow-tooltip="true" align="center" prop="orderDate2" label="报单日期2" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="arrivalDate2" label="到货日期2" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="factoryProductName" label="产品" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="areaCategory" label="区域归属" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="ruleType" label="规则类型">
                 <template slot-scope="scope">
                     <!-- 从数组映射表中查找对应的中文名称 -->

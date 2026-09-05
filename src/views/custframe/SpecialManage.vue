@@ -5,6 +5,14 @@
                 <el-button class="filter-item" size="mini" type="success" icon="el-icon-plus"
                     @click="addOrUpdateHandle()">新增站点</el-button>
             </el-form-item>
+            <el-form-item>
+                <el-input v-model="bullay" placeholder="模糊搜索" clearable @keyup.enter.native="searchEnterFun()"
+                    ref="searchInput"></el-input>
+            </el-form-item>
+            <el-button class="filter-item" size="mini" type="success" icon="el-icon-search"
+                @click="getDataList">查询</el-button>
+
+
         </el-form>
         <!-- 站点排序 -->
         <el-table ref="table" v-loading="dataListLoading" :data="currentData" style="width: 100%;">
@@ -40,6 +48,7 @@ export default {
     data() {
         return {
             msg: 'Light-page',
+            bullay:'',
             dataForm: {
                 page: 0,
                 size: 5000
@@ -70,6 +79,11 @@ export default {
             this.dataListLoading = true
             api.BDspicecheckApi(this.dataForm).then(res => {
                 this.dataList = res.content
+                this.dataList = this.dataList.filter(item =>
+                    (item.sitename && item.sitename.includes(this.bullay)) ||
+                    (item.areaname && item.areaname.includes(this.bullay))  ||
+                    (item.sitecode && item.sitecode.includes(this.bullay)) 
+                );
                 this.currentData = {
                     ...this.dataList
                 };

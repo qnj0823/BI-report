@@ -103,7 +103,14 @@ export default {
                 orderout_main_number: ''
             },
             select: [],
-            selectoud: []
+            selectoud: [],
+            pushForm: {
+                orderoutMainNumber: '', //发货主单号
+                orderoutNumber: '', //订单号
+                cproductname: '',//商品名称
+                cproductcode: '',//商品编码
+                actualTonnage: ''//吨
+            },
 
         };
     },
@@ -114,9 +121,10 @@ export default {
         this.getDataList()
     },
     methods: {
-        addOrUpdateHandle(odd, data) {
+        async addOrUpdateHandle(odd, data) {
             this.ptsForm.mainorderno = odd
             this.dataListLoading = true
+            this.getptsNccOrderCar(odd)
             api.APIorderissend(this.ptsForm).then(res => {
                 this.getDataList()
                 const resObj = JSON.parse(res);
@@ -127,7 +135,6 @@ export default {
                     this.errotTest = resObj.errorStack
                     this.dataListLoading = false
                     this.dialogVisible = true
-
                     // this.$message.error(resObj.errorStack)
                     // this.$notify({
                     //     title: '提示',
@@ -135,10 +142,30 @@ export default {
                     //     duration: 0
                     // });
                 }
-
-
-
             })
+        },
+        async getptsNccOrderCar(Mainodd) {
+            //新增推送到eladmin数据库
+            const filterList = this.dataList.filter(item => item.orderoutMainNumber == Mainodd)
+            try {
+                for (const item of filterList) {
+                    this.pushForm.orderoutNumber = item.orderoutNumber;
+                    this.pushForm.orderoutMainNumber = item.orderoutMainNumber
+                    this.pushForm.cproductname = item.pname
+                    this.pushForm.cproductcode = item.pNo
+                    this.pushForm.actualTonnage = item.tong
+                    // 调用接口
+                    await api.APIptsNccOrderCarADD(this.pushForm);
+
+                    // 如果需要可以添加延迟
+                    // await new Promise(resolve => setTimeout(resolve, 500));
+                    // await new Promise(resolve => setTimeout)
+                }
+            } catch (error) {
+                // 错误处理
+                this.$message.error(`提交成功: ${error.message || '未知错误'}`);
+            }
+            console.log(filterList, Mainodd, 'filterList')
         },
         handleClose(done) {
             this.$confirm('确认关闭？')
@@ -504,7 +531,7 @@ export default {
                     });
                     let newDate = this.calculateTotal(this.dataList)
                     this.dataList.push(newDate)
-                    console.log(this.dataList)
+                    console.log(this.dataList, 'dataList')
                     this.dataListLoading = false
 
                 })

@@ -1193,6 +1193,58 @@ export function importproCyclemaxAPi(formData) {
   })
 }
 
+//常温报表覆盖导入
+export function importAmbientOrderAPi(formData) {
+  return request({
+    url: 'api/trackAmbientOrder/importorderdata',
+    method: 'POST',
+    data: formData,
+    // headers: { 'Content-Type': 'multipart/form-data' }
+  })
+}
+
+//常温报表追加导入
+export function importAmbientOrderinsertAPi(formData) {
+  return request({
+    url: 'api/trackAmbientOrder/insertimportorderdata',
+    method: 'POST',
+    data: formData,
+    // headers: { 'Content-Type': 'multipart/form-data' }
+  })
+}
+
+//常温报表查询
+export function tracAmbientOrder(params) {
+  return request({
+    url: 'api/trackAmbientOrder/all',
+    params,
+    method: 'get'
+  })
+}
+//常温报表查询—新增
+export function wltrackAmbientOrderaddAPI(data) {
+  return request({
+    url: 'api/trackAmbientOrder',
+    method: 'post',
+    data
+  })
+}
+//常温报表查询—修改
+export function wltrackAmbientOrderputAPI(data) {
+  return request({
+    url: 'api/trackAmbientOrder',
+    data,
+    method: 'put'
+  })
+}
+//常温报表查询—删除
+export function wltrackAmbientOrderdelAPI(ids) {
+  return request({
+    url: 'api/trackAmbientOrder',
+    method: 'delete',
+    data: ids
+  })
+}
 
 
 //物流--物流站点与光明产品到货周期对应表(导入追加)

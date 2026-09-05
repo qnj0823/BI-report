@@ -9,10 +9,45 @@ import XLSXS from 'xlsx-style'
  */
 export function exportExcel(tableList, fileName) {
   let tableData = [
-    ['区域','区域（广东）', '站点', '联系人', '联系人电话', '地址']
+    ['发货日期', '一级组织', '二级组织', '三级组织', '区域', '合计-件', '合计-吨', '950G常温噜渴', '950G常温噜渴(宴席）', '300G常温噜渴', '300ML常温噜渴(宴席)', '1L椰子牛乳', '300ML姜黄', '380ML双柚汁', '1.35ML双柚汁', '380ML橙汁', '1.35ML橙汁', '380ML椰子水', '1L椰子水', '900M菠萝芒果', '300ML菠萝芒果', '900ML苹果汁', '300ML苹果汁', '300G芦荟汁', '300G山楂汁', '1L噜渴椰汁', '1.25L噜渴椰汁（宴席）', '1.25L噜渴椰汁', '300ML噜渴椰汁', '245ML噜渴椰汁', '280G常温噜渴', '185ML常温噜渴(线下)', '185ML常温噜渴(线上)', '720g常温噜渴', '1.25L常温噜渴']
   ]
   tableList.forEach(item => {
-    tableData.push([item.areaName || '', item.areaGd || '',item.wlSiteName || '', item.contacts || '', item.tel || '', item.address || ''
+    tableData.push([
+      item.planDeliveryDate || '',
+      item.orgLevel1 || '',
+      item.orgLevel2 || '',
+      item.orgLevel3 || '',
+      item.region || '',
+      item.totalQuantity || '',
+      item.totalWeightTon || '',
+      item.product950gLuche || '',
+      item.product950gLucheBanquet || '',
+      item.product300gLuche || '',
+      item.product300mlLucheBanquet || '',
+      item.product1lCoconutMilk || '',
+      item.product300mlcurcuma || '',
+      item.product380mlDoublePlum || '',
+      item.product135lDoublePlum || '',
+      item.product380mlOrange || '',
+      item.product135lOrange || '',
+      item.product380mlCoconutWater || '',
+      item.product1lCoconutWater || '',
+      item.product900mlPineappleMango || '',
+      item.product300mlPineappleMango || '',
+      item.product900mlApple || '',
+      item.product300mlApple || '',
+      item.product300gAloe || '',
+      item.product300gHawthorn || '',
+      item.product1lLucheCoconut || '',
+      item.product125lLucheCoconutBanquet || '',
+      item.product125lLucheCoconut || '',
+      item.product300mlLucheCoconut || '',
+      item.product245mlLucheCoconut || '',
+      item.product280gLuche || '',
+      item.product185mlLucheOffline || '',
+      item.product185mlLucheOnline || '',
+      item.product720gLuche || '',
+      item.product125lLuche || ''
     ])
   })
   let ws = XLSX.utils.aoa_to_sheet(tableData)
@@ -89,28 +124,22 @@ function setExcelStyle(data) {
         wpx: 100
       }, // 第二列宽度为150像素
       {
-        wpx: 120
+        wpx: 100
       }, // 第三列宽度为80像素
       {
-        wpx: 200
+        wpx: 100
       }, // 第四列宽度为80像素
       {
-        wpx: 200
+        wpx: 100
       }, // 第四列宽度为80像素
       {
-        wpx: 200
+        wpx: 100
       }, // 第四列宽度为80像素
       {
-        wpx: 200
+        wpx: 100
       }, // 第四列宽度为80像素
       {
-        wpx: 200
-      }, // 第四列宽度为80像素
-      {
-        wpx: 200
-      }, // 第四列宽度为80像素
-      {
-        wpx: 200
+        wpx: 100
       }, // 第四列宽度为80像素
       ]
       // 单元格宽度

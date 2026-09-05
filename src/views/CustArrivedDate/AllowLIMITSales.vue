@@ -74,6 +74,12 @@ export default {
                     // 如果 orgname 相同，再比较 cname
                     return (a.cname || '').localeCompare(b.cname || '');
                 });
+                this.dataList = this.dataList.filter(item =>
+                    (item.orgname && item.orgname.includes(this.bullay)) ||
+                    (item.cname && item.cname.includes(this.bullay))  ||
+                    (item.pname && item.pname.includes(this.bullay)) 
+                );
+
 
                 this.currentData = {
                     ...this.dataList

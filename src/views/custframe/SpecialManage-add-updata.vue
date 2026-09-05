@@ -34,9 +34,15 @@ export default {
             constants: this.$constants,
             visible: false,
             exportList: [],
+            exportList3:[],
             addOrUpdateVisible: false,
             dataForm2: {
                 page: 0,
+                size: 5000,
+                sort: '',
+            },
+            dataForm3: {
+                page: 1,
                 size: 5000,
                 sort: '',
             },
@@ -61,6 +67,11 @@ export default {
         getCliqProd() {
             api.BDSiteFactorycheckApi(this.dataForm2).then(res => {
                 this.exportList = res.content
+                api.BDSiteFactorycheckApi(this.dataForm3).then(res1 => {
+                    this.exportList3 = res1.content
+                    this.exportList = [...this.exportList, ...this.exportList3]
+                    
+                })
                 console.log(this.exportList,'this.exportList')
             })
 

@@ -92,6 +92,7 @@ import axios from 'axios';
 import {
     exportExcel
 } from './OutOrderExpro.js'
+import { resolve } from 'core-js/es6/promise';
 export default {
     components: {
         ChildComponent
@@ -215,6 +216,7 @@ export default {
 
                         // 如果需要可以添加延迟
                         // await new Promise(resolve => setTimeout(resolve, 500));
+                       // await new Promise(resolve => setTimeout)
                     }
 
                     // 第二步：循环调用 pullOrderPtsApi 接口 出库推送订单数据到PTS

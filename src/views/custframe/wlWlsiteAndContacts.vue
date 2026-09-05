@@ -15,6 +15,7 @@
         </el-form>
         <el-table ref="table" v-loading="dataListLoading" :data="currentData" style="width: 100%;">
             <el-table-column :show-overflow-tooltip="true" align="center" prop="areaName" label="区域" />
+            <el-table-column :show-overflow-tooltip="true" align="center" prop="areaGd" label="区域（广东）" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="wlSiteName" label="站点" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="contacts" label="联系人" />
             <el-table-column :show-overflow-tooltip="true" align="center" prop="tel"  label="联系人电话" />

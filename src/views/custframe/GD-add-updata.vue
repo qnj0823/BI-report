@@ -49,6 +49,10 @@
                 <el-input v-model="dataForm.factoryProductName" style="width: 100%;" placeholder="产品">
                 </el-input>
             </el-form-item>
+            <el-form-item label="区域归属" prop="factoryProductName">
+                <el-input v-model="dataForm.areaCategory" style="width: 100%;" placeholder="区域归属">
+                </el-input>
+            </el-form-item>
             <el-form-item label="规则类型" prop="ruleType">
                 <!-- <el-input v-model="dataForm.ruleType" style="width: 100%;" placeholder="规则类型">
                 </el-input> -->
@@ -78,11 +82,16 @@ export default {
             constants: this.$constants,
             visible: false,
             exportList: [],
+            exportList1:[],
             addOrUpdateVisible: false,
             dataForm2: {
                 page: 0,
-                size: 5000,
+                size: 8000,
                 sort: '',
+            },
+            dataForm3: {
+                page: 1,
+                size: 8000
             },
             selectedPROValue: '',
             selectedPROLable: '',
@@ -148,8 +157,13 @@ export default {
         getCliqProd() {
             api.BDSiteFactorycheckApi(this.dataForm2).then(res => {
                 this.exportList = res.content
-                this.exportList = this.exportList.filter(item => item.areaname == '广东')
+                api.BDSiteFactorycheckApi(this.dataForm3).then(res1 => {
+                    this.exportList1 = res1.content
+                    this.exportList = [...this.exportList, ...this.exportList1]
+                    this.exportList = this.exportList.filter(item => item.areaname == '广东')
                 console.log(this.exportList, 'this.exportList')
+                })
+                
             })
         },
         handlebigChange1(value) {

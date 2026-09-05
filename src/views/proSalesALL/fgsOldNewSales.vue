@@ -165,8 +165,6 @@ export default {
                         item.otherrate = '0.00%';   // 如果 sum 为零，设置为 0%  
                     }
                 })
-
-
                 this.dataListLoading = false
             })
         }

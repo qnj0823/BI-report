@@ -154,6 +154,18 @@ export default {
                 wlSiteCode: '12117991',
                 days: '8',
                 createdate: ''
+            }, {
+                areaName: '四川',
+                deliverydate: '',//到货周期
+                vouchdate: '',//下单日期
+                factoryProductCode: '10500103',
+                factoryProductName: '光明噜渴原味酸奶饮品(白桃慕斯味)300g-1*12纸箱(成都)',
+                productCode: '1520100069',
+                piece: '',
+                wlSiteName: 'LOOK雨帆自提',
+                wlSiteCode: '12117991',
+                days: '8',
+                createdate: ''
             }],
         }
     },
