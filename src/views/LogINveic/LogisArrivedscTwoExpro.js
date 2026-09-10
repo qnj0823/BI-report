@@ -111,7 +111,7 @@ export function exportscTwoExcel(tableList, tableList1, date, fileName, area) {
   let wb = XLSX.utils.book_new()
   // 将工作表添加到工作簿中  
   XLSX.utils.book_append_sheet(wb, ws, '物流配送表');
-  XLSX.utils.book_append_sheet(wb, ws2, '二次物流');
+  // XLSX.utils.book_append_sheet(wb, ws2, '二次物流');
 
   let wbout = XLSXS.write(wb, {
     bookType: 'xlsx',

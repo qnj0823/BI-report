@@ -491,6 +491,16 @@ export default {
                 }
             ],
             zjfinalResult: [],
+            scDatalistSpec: [
+                {
+                    oldsite: '藏拉萨叁幺捌',
+                    newsite: 'LOOK泸州'
+                },
+                {
+                    oldsite: '川达州城口朵朵',
+                    newsite: 'LOOK达州万源'
+                }
+            ]
         };
     },
     mounted() {
@@ -524,14 +534,14 @@ export default {
                 this.dataList = this.mergeDataList(this.dataList);
                 // 1. 先取出 lswlzd 中 wlarea 为广西的所有站点编码
                 const guangxiCodes = this.lswlzd
-                        .filter(item => item.wlarea == '四川')
-                        .map(item => item.wlsitecode);
+                    .filter(item => item.wlarea == '四川')
+                    .map(item => item.wlsitecode);
 
-                    // 2. 从 this.dataList 中剔除 wlSiteCode 在 guangxiCodes 中的项
-                    this.dataList = this.dataList.filter(item => {
-                        return !guangxiCodes.includes(item.wlSiteCode);
-                    });
-                    console.log(this.dataList, '四川')
+                // 2. 从 this.dataList 中剔除 wlSiteCode 在 guangxiCodes 中的项
+                this.dataList = this.dataList.filter(item => {
+                    return !guangxiCodes.includes(item.wlSiteCode);
+                });
+                console.log(this.dataList, '四川')
                 //计算小计
                 this.dataList = this.dataList.map(item => {
                     let sum = 0;
@@ -595,23 +605,88 @@ export default {
                         // 返回新对象（保留原字段 + 新增 sum）
                         return { ...item, sum };
                     });
-                    //计算总计
-                    this.calculateTotals(this.sichuanList, {
-                        excludeFields: ['vcol6_name', 'vcol6_code', 'vcol2_name', 'vcol2', 'vnote'],
-                        totalFields: {
-                            vcol2_name: "总计",
-                            wlSiteCode: "TOTAL",
-                            wlSiteName: "总计",
-                            days: 0
-                        },
-                        addToOriginal: true
-                    })
-                    console.log()
+                    // //计算总计
+                    // this.calculateTotals(this.sichuanList, {
+                    //     excludeFields: ['vcol6_name', 'vcol6_code', 'vcol2_name', 'vcol2', 'vnote'],
+                    //     totalFields: {
+                    //         vcol2_name: "总计",
+                    //         wlSiteCode: "TOTAL",
+                    //         wlSiteName: "总计",
+                    //         days: 0
+                    //     },
+                    //     addToOriginal: true
+                    // })
+                    this.dataList.push(...this.sichuanList)
+                    this.dataList = this.handleDataListCalc(this.dataList)
+                    console.log(this.dataList, 125635)
+
+
                     this.dataListLoading = false
                     this.showExportButton = true
                 })
 
             })
+        },
+        handleDataListCalc(list) {
+            // 分组排序权重：同一组上下相邻
+            const groupOrder = {
+                'LOOK泸州': 0,
+                '藏拉萨叁幺捌': 1,
+                'LOOK达州万源': 2,
+                '川达州城口朵朵': 3,
+            }
+            // 不参与相减的字段
+            const excludedFields = [
+                'areaName',
+                'days',
+                'linename',
+                'vnote',
+                'wlSiteCode',
+                'wlSiteName',
+            ]
+            // 差值配对
+            const calcPairs = [
+                { main: 'LOOK泸州', sub: '藏拉萨叁幺捌' },
+                { main: 'LOOK达州万源', sub: '川达州城口朵朵' }
+            ]
+
+            // 克隆数组，防止修改原传入引用
+            const newList = JSON.parse(JSON.stringify(list))
+
+            // 排序，Vue2不支持?? 改用判断
+            newList.sort(function (a, b) {
+                let ga = groupOrder[a.wlSiteName];
+                if (ga === undefined) {
+                    ga = 99;
+                }
+                let gb = groupOrder[b.wlSiteName];
+                if (gb === undefined) {
+                    gb = 99;
+                }
+                return ga - gb;
+            })
+
+            // 循环处理每一组差值
+            calcPairs.forEach(function (pair) {
+                const mainItem = newList.find(function (item) {
+                    return item.wlSiteName === pair.main
+                })
+                const subItem = newList.find(function (item) {
+                    return item.wlSiteName === pair.sub
+                })
+                if (!mainItem || !subItem) return
+
+                Object.keys(mainItem).forEach(function (key) {
+                    if (excludedFields.indexOf(key) > -1) return
+                    const valMain = Number(mainItem[key])
+                    const valSub = Number(subItem[key])
+                    if (!isNaN(valMain) && !isNaN(valSub)) {
+                        mainItem[key] = valMain - valSub
+                    }
+                })
+            })
+
+            return newList
         },
         groupAndSumWithTotal(arr) {
             const result = [];
@@ -784,14 +859,14 @@ export default {
                 this.dataList = this.mergeDataList(this.dataList);
                 // 1. 先取出 lswlzd 中 wlarea 为广西的所有站点编码
                 const guangxiCodes = this.lswlzd
-                        .filter(item => item.wlarea == '重庆')
-                        .map(item => item.wlsitecode);
+                    .filter(item => item.wlarea == '重庆')
+                    .map(item => item.wlsitecode);
 
-                    // 2. 从 this.dataList 中剔除 wlSiteCode 在 guangxiCodes 中的项
-                    this.dataList = this.dataList.filter(item => {
-                        return !guangxiCodes.includes(item.wlSiteCode);
-                    });
-                    console.log(this.dataList, '重庆')
+                // 2. 从 this.dataList 中剔除 wlSiteCode 在 guangxiCodes 中的项
+                this.dataList = this.dataList.filter(item => {
+                    return !guangxiCodes.includes(item.wlSiteCode);
+                });
+                console.log(this.dataList, '重庆')
                 //计算小计
                 this.dataList = this.dataList.map(item => {
                     let sum = 0;
@@ -840,14 +915,14 @@ export default {
                 this.dataList = this.mergeDataList(this.dataList);
                 // 1. 先取出 lswlzd 中 wlarea 为广西的所有站点编码
                 const guangxiCodes = this.lswlzd
-                        .filter(item => item.wlarea == '云南')
-                        .map(item => item.wlsitecode);
+                    .filter(item => item.wlarea == '云南')
+                    .map(item => item.wlsitecode);
 
-                    // 2. 从 this.dataList 中剔除 wlSiteCode 在 guangxiCodes 中的项
-                    this.dataList = this.dataList.filter(item => {
-                        return !guangxiCodes.includes(item.wlSiteCode);
-                    });
-                    console.log(this.dataList, '云南')
+                // 2. 从 this.dataList 中剔除 wlSiteCode 在 guangxiCodes 中的项
+                this.dataList = this.dataList.filter(item => {
+                    return !guangxiCodes.includes(item.wlSiteCode);
+                });
+                console.log(this.dataList, '云南')
                 //计算小计
                 this.dataList = this.dataList.map(item => {
                     let sum = 0;
@@ -896,14 +971,14 @@ export default {
                 this.dataList = this.mergeDataList(this.dataList);
                 // 1. 先取出 lswlzd 中 wlarea 为广西的所有站点编码
                 const guangxiCodes = this.lswlzd
-                        .filter(item => item.wlarea == '贵州')
-                        .map(item => item.wlsitecode);
+                    .filter(item => item.wlarea == '贵州')
+                    .map(item => item.wlsitecode);
 
-                    // 2. 从 this.dataList 中剔除 wlSiteCode 在 guangxiCodes 中的项
-                    this.dataList = this.dataList.filter(item => {
-                        return !guangxiCodes.includes(item.wlSiteCode);
-                    });
-                    console.log(this.dataList, '贵州')
+                // 2. 从 this.dataList 中剔除 wlSiteCode 在 guangxiCodes 中的项
+                this.dataList = this.dataList.filter(item => {
+                    return !guangxiCodes.includes(item.wlSiteCode);
+                });
+                console.log(this.dataList, '贵州')
                 //计算小计
                 this.dataList = this.dataList.map(item => {
                     let sum = 0;
