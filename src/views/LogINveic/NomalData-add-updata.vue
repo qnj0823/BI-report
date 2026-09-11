@@ -122,9 +122,9 @@ export default {
                 areaName: '四川',
                 deliverydate: '',//到货周期
                 vouchdate: '',//下单日期
-                factoryProductCode: '10500082',
-                factoryProductName: '光明噜渴原味酸奶饮品(常温)300ml-1*12纸箱(藏文版)',
-                productCode: '1520100062',
+                factoryProductCode: '10500128',
+                factoryProductName: '光明噜渴原味酸奶饮品(常温)300g-1*12纸箱(藏文版)',
+                productCode: '1520100080',
                 piece: '',
                 wlSiteName: 'LOOK雨帆自提',
                 wlSiteCode: '12117991',
