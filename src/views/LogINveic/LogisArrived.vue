@@ -630,7 +630,7 @@ export default {
         handleDataListCalc(list) {
             // 分组排序权重：同一组上下相邻
             const groupOrder = {
-                'LOOK泸州': 0,
+                'LOOK宜宾': 0,
                 '藏拉萨叁幺捌': 1,
                 'LOOK达州万源': 2,
                 '川达州城口朵朵': 3,
@@ -646,7 +646,7 @@ export default {
             ]
             // 差值配对
             const calcPairs = [
-                { main: 'LOOK泸州', sub: '藏拉萨叁幺捌' },
+                { main: 'LOOK宜宾', sub: '藏拉萨叁幺捌' },
                 { main: 'LOOK达州万源', sub: '川达州城口朵朵' }
             ]
 
